@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Metadata Source Schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string"
+    },
+    "internalId": {
+      "type": "integer"
+    },
+    "implementationStatus": {
+      "type": "string",
+      "enum": [
+        "active",
+        "wish",
+        "inquired",
+        "in technical process",
+        "trial",
+        "cancelled",
+        "impossible"
+      ]
+    },
+    "solrShard": {
+      "type": "string",
+      "enum": [
+        "UBL main",
+        "UBL ai",
+        "SLUB main",
+        "SLUB DBoD"
+      ]
+    },
+    "lastProcessed": {
+      "type": "date-only"
+    },
+    "description": {
+      "type": "string"
+    },
+    "vendors": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Id of the the sources content’s vendor, linked via uuid from vendor app."
+          },
+          "name": {
+            "type": "string",
+            "description": "Vendor's name. If not given, it will be determined by backend module."
+          },
+          "ticketLink": {
+            "type": "string",
+            "description": "Link to Vendor's Ticket in Jira"
+          },
+          "status": {
+            "type": "string",
+            "description": "Vendor's status."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    "contacts": {
+      "type": "object",
+      "properties": {
+        "internal": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "object",
+            "$ref": "contact.json"
+          }
+        },
+        "external": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "object",
+            "$ref": "contact.json"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "id",
+    "label"
+  ],
+  "additionalProperties": true
+}

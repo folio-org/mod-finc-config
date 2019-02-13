@@ -1,0 +1,7 @@
+{
+  "srvcId": "${artifactId}-${version}",
+  "nodeId": "localhost",
+  "descriptor": {
+    "exec": "java -Dport=%p -jar ../mod-notify/target/mod-notify-fat.jar -Dhttp.port=%p embed_postgres=true"
+  }
+}

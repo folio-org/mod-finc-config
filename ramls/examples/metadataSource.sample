@@ -1,0 +1,53 @@
+{
+  "id": "6dd325f8-b1d5-4568-a0d7-aecf6b8d6697",
+  "label": "Cambridge University Press Journals",
+  "internalId": 1,
+  "implementationStatus": "active",
+  "solrShard": "UBL main",
+  "lastProcessed": "2018-06-14",
+  "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+  "vendors": [
+    {
+      "id": "uuid-4564",
+      "name": "Cambridge University Press",
+      "ticketLink": "10167",
+      "status": "technical implementation"
+    },
+    {
+      "id": "uuid-1678",
+      "name": "Cambridge University Press",
+      "ticketLink": "10168",
+      "status": "closed"
+    }
+  ],
+  "contacts": {
+    "internal": [
+      {
+        "id": "uuid-4321",
+        "name": "Erika Mustermann",
+        "role": "metadata",
+        "isInternal": "1"
+      },
+      {
+        "id": "uuid-4322",
+        "name": "Max Mustermann",
+        "role": "technical",
+        "isInternal": "1"
+      }
+    ],
+    "external": [
+      {
+        "id": "uuid-4323",
+        "name": "John Doe",
+        "role": "management",
+        "isInternal": "0"
+      },
+      {
+        "id": "uuid-4324",
+        "name": "Jane Doe",
+        "role": "technical",
+        "isInternal": "0"
+      }
+    ]
+  }
+}

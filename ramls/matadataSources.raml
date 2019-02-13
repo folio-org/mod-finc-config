@@ -1,0 +1,89 @@
+#%RAML 1.0
+title: Metadata Sources
+version: v1
+baseUri: http://localhost/mod-amsl-discovery
+
+documentation:
+  - title: mod-amsl-discovery API
+    content: This documents the API calls that can be made to query and manage metadata sources
+
+types:
+  metadataSource: !include schemas/metadataSource.json
+  metadataSources: !include schemas/metadataSources.json
+  errors: !include ./raml-util/schemas/errors.schema
+
+traits:
+  orderable: !include ./raml-util/traits/orderable.raml
+  pageable: !include ./raml-util/traits/pageable.raml
+  searchable: !include ./raml-util/traits/searchable.raml
+  language: !include ./raml-util/traits/language.raml
+  validate: !include ./raml-util/traits/validation.raml
+
+resourceTypes:
+  collection: !include ./raml-util/rtypes/collection.raml
+  collection-item: !include ./raml-util/rtypes/item-collection.raml
+
+/metadata-sources:
+  displayName: Metadata Sources
+  type:
+    collection:
+      exampleCollection: !include examples/metadataSource_collection.sample
+      exampleItem: !include examples/metadataSource.sample
+      schemaCollection: metadataSources
+      schemaItem: metadataSource
+  get:
+    is: [
+      searchable: {description: "", example: "active=true sortBy username"},
+      orderable: {fieldsList: "field A, field B"},
+      pageable
+    ]
+    description: Get all metadata sources
+    responses:
+      200:
+        description: "Returns item with a given ID"
+        body:
+          application/json:
+            type: metadataSources
+      404:
+        description: "Item with a given ID not found"
+        body:
+          text/plain:
+            example: |
+              "not found"
+      500:
+        description: "Internal server error, e.g. due to misconfiguration"
+        body:
+          text/plain:
+            example: "internal server error, contact administrator"
+  post:
+    is: [validate]
+    description: Post new metadata source
+  /{id}:
+    type:
+      collection-item:
+        exampleItem: !include examples/metadataSource.sample
+        schema: metadataSource
+    get:
+      description: Get one metadatasource identified by id
+      responses:
+        200:
+          description: "Returns item with a given ID"
+          body:
+            application/json:
+              type: metadataSource
+        404:
+          description: "Item with a given ID not found"
+          body:
+            text/plain:
+              example: |
+                "not found"
+        500:
+          description: "Internal server error, e.g. due to misconfiguration"
+          body:
+            text/plain:
+              example: "internal server error, contact administrator"
+    delete:
+      description: Delete an metadata source identified by id
+    put:
+      description: Put an metadata source identified by id
+

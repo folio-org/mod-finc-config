@@ -1,0 +1,27 @@
+{
+  "id": "f6f03fb4-3368-4bc0-bc02-3bf6e19604a5",
+  "label": "Early Music Online",
+  "internalId": 3,
+  "implementationStatus": "active",
+  "solrShard": "UBL main",
+  "lastProcessed": "2019-01-07",
+  "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+  "vendors": [
+    {
+      "id": "uuid-1235",
+      "lable": "Early Music Online",
+      "ticketLink": "10170",
+      "status": "technical implementation"
+    }
+  ],
+  "contacts": {
+    "internal": [
+      {
+        "id": "uuid-4322",
+        "name": "Martin Czygan",
+        "role": "technical",
+        "isInternal": "1"
+      }
+    ]
+  }
+}

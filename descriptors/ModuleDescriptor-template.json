@@ -1,0 +1,20 @@
+{
+  "id": "${artifactId}-${version}",
+  "name": "Discovery",
+  "requires": [
+
+  ],
+  "provides": [
+
+  ],
+  "permissionSets": [
+
+  ],
+  "launchDescriptor": {
+    "dockerImage": "${artifactId}:${version}",
+    "dockerArgs": {
+      "HostConfig": { "PortBindings": { "8081/tcp":  [{ "HostPort": "%p" }] } }
+    },
+    "dockerPull" : false
+  }
+}
