@@ -1,7 +1,7 @@
 {
   "id": "f6f03fb4-3368-4bc0-bc02-3bf6e19604a5",
   "label": "Early Music Online",
-  "internalId": 3,
+  "sourceId": 3,
   "implementationStatus": "active",
   "solrShard": "UBL main",
   "lastProcessed": "2019-01-07",
