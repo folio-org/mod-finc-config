@@ -357,11 +357,57 @@ public class MetadataSourcesAPI implements MetadataSources {
   }
 
   @Override
+  @Validate
   public void putMetadataSourcesById(
       String id,
       String lang,
       MetadataSource entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {}
+      Context vertxContext) {
+    logger.debug("Update metadata source: " + id);
+    try {
+      vertxContext.runOnContext(
+          v -> {
+            if (!id.equals(entity.getId())) {
+              asyncResultHandler.handle(
+                  Future.succeededFuture(
+                      PutMetadataSourcesByIdResponse.respond400WithTextPlain(
+                          "You cannot change the value of the id field")));
+            } else {
+              String tenantId = moduleVariables.getString("username");
+              try {
+                PostgresClient.getInstance(vertxContext.owner(), tenantId)
+                    .update(
+                        TABLE_NAME,
+                        entity,
+                        id,
+                        putReply -> {
+                          if (putReply.failed()) {
+                            asyncResultHandler.handle(
+                                Future.succeededFuture(
+                                    PutMetadataSourcesByIdResponse.respond500WithTextPlain(
+                                        putReply.cause().getMessage())));
+                          } else {
+                            asyncResultHandler.handle(
+                                Future.succeededFuture(
+                                    PutMetadataSourcesByIdResponse.respond204()));
+                          }
+                        });
+              } catch (Exception e) {
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        PutMetadataSourcesByIdResponse.respond500WithTextPlain(
+                            messages.getMessage(lang, MessageConsts.InternalServerError))));
+              }
+            }
+          });
+    } catch (Exception e) {
+      logger.debug(e.getLocalizedMessage());
+      asyncResultHandler.handle(
+          Future.succeededFuture(
+              PutMetadataSourcesByIdResponse.respond500WithTextPlain(
+                  messages.getMessage(lang, MessageConsts.InternalServerError))));
+    }
+  }
 }
