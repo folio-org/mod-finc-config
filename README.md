@@ -1,8 +1,8 @@
-# mod-amsl-discovery
+# mod-finc-config
 
 ## Introduction
 
-Knowledge base for amsl's discovery module.
+Knowledge base for amsl's finc-config module.
 
 This module works tenant-agnostic. That means, its data is not stored separated by tenant.
 
@@ -30,7 +30,7 @@ The parameters
 
 * `database user`: The username of the role which will be created by the _database admin user_. If omitted _ubl_ will be used
 
-* `database schema name`: The name of the schema which will be created by the _database admin user_. If omitted __mod_amsl_discovery_ will be used
+* `database schema name`: The name of the schema which will be created by the _database admin user_. If omitted __mod-finc-config_ will be used
 
 For instance, you can call the script as follows:
 
@@ -50,5 +50,5 @@ Here _MOD_USERNAME_ needs to be the same as the _database user_ when setting up 
 Then, you can start the module as follows:
 
 ```
-$ env DB_HOST=localhost DB_PORT=5432 DB_DATABASE=okapi_modules MOD_USERNAME=ubl java -jar mod-amsl-discovery-fat.jar
+$ env DB_HOST=localhost DB_PORT=5432 DB_DATABASE=okapi_modules MOD_USERNAME=ubl java -jar mod-finc-config-fat.jar
 ```

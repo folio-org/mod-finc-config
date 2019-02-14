@@ -7,64 +7,35 @@
       "type": "string"
     },
     "label": {
-      "type": "string"
-    },
-    "sourceId": {
-      "type": "integer"
-    },
-    "implementationStatus": {
       "type": "string",
-      "enum": [
-        "active",
-        "wish",
-        "inquired",
-        "in technical process",
-        "trial",
-        "cancelled",
-        "impossible"
-      ]
-    },
-    "solrShard": {
-      "type": "string",
-      "enum": [
-        "UBL main",
-        "UBL ai",
-        "SLUB main",
-        "SLUB DBoD"
-      ]
-    },
-    "lastProcessed": {
-      "type": "date-only"
+      "description": "A unique name for this metadata source"
     },
     "description": {
-      "type": "string"
+      "type": "string",
+      "description" : "A globally unique (UUID) identifier"
     },
-    "vendors": {
-      "type": "array",
-      "minItems": 0,
-      "items": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Id of the the sources content’s vendor, linked via uuid from vendor app."
-          },
-          "name": {
-            "type": "string",
-            "description": "Vendor's name. If not given, it will be determined by backend module."
-          },
-          "ticketLink": {
-            "type": "string",
-            "description": "Link to Vendor's Ticket in Jira"
-          },
-          "status": {
-            "type": "string",
-            "description": "Vendor's status."
-          }
+    "status": {
+      "type": "string",
+      "enum": [
+        "wish",
+        "negotiation",
+        "technical implementation",
+        "active",
+        "deactivated",
+        "terminated"
+      ]
+    },
+    "vendor": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Id of the the sources content’s vendor, linked via uuid from vendor app."
         },
-        "required": [
-          "id"
-        ]
+        "name": {
+          "type": "string",
+          "description": "Vendor's name. If not given, it will be determined by backend module."
+        }
       }
     },
     "contacts": {
@@ -87,11 +58,71 @@
           }
         }
       }
+    },
+    "indexingLevel": {
+      "type": "string"
+    },
+    "licensingNote": {
+      "type": "string"
+    },
+    "contracts": {
+      "description": "Links to contracts in agreements/license app or link to file upload app",
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
+    },
+    "lastProcessed": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ticket": {
+      "type": "string",
+      "description": "Link to Jira ticket"
+    },
+    "accessUrl": {
+      "type": "string"
+    },
+    "sourceId": {
+      "type": "integer"
+    },
+    "solrShard": {
+      "type": "string",
+      "enum": [
+        "UBL main",
+        "UBL ai",
+        "SLUB main",
+        "SLUB DBoD"
+      ]
+    },
+    "deliveryMethods": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string",
+        "enum": [
+          "API Download",
+          "API Foo"
+        ]
+      }
+    },
+    "format": {
+      "type": "string"
+    },
+    "updateRhythm": {
+      "type": "string"
+    },
+    "inferiorTo": {
+      "type": "string"
     }
   },
   "required": [
     "id",
-    "label"
+    "label",
+    "status",
+    "sourceId"
+
   ],
-  "additionalProperties": true
+  "additionalProperties": false
 }

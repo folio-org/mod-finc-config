@@ -1,10 +1,10 @@
 #%RAML 1.0
 title: Metadata Sources
 version: v1
-baseUri: http://localhost/mod-amsl-discovery
+baseUri: http://localhost/mod-finc-config
 
 documentation:
-  - title: mod-amsl-discovery API
+  - title: mod-finc-config API
     content: This documents the API calls that can be made to query and manage metadata sources
 
 types:
@@ -38,23 +38,6 @@ resourceTypes:
       pageable
     ]
     description: Get all metadata sources
-    responses:
-      200:
-        description: "Returns item with a given ID"
-        body:
-          application/json:
-            type: metadataSources
-      404:
-        description: "Item with a given ID not found"
-        body:
-          text/plain:
-            example: |
-              "not found"
-      500:
-        description: "Internal server error, e.g. due to misconfiguration"
-        body:
-          text/plain:
-            example: "internal server error, contact administrator"
   post:
     is: [validate]
     description: Post new metadata source
@@ -65,23 +48,6 @@ resourceTypes:
         schema: metadataSource
     get:
       description: Get one metadatasource identified by id
-      responses:
-        200:
-          description: "Returns item with a given ID"
-          body:
-            application/json:
-              type: metadataSource
-        404:
-          description: "Item with a given ID not found"
-          body:
-            text/plain:
-              example: |
-                "not found"
-        500:
-          description: "Internal server error, e.g. due to misconfiguration"
-          body:
-            text/plain:
-              example: "internal server error, contact administrator"
     delete:
       description: Delete an metadata source identified by id
     put:

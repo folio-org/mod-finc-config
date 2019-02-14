@@ -1,6 +1,6 @@
 {
   "id": "${artifactId}-${version}",
-  "name": "mod-amsl-discovery",
+  "name": "mod-finc-config",
   "provides": [
     {
       "id": "metadata-sources",

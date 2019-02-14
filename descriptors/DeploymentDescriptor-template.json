@@ -2,6 +2,6 @@
   "srvcId": "${artifactId}-${version}",
   "nodeId": "localhost",
   "descriptor": {
-    "exec": "java -Dport=%p -jar ../mod-amsl-discovery/target/mod-amsl-discovery-fat.jar -Dhttp.port=%p"
+    "exec": "java -Dport=%p -jar ../mod-finc-config/target/mod-finc-config-fat.jar -Dhttp.port=%p"
   }
 }
