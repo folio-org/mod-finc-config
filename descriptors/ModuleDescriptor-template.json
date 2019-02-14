@@ -1,20 +1,57 @@
 {
   "id": "${artifactId}-${version}",
-  "name": "Discovery",
-  "requires": [
-
-  ],
+  "name": "mod-amsl-discovery",
   "provides": [
-
-  ],
-  "permissionSets": [
-
+    {
+      "id": "metadata-sources",
+      "version": "0.1",
+      "handlers": [
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/metadata-sources"
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/metadata-sources/{id}"
+        },
+        {
+          "methods": [
+            "POST"
+          ],
+          "pathPattern": "/metadata-sources"
+        },
+        {
+          "methods": [
+            "PUT"
+          ],
+          "pathPattern": "/metadata-sources/{id}"
+        },
+        {
+          "methods": [
+            "DELETE"
+          ],
+          "pathPattern": "/metadata-sources/{id}"
+        }
+      ]
+    }
   ],
   "launchDescriptor": {
     "dockerImage": "${artifactId}:${version}",
     "dockerArgs": {
-      "HostConfig": { "PortBindings": { "8081/tcp":  [{ "HostPort": "%p" }] } }
+      "HostConfig": {
+        "PortBindings": {
+          "8081/tcp": [
+            {
+              "HostPort": "%p"
+            }
+          ]
+        }
+      }
     },
-    "dockerPull" : false
+    "dockerPull": false
   }
 }
