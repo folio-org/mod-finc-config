@@ -1,0 +1,69 @@
+#%RAML 1.0
+title: Finc-Tenant
+version: v0.1
+protocols: [ HTTP, HTTPS ]
+baseUri: http://localhost:9130
+
+documentation:
+  - title: finc-config Tenant API
+    content: <b>finc-config</b>
+
+types:
+  tenantAttributes: !include ./raml-util/schemas/moduleInfo.schema
+  errors: !include ./raml-util/schemas/errors.schema
+  error.schema: !include ./raml-util/schemas/error.schema
+  parameters.schema: !include ./raml-util/schemas/parameters.schema
+
+traits:
+  validate: !include raml-util/traits/validation.raml
+
+/_/finc/tenant:
+  post:
+    description: Post a new tenant
+    is: [validate]
+    body:
+      application/json:
+        schema: tenantAttributes
+    responses:
+      201:
+        description: "tenant id added successfully, returns a list of commands that have failed while initializing the tenant"
+        body:
+          application/json:
+      204:
+        description: "tenant id exists, nothing will be added"
+      400:
+        description: "Bad request"
+        body:
+          text/plain:
+      500:
+        description: "Internal server error"
+        body:
+          text/plain:
+            example: "Internal server error, contact administrator"
+  delete:
+    description: Delete a tenant
+    responses:
+      204:
+        description: "Delete succeeded"
+      400:
+        description: "Bad request"
+        body:
+          text/plain:
+      500:
+        description: "Internal server error"
+        body:
+          text/plain:
+            example: "Internal server error, contact administrator"
+  get:
+    description: Does tenant id already exist
+    responses:
+      200:
+        description: "true or false indicator"
+        body:
+          text/plain:
+            example: "Text....."
+      500:
+        description: "Internal server error"
+        body:
+          text/plain:
+            example: "Internal server error, contact administrator"

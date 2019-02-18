@@ -37,7 +37,23 @@
           "pathPattern": "/metadata-sources/{id}"
         }
       ]
+    },
+    {
+      "id": "_tenant",
+      "version": "1.0",
+      "interfaceType": "system",
+      "handlers": [
+        {
+          "methods": [
+            "POST",
+            "DELETE",
+            "GET"
+          ],
+          "pathPattern": "/_/finc/tenant"
+        }
+      ]
     }
+
   ],
   "launchDescriptor": {
     "dockerImage": "${artifactId}:${version}",

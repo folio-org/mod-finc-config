@@ -1,0 +1,21 @@
+{
+  "scripts": [],
+  "tables": [
+    {
+      "tableName": "metadata_sources",
+      "generateId": true,
+      "fromModuleVersion": "1.0",
+      "populateJsonWithId": true,
+      "pkColumnName": "_id",
+      "withMetadata": true,
+      "uniqueIndex": [
+        {
+          "fieldName": "label",
+          "tOps": "ADD"
+        }
+      ]
+    }
+  ],
+  "views": [
+  ]
+}

@@ -10,13 +10,19 @@ import org.folio.rest.jaxrs.model.MetadataSourcesGetOrder;
 import org.folio.rest.jaxrs.resource.MetadataSources;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
+import org.folio.rest.persist.Criteria.Limit;
+import org.folio.rest.persist.Criteria.Offset;
 import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
 import org.folio.rest.tools.utils.ValidationHelper;
-import org.folio.rest.utils.ModuleEnvs;
+import org.folio.rest.utils.Constants;
+import org.z3950.zing.cql.cql2pgjson.CQL2PgJSON;
+import org.z3950.zing.cql.cql2pgjson.FieldException;
 
 import javax.ws.rs.core.Response;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -27,11 +33,16 @@ public class MetadataSourcesAPI implements MetadataSources {
   private static final String TABLE_NAME = "metadata_sources";
   private final Messages messages = Messages.getInstance();
   private final Logger logger = LoggerFactory.getLogger(MetadataSourcesAPI.class);
-  private JsonObject moduleVariables;
 
   public MetadataSourcesAPI(Vertx vertx, String tenantId) {
     PostgresClient.getInstance(vertx).setIdField(ID_FIELD);
-    moduleVariables = ModuleEnvs.allMODConfs();
+  }
+
+  private CQLWrapper getCQL(String query, int limit, int offset) throws FieldException {
+    CQL2PgJSON cql2PgJSON = new CQL2PgJSON(Arrays.asList(TABLE_NAME + ".jsonb"));
+    return new CQLWrapper(cql2PgJSON, query)
+        .setLimit(new Limit(limit))
+        .setOffset(new Offset(offset));
   }
 
   @Override
@@ -48,9 +59,10 @@ public class MetadataSourcesAPI implements MetadataSources {
       Context vertxContext) {
     logger.debug("Getting metadata sources");
     try {
+      CQLWrapper cql = getCQL(query, limit, offset);
       vertxContext.runOnContext(
           v -> {
-            String tenantId = moduleVariables.getString("username");
+            String tenantId = Constants.MODULE_TENANT;
             String field = "*";
             String[] fieldList = {field};
             try {
@@ -59,7 +71,7 @@ public class MetadataSourcesAPI implements MetadataSources {
                       TABLE_NAME,
                       MetadataSource.class,
                       fieldList,
-                      "",
+                      cql,
                       true,
                       false,
                       reply -> {
@@ -148,7 +160,7 @@ public class MetadataSourcesAPI implements MetadataSources {
     try {
       vertxContext.runOnContext(
           v -> {
-            String tenantId = moduleVariables.getString("username");
+            String tenantId = Constants.MODULE_TENANT;
             try {
               String id = entity.getId();
               if (id == null) {
@@ -261,7 +273,7 @@ public class MetadataSourcesAPI implements MetadataSources {
     try {
       vertxContext.runOnContext(
           v -> {
-            String tenantId = moduleVariables.getString("username");
+            String tenantId = Constants.MODULE_TENANT;
 
             try {
               PostgresClient.getInstance(vertxContext.owner(), tenantId)
@@ -321,7 +333,7 @@ public class MetadataSourcesAPI implements MetadataSources {
     try {
       vertxContext.runOnContext(
           v -> {
-            String tenantId = moduleVariables.getString("username");
+            String tenantId = Constants.MODULE_TENANT;
             try {
               PostgresClient.getInstance(vertxContext.owner(), tenantId)
                   .delete(
@@ -375,7 +387,7 @@ public class MetadataSourcesAPI implements MetadataSources {
                       PutMetadataSourcesByIdResponse.respond400WithTextPlain(
                           "You cannot change the value of the id field")));
             } else {
-              String tenantId = moduleVariables.getString("username");
+              String tenantId = Constants.MODULE_TENANT;
               try {
                 PostgresClient.getInstance(vertxContext.owner(), tenantId)
                     .update(

@@ -10,12 +10,13 @@
     <packaging>jar</packaging>
 
     <properties>
-        <argLine />
+        <argLine/>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <raml-module-builder.version>23.3.0</raml-module-builder.version>
         <ramlfiles_path>${basedir}/ramls</ramlfiles_path>
+        <database_setup_path>${basedir}/database-setup</database_setup_path>
         <vertx-version>3.5.4</vertx-version>
     </properties>
 
@@ -28,20 +29,17 @@
     </repositories>
 
     <dependencies>
-
         <dependency>
             <groupId>org.folio</groupId>
             <artifactId>domain-models-runtime</artifactId>
             <version>${raml-module-builder.version}</version>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
@@ -63,7 +61,18 @@
             <artifactId>vertx-web-client</artifactId>
             <version>${vertx-version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.jayway.restassured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>2.4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-rules</artifactId>
+            <version>1.19.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -227,6 +236,54 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>copy-resources-2</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/apidocs/raml-util</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${ramlfiles_path}/raml-util</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-3</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/apidocs/raml</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${ramlfiles_path}</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-4</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/database-setup</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${database_setup_path}</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>filter-descriptor-inputs</id>
                         <phase>generate-resources</phase>
                         <goals>
@@ -264,8 +321,10 @@
                                     <destinationFile>${project.build.directory}/ModuleDescriptor.json</destinationFile>
                                 </fileSet>
                                 <fileSet>
-                                    <sourceFile>${project.build.directory}/DeploymentDescriptor-template.json</sourceFile>
-                                    <destinationFile>${project.build.directory}/DeploymentDescriptor.json</destinationFile>
+                                    <sourceFile>${project.build.directory}/DeploymentDescriptor-template.json
+                                    </sourceFile>
+                                    <destinationFile>${project.build.directory}/DeploymentDescriptor.json
+                                    </destinationFile>
                                 </fileSet>
                             </fileSets>
                         </configuration>
@@ -284,11 +343,18 @@
                         <phase>prepare-package</phase>
                         <configuration>
                             <target>
-                                <replace token="baseUri: http://api.e-bookmobile.com/{version}" value="baseUri: http://localhost:{http.port}" dir="${basedir}/target/classes/apidocs/raml">
-                                    <include name="**/*.raml" />
+                                <replace token="baseUri: http://api.e-bookmobile.com/{version}"
+                                         value="baseUri: http://localhost:{http.port}"
+                                         dir="${basedir}/target/classes/apidocs/raml">
+                                    <include name="**/*.raml"/>
                                 </replace>
-                                <replace token="protocols: [ HTTPS ]" value="protocols: [ HTTP ]" dir="${basedir}/target/classes/apidocs/raml">
-                                    <include name="**/*.raml" />
+                                <replace token="protocols: [ HTTPS ]" value="protocols: [ HTTP ]"
+                                         dir="${basedir}/target/classes/apidocs/raml">
+                                    <include name="**/*.raml"/>
+                                </replace>
+                                <replace token="../.." value="../raml-util"
+                                         dir="${basedir}/target/classes/apidocs/raml">
+                                    <include name="**/*.raml"/>
                                 </replace>
                             </target>
                         </configuration>
@@ -311,14 +377,15 @@
                         </goals>
                         <configuration>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
                                         <Main-Class>org.folio.rest.RestLauncher</Main-Class>
                                         <Main-Verticle>org.folio.rest.RestVerticle</Main-Verticle>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>
-                            <artifactSet />
+                            <artifactSet/>
                             <outputFile>${project.build.directory}/${project.artifactId}-fat.jar</outputFile>
                         </configuration>
                     </execution>
