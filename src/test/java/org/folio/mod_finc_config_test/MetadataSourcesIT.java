@@ -1,9 +1,11 @@
 package org.folio.mod_finc_config_test;
 
+import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.parsing.Parser;
-import com.jayway.restassured.response.Response;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
@@ -12,6 +14,8 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.MetadataSource;
@@ -22,14 +26,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.runner.RunWith;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
 
 @RunWith(VertxUnitRunner.class)
 public class MetadataSourcesIT {
@@ -41,10 +38,6 @@ public class MetadataSourcesIT {
   private static Vertx vertx;
   private static MetadataSource metadataSource;
   private static MetadataSource metadataSourceChanged;
-
-  @Rule
-  public final EnvironmentVariables environmentVariables =
-      new EnvironmentVariables().set("MOD_USERNAME", "diku");
 
   @Rule public Timeout timeout = Timeout.seconds(10);
 
@@ -67,7 +60,6 @@ public class MetadataSourcesIT {
       PostgresClient.setIsEmbedded(true);
       PostgresClient instance = PostgresClient.getInstance(vertx);
       instance.startEmbeddedPostgres();
-      //      DBUtils.initDatabaseSchema("localhost", "6000", "postgres", "username", "password");
     } catch (Exception e) {
       context.fail(e);
       return;
@@ -81,8 +73,9 @@ public class MetadataSourcesIT {
     RestAssured.port = port;
     RestAssured.defaultParser = Parser.JSON;
 
-    String okapiUrl = "http://localhost:" + port;
-    TenantClient tenantClient = new TenantClient(okapiUrl, Constants.MODULE_TENANT, Constants.MODULE_TENANT);
+    String url = "http://localhost:" + port;
+    TenantClient tenantClient =
+        new TenantClient(url, Constants.MODULE_TENANT, Constants.MODULE_TENANT);
     DeploymentOptions options =
         new DeploymentOptions().setConfig(new JsonObject().put("http.port", port)).setWorker(true);
 
@@ -223,14 +216,6 @@ public class MetadataSourcesIT {
         .body("metadataSources[0].status", equalTo(metadataSource.getStatus().value()));
 
     String cql2 = "?query=(label=\"FOO*\")";
-    Response accept =
-        given()
-            .header("X-Okapi-Tenant", TENANT)
-            .header("content-type", APPLICATION_JSON)
-            .header("accept", APPLICATION_JSON)
-            .get(BASE_URI + cql2)
-            .thenReturn();
-    System.out.println(accept.body().print());
     given()
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
@@ -274,7 +259,7 @@ public class MetadataSourcesIT {
     given()
         .body(Json.encode(metadataSourceInvalid))
         .header("X-Okapi-Tenant", TENANT)
-            .header("content-type", APPLICATION_JSON)
+        .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
         .post(BASE_URI)
         .then()
