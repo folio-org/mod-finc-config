@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "metadataCollections": {
+      "type": "array",
+      "id": "metadataCollectionsData",
+      "items": {
+        "type": "object",
+        "$ref": "metadataCollection.json"
+      }
+    },
+    "totalRecords": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "metadataCollections",
+    "totalRecords"
+  ]
+}

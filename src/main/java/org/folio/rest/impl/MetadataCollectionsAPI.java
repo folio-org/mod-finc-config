@@ -13,9 +13,9 @@ import java.util.Map;
 import java.util.UUID;
 import javax.ws.rs.core.Response;
 import org.folio.rest.annotations.Validate;
-import org.folio.rest.jaxrs.model.MetadataSource;
-import org.folio.rest.jaxrs.model.MetadataSourcesGetOrder;
-import org.folio.rest.jaxrs.resource.MetadataSources;
+import org.folio.rest.jaxrs.model.MetadataCollection;
+import org.folio.rest.jaxrs.model.MetadataCollectionsGetOrder;
+import org.folio.rest.jaxrs.resource.MetadataCollections;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.Criteria.Limit;
@@ -33,14 +33,14 @@ import org.z3950.zing.cql.cql2pgjson.FieldException;
  * ATTENTION: API works tenant agnostic. Thus, don't use 'x-okapi-tenant' header, but {@value
  * Constants#MODULE_TENANT} as tenant.
  */
-public class MetadataSourcesAPI implements MetadataSources {
+public class MetadataCollectionsAPI implements MetadataCollections {
 
   private static final String ID_FIELD = "_id";
-  private static final String TABLE_NAME = "metadata_sources";
+  private static final String TABLE_NAME = "metadata_collections";
   private final Messages messages = Messages.getInstance();
-  private final Logger logger = LoggerFactory.getLogger(MetadataSourcesAPI.class);
+  private final Logger logger = LoggerFactory.getLogger(MetadataCollectionsAPI.class);
 
-  public MetadataSourcesAPI(Vertx vertx, String tenantId) {
+  public MetadataCollectionsAPI(Vertx vertx, String tenantId) {
     PostgresClient.getInstance(vertx).setIdField(ID_FIELD);
   }
 
@@ -53,17 +53,17 @@ public class MetadataSourcesAPI implements MetadataSources {
 
   @Override
   @Validate
-  public void getMetadataSources(
+  public void getMetadataCollections(
       String query,
       String orderBy,
-      MetadataSourcesGetOrder order,
+      MetadataCollectionsGetOrder order,
       int offset,
       int limit,
       String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    logger.debug("Getting metadata sources");
+    logger.debug("Getting metadata collections");
     try {
       CQLWrapper cql = getCQL(query, limit, offset);
       vertxContext.runOnContext(
@@ -75,7 +75,7 @@ public class MetadataSourcesAPI implements MetadataSources {
               PostgresClient.getInstance(vertxContext.owner(), tenantId)
                   .get(
                       TABLE_NAME,
-                      MetadataSource.class,
+                      MetadataCollection.class,
                       fieldList,
                       cql,
                       true,
@@ -83,21 +83,20 @@ public class MetadataSourcesAPI implements MetadataSources {
                       reply -> {
                         try {
                           if (reply.succeeded()) {
-                            org.folio.rest.jaxrs.model.MetadataSources sourcesCollection =
-                                new org.folio.rest.jaxrs.model.MetadataSources();
-                            List<MetadataSource> sources = reply.result().getResults();
-                            sourcesCollection.setMetadataSources(sources);
-                            sourcesCollection.setTotalRecords(
+                            org.folio.rest.jaxrs.model.MetadataCollections collectionsCollection =
+                                new org.folio.rest.jaxrs.model.MetadataCollections();
+                            List<MetadataCollection> results = reply.result().getResults();
+                            collectionsCollection.setMetadataCollections(results);
+                            collectionsCollection.setTotalRecords(
                                 reply.result().getResultInfo().getTotalRecords());
-
                             asyncResultHandler.handle(
                                 Future.succeededFuture(
-                                    GetMetadataSourcesResponse.respond200WithApplicationJson(
-                                        sourcesCollection)));
+                                    GetMetadataCollectionsResponse.respond200WithApplicationJson(
+                                        collectionsCollection)));
                           } else {
                             asyncResultHandler.handle(
                                 Future.succeededFuture(
-                                    GetMetadataSourcesResponse.respond500WithTextPlain(
+                                    GetMetadataCollectionsResponse.respond500WithTextPlain(
                                         messages.getMessage(
                                             lang, MessageConsts.InternalServerError))));
                           }
@@ -105,7 +104,7 @@ public class MetadataSourcesAPI implements MetadataSources {
                           logger.debug(e.getLocalizedMessage());
                           asyncResultHandler.handle(
                               Future.succeededFuture(
-                                  GetMetadataSourcesResponse.respond500WithTextPlain(
+                                  GetMetadataCollectionsResponse.respond500WithTextPlain(
                                       messages.getMessage(
                                           lang, MessageConsts.InternalServerError))));
                         }
@@ -114,7 +113,7 @@ public class MetadataSourcesAPI implements MetadataSources {
               logger.debug("IllegalStateException: " + e.getLocalizedMessage());
               asyncResultHandler.handle(
                   Future.succeededFuture(
-                      GetMetadataSourcesResponse.respond400WithTextPlain(
+                      GetMetadataCollectionsResponse.respond400WithTextPlain(
                           "CQL Illegal State Error for '" + "" + "': " + e.getLocalizedMessage())));
             } catch (Exception e) {
               Throwable cause = e;
@@ -127,12 +126,12 @@ public class MetadataSourcesAPI implements MetadataSources {
                 logger.debug("BAD CQL");
                 asyncResultHandler.handle(
                     Future.succeededFuture(
-                        GetMetadataSourcesResponse.respond400WithTextPlain(
+                        GetMetadataCollectionsResponse.respond400WithTextPlain(
                             "CQL Parsing Error for '" + "" + "': " + cause.getLocalizedMessage())));
               } else {
                 asyncResultHandler.handle(
                     io.vertx.core.Future.succeededFuture(
-                        GetMetadataSourcesResponse.respond500WithTextPlain(
+                        GetMetadataCollectionsResponse.respond500WithTextPlain(
                             messages.getMessage(lang, MessageConsts.InternalServerError))));
               }
             }
@@ -144,12 +143,12 @@ public class MetadataSourcesAPI implements MetadataSources {
         logger.debug("BAD CQL");
         asyncResultHandler.handle(
             Future.succeededFuture(
-                GetMetadataSourcesResponse.respond400WithTextPlain(
+                GetMetadataCollectionsResponse.respond400WithTextPlain(
                     "CQL Parsing Error for '" + "" + "': " + e.getLocalizedMessage())));
       } else {
         asyncResultHandler.handle(
             io.vertx.core.Future.succeededFuture(
-                GetMetadataSourcesResponse.respond500WithTextPlain(
+                GetMetadataCollectionsResponse.respond500WithTextPlain(
                     messages.getMessage(lang, MessageConsts.InternalServerError))));
       }
     }
@@ -157,12 +156,13 @@ public class MetadataSourcesAPI implements MetadataSources {
 
   @Override
   @Validate
-  public void postMetadataSources(
+  public void postMetadataCollections(
       String lang,
-      MetadataSource entity,
+      MetadataCollection entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
+    logger.debug("Posting metadata collection");
     try {
       vertxContext.runOnContext(
           v -> {
@@ -182,31 +182,33 @@ public class MetadataSourcesAPI implements MetadataSources {
                 PostgresClient.getInstance(vertxContext.owner(), tenantId)
                     .get(
                         TABLE_NAME,
-                        MetadataSource.class,
+                        MetadataCollection.class,
                         crit,
                         true,
                         getReply -> {
-                          logger.debug("Attempting to get existing metadata source of same id");
+                          logger.debug("Attempting to get existing metadata collection of same id");
                           if (getReply.failed()) {
                             logger.debug(
-                                "Attempt to get metadata source failed: "
+                                "Attempt to get metadata collection failed: "
                                     + getReply.cause().getMessage());
                             asyncResultHandler.handle(
                                 Future.succeededFuture(
-                                    PostMetadataSourcesResponse.respond500WithTextPlain(
+                                    PostMetadataCollectionsResponse.respond500WithTextPlain(
                                         messages.getMessage(
                                             lang, MessageConsts.InternalServerError))));
                           } else {
-                            List<MetadataSource> sourceList = getReply.result().getResults();
-                            if (sourceList.size() > 0) {
-                              logger.debug("Metadata source with this id already exists");
+
+                            List<MetadataCollection> metadataCollections =
+                                getReply.result().getResults();
+                            if (metadataCollections.size() > 0) {
+                              logger.debug("Metadata collection with this id already exists");
                               asyncResultHandler.handle(
                                   Future.succeededFuture(
-                                      PostMetadataSourcesResponse.respond422WithApplicationJson(
+                                      PostMetadataCollectionsResponse.respond422WithApplicationJson(
                                           ValidationHelper.createValidationErrorMessage(
                                               "'id'",
                                               entity.getId(),
-                                              "Metadata source with this id already exists"))));
+                                              "Metadata collection with this id already exists"))));
                             } else {
                               PostgresClient postgresClient =
                                   PostgresClient.getInstance(vertxContext.owner(), tenantId);
@@ -220,26 +222,31 @@ public class MetadataSourcesAPI implements MetadataSources {
                                         logger.debug("save successful");
                                         asyncResultHandler.handle(
                                             Future.succeededFuture(
-                                                PostMetadataSourcesResponse
+                                                PostMetadataCollectionsResponse
                                                     .respond201WithApplicationJson(
                                                         entity,
-                                                        PostMetadataSourcesResponse.headersFor201()
+                                                        PostMetadataCollectionsResponse
+                                                            .headersFor201()
                                                             .withLocation(
-                                                                "/metadata-sources/"
+                                                                "/metadata-collections/"
                                                                     + entity.getId()))));
                                       } else {
                                         asyncResultHandler.handle(
                                             Future.succeededFuture(
-                                                PostMetadataSourcesResponse.respond500WithTextPlain(
-                                                    messages.getMessage(
-                                                        lang, MessageConsts.InternalServerError))));
+                                                PostMetadataCollectionsResponse
+                                                    .respond500WithTextPlain(
+                                                        messages.getMessage(
+                                                            lang,
+                                                            MessageConsts.InternalServerError))));
                                       }
                                     } catch (Exception e) {
                                       asyncResultHandler.handle(
                                           io.vertx.core.Future.succeededFuture(
-                                              PostMetadataSourcesResponse.respond500WithTextPlain(
-                                                  messages.getMessage(
-                                                      lang, MessageConsts.InternalServerError))));
+                                              PostMetadataCollectionsResponse
+                                                  .respond500WithTextPlain(
+                                                      messages.getMessage(
+                                                          lang,
+                                                          MessageConsts.InternalServerError))));
                                     }
                                   });
                             }
@@ -249,33 +256,33 @@ public class MetadataSourcesAPI implements MetadataSources {
                 logger.error(e.getLocalizedMessage(), e);
                 asyncResultHandler.handle(
                     Future.succeededFuture(
-                        PostMetadataSourcesResponse.respond500WithTextPlain(
+                        PostMetadataCollectionsResponse.respond500WithTextPlain(
                             messages.getMessage(lang, MessageConsts.InternalServerError))));
               }
             } catch (Exception e) {
               asyncResultHandler.handle(
                   Future.succeededFuture(
-                      PostMetadataSourcesResponse.respond500WithTextPlain(
+                      PostMetadataCollectionsResponse.respond500WithTextPlain(
                           messages.getMessage(lang, MessageConsts.InternalServerError))));
             }
           });
     } catch (Exception e) {
       asyncResultHandler.handle(
           Future.succeededFuture(
-              PostMetadataSourcesResponse.respond500WithTextPlain(
+              PostMetadataCollectionsResponse.respond500WithTextPlain(
                   messages.getMessage(lang, MessageConsts.InternalServerError))));
     }
   }
 
   @Override
   @Validate
-  public void getMetadataSourcesById(
+  public void getMetadataCollectionsById(
       String id,
       String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    logger.debug("Getting single metadata source by id: " + id);
+    logger.debug("Getting single metadata collection by id: " + id);
     try {
       vertxContext.runOnContext(
           v -> {
@@ -286,27 +293,27 @@ public class MetadataSourcesAPI implements MetadataSources {
                   .getById(
                       TABLE_NAME,
                       id,
-                      MetadataSource.class,
+                      MetadataCollection.class,
                       reply -> {
                         if (reply.succeeded()) {
-                          MetadataSource result = reply.result();
+                          MetadataCollection result = reply.result();
                           if (result == null) {
                             asyncResultHandler.handle(
                                 Future.succeededFuture(
-                                    GetMetadataSourcesByIdResponse.respond404WithTextPlain(
-                                        "Metadata source: "
+                                    GetMetadataCollectionsByIdResponse.respond404WithTextPlain(
+                                        "Metadata collection: "
                                             + messages.getMessage(
                                                 lang, MessageConsts.ObjectDoesNotExist))));
                           } else {
                             asyncResultHandler.handle(
                                 Future.succeededFuture(
-                                    GetMetadataSourcesByIdResponse.respond200WithApplicationJson(
-                                        result)));
+                                    GetMetadataCollectionsByIdResponse
+                                        .respond200WithApplicationJson(result)));
                           }
                         } else {
                           asyncResultHandler.handle(
                               Future.succeededFuture(
-                                  GetMetadataSourcesByIdResponse.respond500WithTextPlain(
+                                  GetMetadataCollectionsByIdResponse.respond500WithTextPlain(
                                       messages.getMessage(
                                           lang, MessageConsts.InternalServerError))));
                         }
@@ -315,27 +322,27 @@ public class MetadataSourcesAPI implements MetadataSources {
               logger.debug("Error occured: " + e.getMessage());
               asyncResultHandler.handle(
                   Future.succeededFuture(
-                      GetMetadataSourcesByIdResponse.respond500WithTextPlain(
+                      GetMetadataCollectionsByIdResponse.respond500WithTextPlain(
                           messages.getMessage(lang, MessageConsts.InternalServerError))));
             }
           });
     } catch (Exception e) {
       asyncResultHandler.handle(
           Future.succeededFuture(
-              GetMetadataSourcesByIdResponse.respond500WithTextPlain(
+              GetMetadataCollectionsByIdResponse.respond500WithTextPlain(
                   messages.getMessage(lang, MessageConsts.InternalServerError))));
     }
   }
 
   @Override
   @Validate
-  public void deleteMetadataSourcesById(
+  public void deleteMetadataCollectionsById(
       String id,
       String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    logger.debug("Delete metadata source: " + id);
+    logger.debug("Delete metadata collection: " + id);
     try {
       vertxContext.runOnContext(
           v -> {
@@ -350,47 +357,47 @@ public class MetadataSourcesAPI implements MetadataSources {
                           logger.debug("Delete failed: " + deleteReply.cause().getMessage());
                           asyncResultHandler.handle(
                               Future.succeededFuture(
-                                  DeleteMetadataSourcesByIdResponse.respond404WithTextPlain(
+                                  DeleteMetadataCollectionsByIdResponse.respond404WithTextPlain(
                                       "Not found")));
                         } else {
                           asyncResultHandler.handle(
                               Future.succeededFuture(
-                                  DeleteMetadataSourcesByIdResponse.respond204()));
+                                  DeleteMetadataCollectionsByIdResponse.respond204()));
                         }
                       });
             } catch (Exception e) {
               logger.debug("Delete failed: " + e.getMessage());
               asyncResultHandler.handle(
                   Future.succeededFuture(
-                      DeleteMetadataSourcesByIdResponse.respond500WithTextPlain(
+                      DeleteMetadataCollectionsByIdResponse.respond500WithTextPlain(
                           messages.getMessage(lang, MessageConsts.InternalServerError))));
             }
           });
     } catch (Exception e) {
       asyncResultHandler.handle(
           Future.succeededFuture(
-              DeleteMetadataSourcesByIdResponse.respond500WithTextPlain(
+              DeleteMetadataCollectionsByIdResponse.respond500WithTextPlain(
                   messages.getMessage(lang, MessageConsts.InternalServerError))));
     }
   }
 
   @Override
   @Validate
-  public void putMetadataSourcesById(
+  public void putMetadataCollectionsById(
       String id,
       String lang,
-      MetadataSource entity,
+      MetadataCollection entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    logger.debug("Update metadata source: " + id);
+    logger.debug("Update metadata collection: " + id);
     try {
       vertxContext.runOnContext(
           v -> {
             if (!id.equals(entity.getId())) {
               asyncResultHandler.handle(
                   Future.succeededFuture(
-                      PutMetadataSourcesByIdResponse.respond400WithTextPlain(
+                      PutMetadataCollectionsByIdResponse.respond400WithTextPlain(
                           "You cannot change the value of the id field")));
             } else {
               String tenantId = Constants.MODULE_TENANT;
@@ -404,18 +411,18 @@ public class MetadataSourcesAPI implements MetadataSources {
                           if (putReply.failed()) {
                             asyncResultHandler.handle(
                                 Future.succeededFuture(
-                                    PutMetadataSourcesByIdResponse.respond500WithTextPlain(
+                                    PutMetadataCollectionsByIdResponse.respond500WithTextPlain(
                                         putReply.cause().getMessage())));
                           } else {
                             asyncResultHandler.handle(
                                 Future.succeededFuture(
-                                    PutMetadataSourcesByIdResponse.respond204()));
+                                    PutMetadataCollectionsByIdResponse.respond204()));
                           }
                         });
               } catch (Exception e) {
                 asyncResultHandler.handle(
                     Future.succeededFuture(
-                        PutMetadataSourcesByIdResponse.respond500WithTextPlain(
+                        PutMetadataCollectionsByIdResponse.respond500WithTextPlain(
                             messages.getMessage(lang, MessageConsts.InternalServerError))));
               }
             }
@@ -424,7 +431,7 @@ public class MetadataSourcesAPI implements MetadataSources {
       logger.debug(e.getLocalizedMessage());
       asyncResultHandler.handle(
           Future.succeededFuture(
-              PutMetadataSourcesByIdResponse.respond500WithTextPlain(
+              PutMetadataCollectionsByIdResponse.respond500WithTextPlain(
                   messages.getMessage(lang, MessageConsts.InternalServerError))));
     }
   }

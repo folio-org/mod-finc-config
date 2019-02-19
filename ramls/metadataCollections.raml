@@ -1,0 +1,55 @@
+#%RAML 1.0
+title: Metadata Collections
+version: v1
+baseUri: http://localhost/mod-finc-config
+
+documentation:
+  - title: mod-finc-config API
+    content: This documents the API calls that can be made to query and manage metadata collections
+
+types:
+  metadataCollection: !include schemas/metadataCollection.json
+  metadataCollections: !include schemas/metadataCollections.json
+  errors: !include ./raml-util/schemas/errors.schema
+
+traits:
+  orderable: !include ./raml-util/traits/orderable.raml
+  pageable: !include ./raml-util/traits/pageable.raml
+  searchable: !include ./raml-util/traits/searchable.raml
+  language: !include ./raml-util/traits/language.raml
+  validate: !include ./raml-util/traits/validation.raml
+
+resourceTypes:
+  collection: !include ./raml-util/rtypes/collection.raml
+  collection-item: !include ./raml-util/rtypes/item-collection.raml
+
+/metadata-collections:
+  displayName: Metadata Collections
+  type:
+    collection:
+      exampleCollection: !include examples/metadataCollection_collection.sample
+      exampleItem: !include examples/metadataCollection.sample
+      schemaCollection: metadataCollections
+      schemaItem: metadataCollection
+  get:
+    is: [
+      searchable: {description: "", example: "active=true sortBy username"},
+      orderable: {fieldsList: "field A, field B"},
+      pageable
+    ]
+    description: Get all metadata collections
+  post:
+    is: [validate]
+    description: Post new metadata collection
+  /{id}:
+    type:
+      collection-item:
+        exampleItem: !include examples/metadataCollection.sample
+        schema: metadataCollection
+    get:
+      description: Get one metadata collection identified by id
+    delete:
+      description: Delete an metadata collection identified by id
+    put:
+      description: Put an metadata collection identified by id
+
