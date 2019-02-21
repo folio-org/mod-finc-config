@@ -36,21 +36,25 @@ public class MetadataSourcesIT {
   private static final String TENANT = "diku";
 
   private static Vertx vertx;
-  private static MetadataSource metadataSource;
-  private static MetadataSource metadataSourceChanged;
+  private static MetadataSource metadataSource1;
+  private static MetadataSource metadataSource2;
+  private static MetadataSource metadataSource2Changed;
 
-  @Rule public Timeout timeout = Timeout.seconds(10);
+  @Rule public Timeout timeout = Timeout.seconds(10000);
 
   @BeforeClass
   public static void setUp(TestContext context) {
     vertx = Vertx.vertx();
 
     try {
-      String metadataSourceStr =
+      String metadataSourceStr1 =
           new String(Files.readAllBytes(Paths.get("ramls/examples/metadataSource.sample")));
-      metadataSource = Json.decodeValue(metadataSourceStr, MetadataSource.class);
-      metadataSourceChanged =
-          Json.decodeValue(metadataSourceStr, MetadataSource.class)
+      metadataSource1 = Json.decodeValue(metadataSourceStr1, MetadataSource.class);
+      String metadataSourceStr2 =
+          new String(Files.readAllBytes(Paths.get("ramls/examples/metadataSource2.sample")));
+      metadataSource2 = Json.decodeValue(metadataSourceStr2, MetadataSource.class);
+      metadataSource2Changed =
+          Json.decodeValue(metadataSourceStr2, MetadataSource.class)
               .withAccessUrl("www.changed.org");
     } catch (Exception e) {
       context.fail(e);
@@ -111,38 +115,38 @@ public class MetadataSourcesIT {
   public void checkThatWeCanAddGetPutAndDeleteMetadataSources() {
     // POST
     given()
-        .body(Json.encode(metadataSource))
+        .body(Json.encode(metadataSource2))
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
         .post(BASE_URI)
         .then()
         .statusCode(201)
-        .body("id", equalTo(metadataSource.getId()))
-        .body("label", equalTo(metadataSource.getLabel()))
-        .body("description", equalTo(metadataSource.getDescription()));
+        .body("id", equalTo(metadataSource2.getId()))
+        .body("label", equalTo(metadataSource2.getLabel()))
+        .body("description", equalTo(metadataSource2.getDescription()));
 
     // GET
     given()
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
-        .get(BASE_URI + "/" + metadataSource.getId())
+        .get(BASE_URI + "/" + metadataSource2.getId())
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
-        .body("id", equalTo(metadataSource.getId()))
-        .body("label", equalTo(metadataSource.getLabel()))
-        .body("status", equalTo(metadataSource.getStatus().value()))
-        .body("accessUrl", equalTo(metadataSource.getAccessUrl()));
+        .body("id", equalTo(metadataSource2.getId()))
+        .body("label", equalTo(metadataSource2.getLabel()))
+        .body("status", equalTo(metadataSource2.getStatus().value()))
+        .body("accessUrl", equalTo(metadataSource2.getAccessUrl()));
 
     // PUT
     given()
-        .body(Json.encode(metadataSourceChanged))
+        .body(Json.encode(metadataSource2Changed))
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
         .header("accept", "text/plain")
-        .put(BASE_URI + "/" + metadataSource.getId())
+        .put(BASE_URI + "/" + metadataSource2.getId())
         .then()
         .statusCode(204);
 
@@ -151,21 +155,21 @@ public class MetadataSourcesIT {
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
-        .get(BASE_URI + "/" + metadataSource.getId())
+        .get(BASE_URI + "/" + metadataSource2.getId())
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
-        .body("id", equalTo(metadataSourceChanged.getId()))
-        .body("label", equalTo(metadataSourceChanged.getLabel()))
-        .body("status", equalTo(metadataSourceChanged.getStatus().value()))
-        .body("accessUrl", equalTo(metadataSourceChanged.getAccessUrl()));
+        .body("id", equalTo(metadataSource2Changed.getId()))
+        .body("label", equalTo(metadataSource2Changed.getLabel()))
+        .body("status", equalTo(metadataSource2Changed.getStatus().value()))
+        .body("accessUrl", equalTo(metadataSource2Changed.getAccessUrl()));
 
     // DELETE
     given()
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
         .header("accept", "text/plain")
-        .delete(BASE_URI + "/" + metadataSource.getId())
+        .delete(BASE_URI + "/" + metadataSource2.getId())
         .then()
         .statusCode(204);
 
@@ -174,7 +178,7 @@ public class MetadataSourcesIT {
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
-        .get(BASE_URI + "/" + metadataSource.getId())
+        .get(BASE_URI + "/" + metadataSource2.getId())
         .then()
         .statusCode(404);
 
@@ -192,14 +196,14 @@ public class MetadataSourcesIT {
   @Test
   public void checkThatWeCanSearchByCQL() {
     given()
-        .body(Json.encode(metadataSource))
+        .body(Json.encode(metadataSource1))
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
         .post(BASE_URI)
         .then()
         .statusCode(201)
-        .body("id", equalTo(metadataSource.getId()));
+        .body("id", equalTo(metadataSource1.getId()));
 
     String cql = "?query=(label=\"Cambridge*\")";
     given()
@@ -211,9 +215,9 @@ public class MetadataSourcesIT {
         .contentType(ContentType.JSON)
         .statusCode(200)
         .body("metadataSources.size()", equalTo(1))
-        .body("metadataSources[0].id", equalTo(metadataSource.getId()))
-        .body("metadataSources[0].label", equalTo(metadataSource.getLabel()))
-        .body("metadataSources[0].status", equalTo(metadataSource.getStatus().value()));
+        .body("metadataSources[0].id", equalTo(metadataSource1.getId()))
+        .body("metadataSources[0].label", equalTo(metadataSource1.getLabel()))
+        .body("metadataSources[0].status", equalTo(metadataSource1.getStatus().value()));
 
     String cql2 = "?query=(label=\"FOO*\")";
     given()
@@ -236,17 +240,17 @@ public class MetadataSourcesIT {
         .contentType(ContentType.JSON)
         .statusCode(200)
         .body("metadataSources.size()", equalTo(1))
-        .body("metadataSources[0].id", equalTo(metadataSource.getId()))
-        .body("metadataSources[0].label", equalTo(metadataSource.getLabel()))
-        .body("metadataSources[0].status", equalTo(metadataSource.getStatus().value()))
-        .body("metadataSources[0].solrShard", equalTo(metadataSource.getSolrShard().value()));
+        .body("metadataSources[0].id", equalTo(metadataSource1.getId()))
+        .body("metadataSources[0].label", equalTo(metadataSource1.getLabel()))
+        .body("metadataSources[0].status", equalTo(metadataSource1.getStatus().value()))
+        .body("metadataSources[0].solrShard", equalTo(metadataSource1.getSolrShard().value()));
 
     // DELETE
     given()
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
         .header("accept", "text/plain")
-        .delete(BASE_URI + "/" + metadataSource.getId())
+        .delete(BASE_URI + "/" + metadataSource1.getId())
         .then()
         .statusCode(204);
   }
@@ -254,7 +258,7 @@ public class MetadataSourcesIT {
   @Test
   public void checkThatInvalidMetadataSourceIsNotPosted() {
     MetadataSource metadataSourceInvalid =
-        Json.decodeValue(Json.encode(MetadataSourcesIT.metadataSource), MetadataSource.class)
+        Json.decodeValue(Json.encode(MetadataSourcesIT.metadataSource2), MetadataSource.class)
             .withLabel(null);
     given()
         .body(Json.encode(metadataSourceInvalid))
