@@ -4,8 +4,8 @@
     "description": "This is a test metadata source",
     "status": "active",
     "vendor": {
-    "id": "uuid-1234",
-    "name": "Test vendor"
+      "id": "uuid-1234",
+      "name": "Test vendor"
     },
     "contacts": {
       "internal": [
@@ -43,14 +43,22 @@
         "http://contract1.de"
     ],
     "lastProcessed": "2018-01-01",
-    "ticket": "http://redmine.de/123",
+    "tickets": [
+      "http://redmine.de/123",
+      "http://redmine.de/456"
+    ],
     "accessUrl": "http://access.url",
     "sourceId": 1,
     "solrShard": "UBL main",
     "deliveryMethods": [
         "API Download"
     ],
-    "format": "csv",
+    "formats": [
+      "csv"
+    ],
     "updateRhythm": "monthly",
-    "inferiorTo": "uuid-789"
+    "inferiorTo": [
+      "uuid-789",
+      "uuid-123"
+    ]
 }

@@ -29,13 +29,18 @@
         "http://contract2.de"
     ],
     "lastProcessed": "2017-12-12",
-    "ticket": "http://redmine.de/456",
+    "tickets": [
+      "http://redmine.de/456"
+    ],
     "accessUrl": "http://access.url",
     "sourceId": 2,
     "solrShard": "UBL main",
     "deliveryMethods": [
         "API Download"
     ],
-    "format": "csv",
+    "formats": [
+      "xml",
+      "json"
+    ],
     "updateRhythm": "monthly"
 }

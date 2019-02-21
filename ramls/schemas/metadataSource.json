@@ -77,9 +77,12 @@
       "type": "string",
       "format": "date-time"
     },
-    "ticket": {
-      "type": "string",
-      "description": "Link to Jira ticket"
+    "tickets": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
     },
     "accessUrl": {
       "type": "string"
@@ -107,14 +110,22 @@
         ]
       }
     },
-    "format": {
-      "type": "string"
+    "formats": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
     },
     "updateRhythm": {
       "type": "string"
     },
     "inferiorTo": {
-      "type": "string"
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [
