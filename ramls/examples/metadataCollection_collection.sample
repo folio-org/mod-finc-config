@@ -9,7 +9,7 @@
         "name": "Cambridge University Press Journals"
       },
       "metadataAvailable": "yes",
-      "usageRestricted": false,
+      "usageRestricted": "no",
       "permittedFor": [
         "DE-15",
         "DE-14"
@@ -34,7 +34,7 @@
         "name": "Early Music Online"
       },
       "metadataAvailable": "yes",
-      "usageRestricted": false,
+      "usageRestricted": "no",
       "permittedFor": [
         "DE-14"
       ],

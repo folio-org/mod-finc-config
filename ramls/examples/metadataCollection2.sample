@@ -7,7 +7,7 @@
     "name": "Early Music Online"
   },
   "metadataAvailable": "yes",
-  "usageRestricted": false,
+  "usageRestricted": "no",
   "permittedFor": [
     "DE-14"
   ],

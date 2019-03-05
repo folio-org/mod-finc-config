@@ -103,11 +103,7 @@
       "type": "array",
       "minItems": 0,
       "items": {
-        "type": "string",
-        "enum": [
-          "API Download",
-          "API Foo"
-        ]
+        "type": "string"
       }
     },
     "formats": {

@@ -39,7 +39,11 @@
       ]
     },
     "usageRestricted": {
-      "type": "boolean"
+      "type": "string",
+      "enum": [
+        "yes",
+        "no"
+      ]
     },
     "permittedFor": {
       "type": "array",

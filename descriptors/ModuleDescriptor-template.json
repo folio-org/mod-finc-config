@@ -39,6 +39,42 @@
       ]
     },
     {
+      "id": "metadata-collections",
+      "version": "0.1",
+      "handlers": [
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/metadata-collections"
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/metadata-collections/{id}"
+        },
+        {
+          "methods": [
+            "POST"
+          ],
+          "pathPattern": "/metadata-collections"
+        },
+        {
+          "methods": [
+            "PUT"
+          ],
+          "pathPattern": "/metadata-collections/{id}"
+        },
+        {
+          "methods": [
+            "DELETE"
+          ],
+          "pathPattern": "/metadata-collections/{id}"
+        }
+      ]
+    },
+    {
       "id": "_tenant",
       "version": "1.0",
       "interfaceType": "system",
