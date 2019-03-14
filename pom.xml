@@ -326,6 +326,12 @@
                                     <destinationFile>${project.build.directory}/DeploymentDescriptor.json
                                     </destinationFile>
                                 </fileSet>
+                                <fileSet>
+                                    <sourceFile>${project.build.directory}/DockerDeploymentDescriptor-template.json
+                                    </sourceFile>
+                                    <destinationFile>${project.build.directory}/DockerDeploymentDescriptor.json
+                                    </destinationFile>
+                                </fileSet>
                             </fileSets>
                         </configuration>
                     </execution>
