@@ -435,4 +435,28 @@
         </plugins>
     </build>
 
+    <distributionManagement>
+        <repository>
+            <id>folio-nexus</id>
+            <name>FOLIO Release Repository</name>
+            <url>https://repository.folio.org/repository/maven-releases/</url>
+            <uniqueVersion>false</uniqueVersion>
+            <layout>default</layout>
+        </repository>
+        <snapshotRepository>
+            <id>folio-nexus</id>
+            <name>FOLIO Snapshot Repository</name>
+            <uniqueVersion>true</uniqueVersion>
+            <url>https://repository.folio.org/repository/maven-snapshots/</url>
+            <layout>default</layout>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <scm>
+        <url>https://github.com/folio-org/${project.artifactId}</url>
+        <connection>scm:git:git://github.com/folio-org/${project.artifactId}.git</connection>
+        <developerConnection>scm:git:git@github.com:folio-org/${project.artifactId}.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
 </project>
