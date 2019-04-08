@@ -16,7 +16,7 @@ public class FincTenantAPI implements FincTenant {
   private TenantAPI tenantAPI;
 
   public FincTenantAPI() {
-    this.tenantAPI = new TenantAPI();
+    this.tenantAPI = new TenantReferenceApi();
   }
 
   @Override
