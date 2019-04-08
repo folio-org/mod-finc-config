@@ -14,7 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        <raml-module-builder.version>23.3.0</raml-module-builder.version>
+        <raml-module-builder.version>23.11.0</raml-module-builder.version>
         <ramlfiles_path>${basedir}/ramls</ramlfiles_path>
         <database_setup_path>${basedir}/database-setup</database_setup_path>
         <vertx-version>3.5.4</vertx-version>
@@ -295,6 +295,22 @@
                                 <resource>
                                     <directory>${basedir}/descriptors</directory>
                                     <include>*Descriptor*-template.json</include>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-sample-data</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/sample-data</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/sample-data</directory>
                                     <filtering>true</filtering>
                                 </resource>
                             </resources>
