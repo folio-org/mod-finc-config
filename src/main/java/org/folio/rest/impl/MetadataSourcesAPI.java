@@ -10,21 +10,19 @@ import io.vertx.core.logging.LoggerFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import javax.ws.rs.core.Response;
+import org.folio.rest.RestVerticle;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.MetadataSource;
 import org.folio.rest.jaxrs.model.MetadataSourcesGetOrder;
 import org.folio.rest.jaxrs.resource.MetadataSources;
-import org.folio.rest.persist.Criteria.Criteria;
-import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.Criteria.Limit;
 import org.folio.rest.persist.Criteria.Offset;
+import org.folio.rest.persist.PgUtil;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
-import org.folio.rest.tools.utils.ValidationHelper;
 import org.folio.rest.utils.Constants;
 import org.z3950.zing.cql.cql2pgjson.CQL2PgJSON;
 import org.z3950.zing.cql.cql2pgjson.FieldException;
@@ -163,108 +161,14 @@ public class MetadataSourcesAPI implements MetadataSources {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    try {
-      vertxContext.runOnContext(
-          v -> {
-            String tenantId = Constants.MODULE_TENANT;
-            try {
-              String id = entity.getId();
-              if (id == null) {
-                id = UUID.randomUUID().toString();
-                entity.setId(id);
-              }
-              Criteria labelCrit = new Criteria();
-              labelCrit.addField("'id'");
-              labelCrit.setOperation("=");
-              labelCrit.setValue(entity.getId());
-              Criterion crit = new Criterion(labelCrit);
-              try {
-                PostgresClient.getInstance(vertxContext.owner(), tenantId)
-                    .get(
-                        TABLE_NAME,
-                        MetadataSource.class,
-                        crit,
-                        true,
-                        getReply -> {
-                          logger.debug("Attempting to get existing metadata source of same id");
-                          if (getReply.failed()) {
-                            logger.debug(
-                                "Attempt to get metadata source failed: "
-                                    + getReply.cause().getMessage());
-                            asyncResultHandler.handle(
-                                Future.succeededFuture(
-                                    PostMetadataSourcesResponse.respond500WithTextPlain(
-                                        messages.getMessage(
-                                            lang, MessageConsts.InternalServerError))));
-                          } else {
-                            List<MetadataSource> sourceList = getReply.result().getResults();
-                            if (sourceList.size() > 0) {
-                              logger.debug("Metadata source with this id already exists");
-                              asyncResultHandler.handle(
-                                  Future.succeededFuture(
-                                      PostMetadataSourcesResponse.respond422WithApplicationJson(
-                                          ValidationHelper.createValidationErrorMessage(
-                                              "'id'",
-                                              entity.getId(),
-                                              "Metadata source with this id already exists"))));
-                            } else {
-                              PostgresClient postgresClient =
-                                  PostgresClient.getInstance(vertxContext.owner(), tenantId);
-                              postgresClient.save(
-                                  TABLE_NAME,
-                                  entity.getId(),
-                                  entity,
-                                  reply -> {
-                                    try {
-                                      if (reply.succeeded()) {
-                                        logger.debug("save successful");
-                                        asyncResultHandler.handle(
-                                            Future.succeededFuture(
-                                                PostMetadataSourcesResponse
-                                                    .respond201WithApplicationJson(
-                                                        entity,
-                                                        PostMetadataSourcesResponse.headersFor201()
-                                                            .withLocation(
-                                                                "/metadata-sources/"
-                                                                    + entity.getId()))));
-                                      } else {
-                                        asyncResultHandler.handle(
-                                            Future.succeededFuture(
-                                                PostMetadataSourcesResponse.respond500WithTextPlain(
-                                                    messages.getMessage(
-                                                        lang, MessageConsts.InternalServerError))));
-                                      }
-                                    } catch (Exception e) {
-                                      asyncResultHandler.handle(
-                                          io.vertx.core.Future.succeededFuture(
-                                              PostMetadataSourcesResponse.respond500WithTextPlain(
-                                                  messages.getMessage(
-                                                      lang, MessageConsts.InternalServerError))));
-                                    }
-                                  });
-                            }
-                          }
-                        });
-              } catch (Exception e) {
-                logger.error(e.getLocalizedMessage(), e);
-                asyncResultHandler.handle(
-                    Future.succeededFuture(
-                        PostMetadataSourcesResponse.respond500WithTextPlain(
-                            messages.getMessage(lang, MessageConsts.InternalServerError))));
-              }
-            } catch (Exception e) {
-              asyncResultHandler.handle(
-                  Future.succeededFuture(
-                      PostMetadataSourcesResponse.respond500WithTextPlain(
-                          messages.getMessage(lang, MessageConsts.InternalServerError))));
-            }
-          });
-    } catch (Exception e) {
-      asyncResultHandler.handle(
-          Future.succeededFuture(
-              PostMetadataSourcesResponse.respond500WithTextPlain(
-                  messages.getMessage(lang, MessageConsts.InternalServerError))));
-    }
+    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
+    PgUtil.post(
+        TABLE_NAME,
+        entity,
+        okapiHeaders,
+        vertxContext,
+        PostMetadataSourcesResponse.class,
+        asyncResultHandler);
   }
 
   @Override
@@ -276,55 +180,15 @@ public class MetadataSourcesAPI implements MetadataSources {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     logger.debug("Getting single metadata source by id: " + id);
-    try {
-      vertxContext.runOnContext(
-          v -> {
-            String tenantId = Constants.MODULE_TENANT;
-
-            try {
-              PostgresClient.getInstance(vertxContext.owner(), tenantId)
-                  .getById(
-                      TABLE_NAME,
-                      id,
-                      MetadataSource.class,
-                      reply -> {
-                        if (reply.succeeded()) {
-                          MetadataSource result = reply.result();
-                          if (result == null) {
-                            asyncResultHandler.handle(
-                                Future.succeededFuture(
-                                    GetMetadataSourcesByIdResponse.respond404WithTextPlain(
-                                        "Metadata source: "
-                                            + messages.getMessage(
-                                                lang, MessageConsts.ObjectDoesNotExist))));
-                          } else {
-                            asyncResultHandler.handle(
-                                Future.succeededFuture(
-                                    GetMetadataSourcesByIdResponse.respond200WithApplicationJson(
-                                        result)));
-                          }
-                        } else {
-                          asyncResultHandler.handle(
-                              Future.succeededFuture(
-                                  GetMetadataSourcesByIdResponse.respond500WithTextPlain(
-                                      messages.getMessage(
-                                          lang, MessageConsts.InternalServerError))));
-                        }
-                      });
-            } catch (Exception e) {
-              logger.debug("Error occured: " + e.getMessage());
-              asyncResultHandler.handle(
-                  Future.succeededFuture(
-                      GetMetadataSourcesByIdResponse.respond500WithTextPlain(
-                          messages.getMessage(lang, MessageConsts.InternalServerError))));
-            }
-          });
-    } catch (Exception e) {
-      asyncResultHandler.handle(
-          Future.succeededFuture(
-              GetMetadataSourcesByIdResponse.respond500WithTextPlain(
-                  messages.getMessage(lang, MessageConsts.InternalServerError))));
-    }
+    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
+    PgUtil.getById(
+        TABLE_NAME,
+        MetadataSource.class,
+        id,
+        okapiHeaders,
+        vertxContext,
+        GetMetadataSourcesByIdResponse.class,
+        asyncResultHandler);
   }
 
   @Override
@@ -336,42 +200,14 @@ public class MetadataSourcesAPI implements MetadataSources {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     logger.debug("Delete metadata source: " + id);
-    try {
-      vertxContext.runOnContext(
-          v -> {
-            String tenantId = Constants.MODULE_TENANT;
-            try {
-              PostgresClient.getInstance(vertxContext.owner(), tenantId)
-                  .delete(
-                      TABLE_NAME,
-                      id,
-                      deleteReply -> {
-                        if (deleteReply.failed()) {
-                          logger.debug("Delete failed: " + deleteReply.cause().getMessage());
-                          asyncResultHandler.handle(
-                              Future.succeededFuture(
-                                  DeleteMetadataSourcesByIdResponse.respond404WithTextPlain(
-                                      "Not found")));
-                        } else {
-                          asyncResultHandler.handle(
-                              Future.succeededFuture(
-                                  DeleteMetadataSourcesByIdResponse.respond204()));
-                        }
-                      });
-            } catch (Exception e) {
-              logger.debug("Delete failed: " + e.getMessage());
-              asyncResultHandler.handle(
-                  Future.succeededFuture(
-                      DeleteMetadataSourcesByIdResponse.respond500WithTextPlain(
-                          messages.getMessage(lang, MessageConsts.InternalServerError))));
-            }
-          });
-    } catch (Exception e) {
-      asyncResultHandler.handle(
-          Future.succeededFuture(
-              DeleteMetadataSourcesByIdResponse.respond500WithTextPlain(
-                  messages.getMessage(lang, MessageConsts.InternalServerError))));
-    }
+    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
+    PgUtil.deleteById(
+        TABLE_NAME,
+        id,
+        okapiHeaders,
+        vertxContext,
+        DeleteMetadataSourcesByIdResponse.class,
+        asyncResultHandler);
   }
 
   @Override
@@ -384,48 +220,14 @@ public class MetadataSourcesAPI implements MetadataSources {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     logger.debug("Update metadata source: " + id);
-    try {
-      vertxContext.runOnContext(
-          v -> {
-            if (!id.equals(entity.getId())) {
-              asyncResultHandler.handle(
-                  Future.succeededFuture(
-                      PutMetadataSourcesByIdResponse.respond400WithTextPlain(
-                          "You cannot change the value of the id field")));
-            } else {
-              String tenantId = Constants.MODULE_TENANT;
-              try {
-                PostgresClient.getInstance(vertxContext.owner(), tenantId)
-                    .update(
-                        TABLE_NAME,
-                        entity,
-                        id,
-                        putReply -> {
-                          if (putReply.failed()) {
-                            asyncResultHandler.handle(
-                                Future.succeededFuture(
-                                    PutMetadataSourcesByIdResponse.respond500WithTextPlain(
-                                        putReply.cause().getMessage())));
-                          } else {
-                            asyncResultHandler.handle(
-                                Future.succeededFuture(
-                                    PutMetadataSourcesByIdResponse.respond204()));
-                          }
-                        });
-              } catch (Exception e) {
-                asyncResultHandler.handle(
-                    Future.succeededFuture(
-                        PutMetadataSourcesByIdResponse.respond500WithTextPlain(
-                            messages.getMessage(lang, MessageConsts.InternalServerError))));
-              }
-            }
-          });
-    } catch (Exception e) {
-      logger.debug(e.getLocalizedMessage());
-      asyncResultHandler.handle(
-          Future.succeededFuture(
-              PutMetadataSourcesByIdResponse.respond500WithTextPlain(
-                  messages.getMessage(lang, MessageConsts.InternalServerError))));
-    }
+    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
+    PgUtil.put(
+        TABLE_NAME,
+        entity,
+        id,
+        okapiHeaders,
+        vertxContext,
+        PutMetadataSourcesByIdResponse.class,
+        asyncResultHandler);
   }
 }
