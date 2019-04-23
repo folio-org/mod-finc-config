@@ -9,6 +9,13 @@
   <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
+  <licenses>
+    <license>
+      <name>Apache License 2.0</name>
+      <url>http://spdx.org/licenses/Apache-2.0</url>
+    </license>
+  </licenses>
+
   <properties>
     <argLine/>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
