@@ -1,6 +1,7 @@
 buildMvn {
   publishModDescriptor = true
   runLintRamlCop = true
+  publishAPI = true
   mvnDeploy = true
 
   doDocker = {
