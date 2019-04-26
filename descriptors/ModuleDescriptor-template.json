@@ -85,6 +85,42 @@
       ]
     },
     {
+      "id": "isils",
+      "version": "0.1",
+      "handlers": [
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/isils"
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/isils/{id}"
+        },
+        {
+          "methods": [
+            "POST"
+          ],
+          "pathPattern": "/isils"
+        },
+        {
+          "methods": [
+            "PUT"
+          ],
+          "pathPattern": "/isils/{id}"
+        },
+        {
+          "methods": [
+            "DELETE"
+          ],
+          "pathPattern": "/isils/{id}"
+        }
+      ]
+    },
+    {
       "id": "finc-select-metadata-collections",
       "version": "0.1",
       "handlers": [

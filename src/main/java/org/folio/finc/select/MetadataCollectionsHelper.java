@@ -404,6 +404,8 @@ public class MetadataCollectionsHelper {
   }
 
   public String getIsilForTenant(String tenantId) {
+    // TODO: http://localhost:9130/isils?query=(tenant==ubl)
+
     if ("ubl".equals(tenantId)) {
       return "DE-15";
     } else if ("slub".equals(tenantId)) {

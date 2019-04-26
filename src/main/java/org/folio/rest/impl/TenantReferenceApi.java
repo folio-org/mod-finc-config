@@ -32,6 +32,7 @@ public class TenantReferenceApi extends TenantAPI {
               .withLead("sample-data")
               .add("metadata-sources")
               .add("metadata-collections")
+              .add("isils")
               .perform(
                   entity,
                   headers,
