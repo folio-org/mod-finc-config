@@ -48,7 +48,7 @@ public class MetadataCollectionsIT {
 
     try {
       String metadataCollectionStr =
-          new String(Files.readAllBytes(Paths.get("ramls/examples/metadataCollection.sample")));
+          new String(Files.readAllBytes(Paths.get("ramls/examples/metadataCollectionConfig.sample")));
       metadataCollection = Json.decodeValue(metadataCollectionStr, MetadataCollection.class);
       metadataCollectionChanged =
           Json.decodeValue(metadataCollectionStr, MetadataCollection.class)

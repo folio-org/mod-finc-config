@@ -7,7 +7,7 @@
       "id": "metadataCollectionsData",
       "items": {
         "type": "object",
-        "$ref": "metadataCollection.json"
+        "$ref": "metadataCollectionConfig.json"
       }
     },
     "totalRecords": {

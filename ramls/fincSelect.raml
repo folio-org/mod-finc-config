@@ -1,0 +1,85 @@
+#%RAML 1.0
+title: Metadata Collections Select
+version: v1
+baseUri: http://localhost/mod-finc-config
+
+documentation:
+  - title: mod-finc-config API
+    content: This documents the API calls that can be made to query and manage metadata collections
+
+types:
+  metadataSourceSelect: !include schemas/metadataSourceSelect.json
+  metadataSourceSelects: !include schemas/metadataSourceSelects.json
+  metadataCollectionSelect: !include schemas/metadataCollectionSelect.json
+  metadataCollectionSelects: !include schemas/metadataCollectionSelects.json
+  select: !include schemas/select.json
+  errors: !include ./raml-util/schemas/errors.schema
+
+traits:
+  orderable: !include ./raml-util/traits/orderable.raml
+  pageable: !include ./raml-util/traits/pageable.raml
+  searchable: !include ./raml-util/traits/searchable.raml
+  language: !include ./raml-util/traits/language.raml
+  validate: !include ./raml-util/traits/validation.raml
+
+resourceTypes:
+  collection: !include ./raml-util/rtypes/collection.raml
+  collection-item: !include ./raml-util/rtypes/item-collection.raml
+
+/finc-select:
+  /metadata-collections:
+    displayName: Metadata Collections Select
+    type:
+      collection:
+        exampleCollection: !include examples/metadataCollectionSelect_collection.sample
+        exampleItem: !include examples/metadataCollectionSelect.sample
+        schemaCollection: metadataCollectionSelects
+        schemaItem: metadataCollectionSelect
+    get:
+      is: [
+        searchable: {description: "", example: "active=true sortBy username"},
+        orderable: {fieldsList: "field A, field B"},
+        pageable
+      ]
+      description: Get all metadata collections
+    /{id}:
+      type:
+        collection-item:
+          exampleItem: !include examples/metadataCollectionSelect.sample
+          schema: metadataCollectionSelect
+      get:
+        description: Get one metadata collection identified by id
+      /select:
+        type:
+          collection-item:
+            exampleItem: !include examples/select.sample
+            schema: select
+        put:
+          description: Put, if this metadata collection is selected resp. deselected
+  /metadata-sources:
+    displayName: Metadata Sources Select
+    type:
+      collection:
+        exampleCollection: !include examples/metadataSourceSelect_collection.sample
+        exampleItem: !include examples/metadataSourceSelect.sample
+        schemaCollection: metadataSourceSelects
+        schemaItem: metadataSourceSelect
+    get:
+      is: [
+        searchable: {description: "", example: "active=true sortBy username"},
+        orderable: {fieldsList: "field A, field B"},
+        pageable
+      ]
+      description: Get all metadata sources
+    /{id}:
+      type:
+        collection-item:
+          exampleItem: !include examples/metadataSourceSelect.sample
+          schema: metadataSourceSelect
+      get:
+        description: Get one metadatasource identified by id
+      /select:
+        post:
+          description: Post, if all metadata collections of this source are selected resp. deselected
+
+

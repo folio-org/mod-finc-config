@@ -45,12 +45,8 @@
         "no"
       ]
     },
-    "permittedFor": {
-      "type": "array",
-      "minItems": 0,
-      "items": {
-        "type": "string"
-      }
+    "permitted": {
+      "type": "boolean"
     },
     "freeContent": {
       "type": "string",
@@ -107,6 +103,16 @@
       "minItems": 0,
       "items": {
         "type": "string"
+      }
+    },
+    "selected": {
+      "type": "boolean"
+    },
+    "filters": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "object"
       }
     }
   },

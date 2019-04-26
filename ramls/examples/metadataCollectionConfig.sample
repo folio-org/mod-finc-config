@@ -21,6 +21,7 @@
   "facetLabel": "012.1 21st Century COE",
   "solrMegaCollections": [
     "21st Century COE Program"
-  ],
-  "selectedBy": [ "DE-15", "DE-14" ]
+  ]
+  "selectedBy": [ "DE-15", "DE-14" ],
+  "filters": []
 }

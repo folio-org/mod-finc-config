@@ -48,10 +48,10 @@ public class MetadataSourcesIT {
 
     try {
       String metadataSourceStr1 =
-          new String(Files.readAllBytes(Paths.get("ramls/examples/metadataSource.sample")));
+          new String(Files.readAllBytes(Paths.get("ramls/examples/metadataSourceConfig.sample")));
       metadataSource1 = Json.decodeValue(metadataSourceStr1, MetadataSource.class);
       String metadataSourceStr2 =
-          new String(Files.readAllBytes(Paths.get("ramls/examples/metadataSource2.sample")));
+          new String(Files.readAllBytes(Paths.get("ramls/examples/metadataSourceConfig2.sample")));
       metadataSource2 = Json.decodeValue(metadataSourceStr2, MetadataSource.class);
       metadataSource2Changed =
           Json.decodeValue(metadataSourceStr2, MetadataSource.class)

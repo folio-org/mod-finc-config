@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "metadataSourceSelectss": {
+      "type": "array",
+      "id": "metadataSourcesSelectData",
+      "items": {
+        "type": "object",
+        "$ref": "metadataSourceSelect.json"
+      }
+    },
+    "totalRecords": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "sources",
+    "totalRecords"
+  ]
+}

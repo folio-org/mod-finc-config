@@ -1,0 +1,137 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Metadata Source Schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string",
+      "description": "A unique name for this metadata source"
+    },
+    "description": {
+      "type": "string",
+      "description" : "A globally unique (UUID) identifier"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "wish",
+        "negotiation",
+        "technical implementation",
+        "active",
+        "deactivated",
+        "terminated"
+      ]
+    },
+    "vendor": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Id of the the sources content’s vendor, linked via uuid from vendor app."
+        },
+        "name": {
+          "type": "string",
+          "description": "Vendor's name. If not given, it will be determined by backend module."
+        }
+      }
+    },
+    "contacts": {
+      "type": "object",
+      "properties": {
+        "internal": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "object",
+            "$ref": "contact.json"
+          }
+        },
+        "external": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "object",
+            "$ref": "contact.json"
+          }
+        }
+      }
+    },
+    "indexingLevel": {
+      "type": "string"
+    },
+    "licensingNote": {
+      "type": "string"
+    },
+    "contracts": {
+      "description": "Links to contracts in agreements/license app or link to file upload app",
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
+    },
+    "lastProcessed": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "tickets": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
+    },
+    "accessUrl": {
+      "type": "string"
+    },
+    "sourceId": {
+      "type": "integer"
+    },
+    "solrShard": {
+      "type": "string",
+      "enum": [
+        "UBL main",
+        "UBL ai",
+        "SLUB main",
+        "SLUB DBoD"
+      ]
+    },
+    "deliveryMethods": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
+    },
+    "formats": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
+    },
+    "updateRhythm": {
+      "type": "string"
+    },
+    "inferiorTo": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
+    },
+    "selected": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "id",
+    "label",
+    "status",
+    "sourceId"
+  ],
+  "additionalProperties": false
+}

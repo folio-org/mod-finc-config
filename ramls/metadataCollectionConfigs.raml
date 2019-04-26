@@ -8,8 +8,8 @@ documentation:
     content: This documents the API calls that can be made to query and manage metadata collections
 
 types:
-  metadataCollection: !include schemas/metadataCollection.json
-  metadataCollections: !include schemas/metadataCollections.json
+  metadataCollection: !include schemas/metadataCollectionConfig.json
+  metadataCollections: !include schemas/metadataCollectionConfigs.json
   errors: !include ./raml-util/schemas/errors.schema
 
 traits:
@@ -27,8 +27,8 @@ resourceTypes:
   displayName: Metadata Collections
   type:
     collection:
-      exampleCollection: !include examples/metadataCollection_collection.sample
-      exampleItem: !include examples/metadataCollection.sample
+      exampleCollection: !include examples/metadataCollectionConfig_collection.sample
+      exampleItem: !include examples/metadataCollectionConfig.sample
       schemaCollection: metadataCollections
       schemaItem: metadataCollection
   get:
@@ -44,7 +44,7 @@ resourceTypes:
   /{id}:
     type:
       collection-item:
-        exampleItem: !include examples/metadataCollection.sample
+        exampleItem: !include examples/metadataCollectionConfig.sample
         schema: metadataCollection
     get:
       description: Get one metadata collection identified by id

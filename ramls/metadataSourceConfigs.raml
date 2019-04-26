@@ -8,8 +8,8 @@ documentation:
     content: This documents the API calls that can be made to query and manage metadata sources
 
 types:
-  metadataSource: !include schemas/metadataSource.json
-  metadataSources: !include schemas/metadataSources.json
+  metadataSource: !include schemas/metadataSourceConfig.json
+  metadataSources: !include schemas/metadataSourceConfigs.json
   errors: !include ./raml-util/schemas/errors.schema
 
 traits:
@@ -27,8 +27,8 @@ resourceTypes:
   displayName: Metadata Sources
   type:
     collection:
-      exampleCollection: !include examples/metadataSource_collection.sample
-      exampleItem: !include examples/metadataSource.sample
+      exampleCollection: !include examples/metadataSourceConfig_collection.sample
+      exampleItem: !include examples/metadataSourceConfig.sample
       schemaCollection: metadataSources
       schemaItem: metadataSource
   get:
@@ -44,7 +44,7 @@ resourceTypes:
   /{id}:
     type:
       collection-item:
-        exampleItem: !include examples/metadataSource.sample
+        exampleItem: !include examples/metadataSourceConfig.sample
         schema: metadataSource
     get:
       description: Get one metadatasource identified by id

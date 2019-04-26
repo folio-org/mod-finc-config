@@ -2,12 +2,12 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
-    "metadataSources": {
+    "metadataCollectionSelects": {
       "type": "array",
-      "id": "metadataSourcesData",
+      "id": "metadataCollectionSelectData",
       "items": {
         "type": "object",
-        "$ref": "metadataSource.json"
+        "$ref": "metadataCollectionSelect.json"
       }
     },
     "totalRecords": {

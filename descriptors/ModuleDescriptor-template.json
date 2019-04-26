@@ -85,6 +85,30 @@
       ]
     },
     {
+      "id": "finc-select-metadata-collections",
+      "version": "0.1",
+      "handlers": [
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-select/metadata-collections"
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-select/metadata-collections/{id}"
+        },
+        {
+          "methods": [
+            "PUT"
+          ],
+          "pathPattern": "/finc-select/metadata-collections/{id}/select"
+        }
+      ]
+    },
+    {
       "id": "_tenant",
       "version": "1.2",
       "interfaceType": "system",

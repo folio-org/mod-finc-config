@@ -9,7 +9,8 @@
   "metadataAvailable": "yes",
   "usageRestricted": "no",
   "permittedFor": [
-    "DE-14"
+    "DE-14",
+    "DE-15"
   ],
   "freeContent": "no",
   "lod": {
@@ -20,5 +21,8 @@
   "facetLabel": "093.8 21st Century Political Science",
   "solrMegaCollections": [
     "21st Century Political Science"
+  ],
+  "selectedBy": [
+    "DE-14"
   ]
 }
