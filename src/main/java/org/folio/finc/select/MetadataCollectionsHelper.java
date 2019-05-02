@@ -45,9 +45,11 @@ public class MetadataCollectionsHelper {
   private static final String TABLE_NAME = "metadata_collections";
   private final Messages messages = Messages.getInstance();
   private final Logger logger = LoggerFactory.getLogger(MetadataCollectionsHelper.class);
+  private final IsilHelper isilHelper;
 
   public MetadataCollectionsHelper(Vertx vertx, String tenantId) {
     PostgresClient.getInstance(vertx).setIdField(ID_FIELD);
+    this.isilHelper = new IsilHelper(vertx, tenantId);
   }
 
   public static List<MetadataCollectionSelect> transform(
@@ -122,7 +124,6 @@ public class MetadataCollectionsHelper {
               String fincId = Constants.MODULE_TENANT;
               String tenantId =
                   TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
-              String isil = this.getIsilForTenant(tenantId);
               PostgresClient.getInstance(vertxContext.owner(), fincId)
                   .get(
                       TABLE_NAME,
@@ -138,15 +139,33 @@ public class MetadataCollectionsHelper {
                                 collectionsCollection =
                                     new org.folio.rest.jaxrs.model.MetadataCollectionSelects();
                             List<MetadataCollection> results = reply.result().getResults();
-                            List<MetadataCollectionSelect> transformedCollections =
-                                this.transform(results, isil);
-                            collectionsCollection.setMetadataCollectionSelects(
-                                transformedCollections);
-                            collectionsCollection.setTotalRecords(transformedCollections.size());
-                            asyncResultHandler.handle(
-                                Future.succeededFuture(
-                                    GetFincSelectMetadataCollectionsResponse
-                                        .respond200WithApplicationJson(collectionsCollection)));
+                            isilHelper
+                                .getIsilForTenant(tenantId, okapiHeaders, vertxContext)
+                                .setHandler(
+                                    isilResult -> {
+                                      if (isilResult.succeeded()) {
+                                        String isil = isilResult.result();
+                                        List<MetadataCollectionSelect> transformedCollections =
+                                            this.transform(results, isil);
+                                        collectionsCollection.setMetadataCollectionSelects(
+                                            transformedCollections);
+                                        collectionsCollection.setTotalRecords(
+                                            transformedCollections.size());
+                                        asyncResultHandler.handle(
+                                            Future.succeededFuture(
+                                                GetFincSelectMetadataCollectionsResponse
+                                                    .respond200WithApplicationJson(
+                                                        collectionsCollection)));
+                                      } else {
+                                        asyncResultHandler.handle(
+                                            Future.succeededFuture(
+                                                GetMetadataCollectionsResponse
+                                                    .respond500WithTextPlain(
+                                                        messages.getMessage(
+                                                            lang,
+                                                            MessageConsts.InternalServerError))));
+                                      }
+                                    });
                           } else {
                             asyncResultHandler.handle(
                                 Future.succeededFuture(
@@ -220,7 +239,6 @@ public class MetadataCollectionsHelper {
             String fincId = Constants.MODULE_TENANT;
             String tenantId =
                 TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
-            String isil = this.getIsilForTenant(tenantId);
             try {
               Criteria idCrit =
                   new Criteria()
@@ -266,13 +284,29 @@ public class MetadataCollectionsHelper {
                                                 lang, MessageConsts.InternalServerError))));
                           } else {
 
-                            MetadataCollectionSelect result =
-                                MetadataCollectionsHelper.transform(
-                                    metadataCollections.get(0), isil);
-                            asyncResultHandler.handle(
-                                Future.succeededFuture(
-                                    GetFincSelectMetadataCollectionsByIdResponse
-                                        .respond200WithApplicationJson(result)));
+                            this.isilHelper
+                                .getIsilForTenant(tenantId, okapiHeaders, vertxContext)
+                                .setHandler(
+                                    isilResult -> {
+                                      if (isilResult.succeeded()) {
+                                        String isil = isilResult.result();
+                                        MetadataCollectionSelect result =
+                                            MetadataCollectionsHelper.transform(
+                                                metadataCollections.get(0), isil);
+                                        asyncResultHandler.handle(
+                                            Future.succeededFuture(
+                                                GetFincSelectMetadataCollectionsByIdResponse
+                                                    .respond200WithApplicationJson(result)));
+                                      } else {
+                                        asyncResultHandler.handle(
+                                            Future.succeededFuture(
+                                                GetFincSelectMetadataCollectionsByIdResponse
+                                                    .respond500WithTextPlain(
+                                                        messages.getMessage(
+                                                            lang,
+                                                            MessageConsts.InternalServerError))));
+                                      }
+                                    });
                           }
                         }
                       });
@@ -305,7 +339,6 @@ public class MetadataCollectionsHelper {
             String fincId = Constants.MODULE_TENANT;
             String tenantId =
                 TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
-            String isil = this.getIsilForTenant(tenantId);
             Criteria idCrit =
                 new Criteria()
                     .addField(ID_FIELD)
@@ -314,58 +347,80 @@ public class MetadataCollectionsHelper {
                     .setValue("'" + id + "'");
             Criterion criterion = new Criterion(idCrit);
             logger.debug("Using criterion: " + criterion.toString());
-            try {
-              PostgresClient.getInstance(vertxContext.owner(), fincId)
-                  .get(
-                      TABLE_NAME,
-                      MetadataCollection.class,
-                      criterion,
-                      true,
-                      false,
-                      getReply -> {
-                        if (getReply.failed()) {
-                          logger.debug(
-                              "Error querying existing metadata collections: "
-                                  + getReply.cause().getLocalizedMessage());
-                          asyncResultHandler.handle(
-                              Future.succeededFuture(
-                                  PutFincSelectMetadataCollectionsSelectByIdResponse
-                                      .respond500WithTextPlain(
-                                          messages.getMessage(
-                                              lang, MessageConsts.InternalServerError))));
-                        } else {
-                          List<MetadataCollection> mdCollections = getReply.result().getResults();
-                          MetadataCollection metadataCollection = mdCollections.get(0);
-                          MetadataCollection updated = null;
-                          try {
-                            updated = this.setSelectStatus(metadataCollection, entity, isil);
-                          } catch (FincSelectException e) {
-                            asyncResultHandler.handle(
-                                Future.succeededFuture(
-                                    PutFincSelectMetadataCollectionsSelectByIdResponse
-                                        .respond404WithTextPlain(e.getMessage())));
-                            return;
-                          }
-                          try {
-                            PostgresClient.getInstance(vertxContext.owner(), fincId)
-                                .update(
-                                    TABLE_NAME,
-                                    updated,
-                                    id,
-                                    putReply -> {
+            this.isilHelper
+                .getIsilForTenant(tenantId, okapiHeaders, vertxContext)
+                .setHandler(
+                    isilResult -> {
+                      if (isilResult.succeeded()) {
+                        String isil = isilResult.result();
+                        try {
+                          PostgresClient.getInstance(vertxContext.owner(), fincId)
+                              .get(
+                                  TABLE_NAME,
+                                  MetadataCollection.class,
+                                  criterion,
+                                  true,
+                                  false,
+                                  getReply -> {
+                                    if (getReply.failed()) {
+                                      logger.debug(
+                                          "Error querying existing metadata collections: "
+                                              + getReply.cause().getLocalizedMessage());
+                                      asyncResultHandler.handle(
+                                          Future.succeededFuture(
+                                              PutFincSelectMetadataCollectionsSelectByIdResponse
+                                                  .respond500WithTextPlain(
+                                                      messages.getMessage(
+                                                          lang,
+                                                          MessageConsts.InternalServerError))));
+                                    } else {
+                                      List<MetadataCollection> mdCollections =
+                                          getReply.result().getResults();
+                                      MetadataCollection metadataCollection = mdCollections.get(0);
+                                      MetadataCollection updated = null;
                                       try {
-                                        if (putReply.failed()) {
-                                          asyncResultHandler.handle(
-                                              Future.succeededFuture(
-                                                  PutFincSelectMetadataCollectionsSelectByIdResponse
-                                                      .respond500WithTextPlain(
-                                                          putReply.cause().getMessage())));
-                                        } else {
-                                          asyncResultHandler.handle(
-                                              Future.succeededFuture(
-                                                  PutFincSelectMetadataCollectionsSelectByIdResponse
-                                                      .respond204()));
-                                        }
+                                        updated =
+                                            this.setSelectStatus(metadataCollection, entity, isil);
+                                      } catch (FincSelectException e) {
+                                        asyncResultHandler.handle(
+                                            Future.succeededFuture(
+                                                PutFincSelectMetadataCollectionsSelectByIdResponse
+                                                    .respond404WithTextPlain(e.getMessage())));
+                                        return;
+                                      }
+                                      try {
+                                        PostgresClient.getInstance(vertxContext.owner(), fincId)
+                                            .update(
+                                                TABLE_NAME,
+                                                updated,
+                                                id,
+                                                putReply -> {
+                                                  try {
+                                                    if (putReply.failed()) {
+                                                      asyncResultHandler.handle(
+                                                          Future.succeededFuture(
+                                                              PutFincSelectMetadataCollectionsSelectByIdResponse
+                                                                  .respond500WithTextPlain(
+                                                                      putReply
+                                                                          .cause()
+                                                                          .getMessage())));
+                                                    } else {
+                                                      asyncResultHandler.handle(
+                                                          Future.succeededFuture(
+                                                              PutFincSelectMetadataCollectionsSelectByIdResponse
+                                                                  .respond204()));
+                                                    }
+                                                  } catch (Exception e) {
+                                                    asyncResultHandler.handle(
+                                                        Future.succeededFuture(
+                                                            PutFincSelectMetadataCollectionsSelectByIdResponse
+                                                                .respond500WithTextPlain(
+                                                                    messages.getMessage(
+                                                                        lang,
+                                                                        MessageConsts
+                                                                            .InternalServerError))));
+                                                  }
+                                                });
                                       } catch (Exception e) {
                                         asyncResultHandler.handle(
                                             Future.succeededFuture(
@@ -375,24 +430,26 @@ public class MetadataCollectionsHelper {
                                                             lang,
                                                             MessageConsts.InternalServerError))));
                                       }
-                                    });
-                          } catch (Exception e) {
-                            asyncResultHandler.handle(
-                                Future.succeededFuture(
-                                    PutFincSelectMetadataCollectionsSelectByIdResponse
-                                        .respond500WithTextPlain(
-                                            messages.getMessage(
-                                                lang, MessageConsts.InternalServerError))));
-                          }
+                                    }
+                                  });
+                        } catch (Exception e) {
+                          logger.debug(e.getLocalizedMessage());
+                          asyncResultHandler.handle(
+                              Future.succeededFuture(
+                                  PutFincSelectMetadataCollectionsSelectByIdResponse
+                                      .respond500WithTextPlain(
+                                          messages.getMessage(
+                                              lang, MessageConsts.InternalServerError))));
                         }
-                      });
-            } catch (Exception e) {
-              logger.debug(e.getLocalizedMessage());
-              asyncResultHandler.handle(
-                  Future.succeededFuture(
-                      PutFincSelectMetadataCollectionsSelectByIdResponse.respond500WithTextPlain(
-                          messages.getMessage(lang, MessageConsts.InternalServerError))));
-            }
+                      } else {
+                        asyncResultHandler.handle(
+                            Future.succeededFuture(
+                                PutFincSelectMetadataCollectionsSelectByIdResponse
+                                    .respond500WithTextPlain(
+                                        messages.getMessage(
+                                            lang, MessageConsts.InternalServerError))));
+                      }
+                    });
           });
     } catch (Exception e) {
       logger.debug(e.getLocalizedMessage());
@@ -400,18 +457,6 @@ public class MetadataCollectionsHelper {
           Future.succeededFuture(
               PutFincSelectMetadataCollectionsSelectByIdResponse.respond500WithTextPlain(
                   messages.getMessage(lang, MessageConsts.InternalServerError))));
-    }
-  }
-
-  public String getIsilForTenant(String tenantId) {
-    // TODO: http://localhost:9130/isils?query=(tenant==ubl)
-
-    if ("ubl".equals(tenantId)) {
-      return "DE-15";
-    } else if ("slub".equals(tenantId)) {
-      return "DE-14";
-    } else {
-      return "foo";
     }
   }
 }

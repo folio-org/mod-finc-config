@@ -36,7 +36,6 @@ public class MetadataCollectionsHelperTest {
     collection2.setPermittedFor(permittedFor2);
     collection2.setSelectedBy(permittedFor2);
 
-
     List<MetadataCollection> collections = new ArrayList<>();
     collections.add(collection1);
     collections.add(collection2);
