@@ -93,7 +93,7 @@ public class IsilHelperIT {
   }
 
   private static void postIsils(TestContext context) {
-    String isil1Str = null;
+    String isil1Str;
     try {
       isil1Str = new String(Files.readAllBytes(Paths.get("ramls/examples/isil1.sample")));
     } catch (IOException e) {

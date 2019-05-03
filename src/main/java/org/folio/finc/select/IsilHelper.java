@@ -18,7 +18,7 @@ public class IsilHelper {
   private static final String TABLE_NAME = "isils";
   private final Messages messages = Messages.getInstance();
   private final Logger logger = LoggerFactory.getLogger(IsilHelper.class);
-  private IsilsAPI isilsAPI;
+  private final IsilsAPI isilsAPI;
 
   public IsilHelper(Vertx vertx, String tenantId) {
     isilsAPI = new IsilsAPI(vertx, tenantId);

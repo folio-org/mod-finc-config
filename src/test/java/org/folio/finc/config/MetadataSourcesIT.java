@@ -90,9 +90,7 @@ public class MetadataSourcesIT {
           try {
             tenantClient.postTenant(
                 null,
-                postTenantRes -> {
-                  async.complete();
-                });
+                postTenantRes -> async.complete());
           } catch (Exception e) {
             context.fail(e);
           }

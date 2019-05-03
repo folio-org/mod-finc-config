@@ -18,7 +18,7 @@ import org.folio.rest.jaxrs.resource.FincSelect;
 
 public class FincSelectAPI implements FincSelect {
 
-  private MetadataCollectionsHelper metadataCollectionsHelper;
+  private final MetadataCollectionsHelper metadataCollectionsHelper;
 
   public FincSelectAPI(Vertx vertx, String tenantId) {
     this.metadataCollectionsHelper = new MetadataCollectionsHelper(vertx, tenantId);

@@ -13,7 +13,7 @@ import org.folio.rest.utils.Constants;
 
 public class FincTenantAPI implements FincTenant {
 
-  private TenantAPI tenantAPI;
+  private final TenantAPI tenantAPI;
 
   public FincTenantAPI() {
     this.tenantAPI = new TenantReferenceApi();

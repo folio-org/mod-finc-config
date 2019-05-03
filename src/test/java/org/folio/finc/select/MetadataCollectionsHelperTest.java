@@ -45,9 +45,8 @@ public class MetadataCollectionsHelperTest {
     collections.add(collection1);
     collections.add(collection2);
 
-    MetadataCollectionsHelper cut = new MetadataCollectionsHelper(Vertx.vertx(), "diku");
-
-    List<MetadataCollectionSelect> transformed = cut.filterForIsil(collections, DE_15);
+    List<MetadataCollectionSelect> transformed = MetadataCollectionsHelper
+        .filterForIsil(collections, DE_15);
     transformed.stream().forEach(mdCollection -> {
       String label = mdCollection.getLabel();
       switch (label) {

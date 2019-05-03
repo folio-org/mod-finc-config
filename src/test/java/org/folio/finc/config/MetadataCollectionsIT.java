@@ -37,8 +37,8 @@ public class MetadataCollectionsIT {
   private static final String TENANT = "ubl";
 
   private static Vertx vertx;
-  public static MetadataCollection metadataCollection;
-  public static MetadataCollection metadataCollectionChanged;
+  private static MetadataCollection metadataCollection;
+  private static MetadataCollection metadataCollectionChanged;
 
   @Rule public Timeout timeout = Timeout.seconds(10);
 

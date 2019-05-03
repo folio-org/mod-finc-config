@@ -42,8 +42,8 @@ public class MetadataCollectionsHelperIT {
   private static Isil isil1;
   private static Vertx vertx;
   @Rule public Timeout timeout = Timeout.seconds(10);
-  private Select unselect = new Select().withSelect(false);
-  private Select select = new Select().withSelect(true);
+  private final Select unselect = new Select().withSelect(false);
+  private final Select select = new Select().withSelect(true);
 
   @BeforeClass
   public static void setUp(TestContext context) {

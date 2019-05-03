@@ -67,7 +67,7 @@ public class MetadataCollectionsHelper {
    * @param isil
    * @return
    */
-  public static MetadataCollectionSelect filterForIsil(
+  private static MetadataCollectionSelect filterForIsil(
       MetadataCollection metadataCollection, String isil) {
     List<String> selectedBy = metadataCollection.getSelectedBy();
     boolean selected = selectedBy.contains(isil);
@@ -110,7 +110,7 @@ public class MetadataCollectionsHelper {
     return new CQLWrapper(cql2PgJSON, query)
         .setLimit(new Limit(limit))
         .setOffset(new Offset(offset));
-  };
+  }
 
   public void getFincSelectMetadataCollections(
       String query,
@@ -155,7 +155,7 @@ public class MetadataCollectionsHelper {
                                       if (isilResult.succeeded()) {
                                         String isil = isilResult.result();
                                         List<MetadataCollectionSelect> transformedCollections =
-                                            this.filterForIsil(results, isil);
+                                            filterForIsil(results, isil);
                                         collectionsCollection.setMetadataCollectionSelects(
                                             transformedCollections);
                                         collectionsCollection.setTotalRecords(
@@ -386,10 +386,10 @@ public class MetadataCollectionsHelper {
                                       List<MetadataCollection> mdCollections =
                                           getReply.result().getResults();
                                       MetadataCollection metadataCollection = mdCollections.get(0);
-                                      MetadataCollection updated = null;
+                                      MetadataCollection updated;
                                       try {
                                         updated =
-                                            this.setSelectStatus(metadataCollection, entity, isil);
+                                            setSelectStatus(metadataCollection, entity, isil);
                                       } catch (FincSelectException e) {
                                         asyncResultHandler.handle(
                                             Future.succeededFuture(
