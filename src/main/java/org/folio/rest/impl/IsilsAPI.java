@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
+import org.folio.rest.RestVerticle;
+import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.jaxrs.resource.Isils;
 import org.folio.rest.persist.Criteria.Limit;
@@ -42,6 +44,7 @@ public class IsilsAPI implements Isils {
         .setOffset(new Offset(offset));
   }
 
+  @Validate
   @Override
   public void getIsils(
       String query,
@@ -142,6 +145,7 @@ public class IsilsAPI implements Isils {
     }
   }
 
+  @Validate
   @Override
   public void postIsils(
       String lang,
@@ -149,6 +153,7 @@ public class IsilsAPI implements Isils {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
+    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
     PgUtil.post(
         TABLE_NAME,
         entity,
@@ -158,6 +163,7 @@ public class IsilsAPI implements Isils {
         asyncResultHandler);
   }
 
+  @Validate
   @Override
   public void getIsilsById(
       String id,
@@ -165,6 +171,7 @@ public class IsilsAPI implements Isils {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
+    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
     PgUtil.getById(
         TABLE_NAME,
         Isil.class,
@@ -175,6 +182,7 @@ public class IsilsAPI implements Isils {
         asyncResultHandler);
   }
 
+  @Validate
   @Override
   public void deleteIsilsById(
       String id,
@@ -182,6 +190,7 @@ public class IsilsAPI implements Isils {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
+    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
     PgUtil.deleteById(
         TABLE_NAME,
         id,
@@ -191,6 +200,7 @@ public class IsilsAPI implements Isils {
         asyncResultHandler);
   }
 
+  @Validate
   @Override
   public void putIsilsById(
       String id,
@@ -199,6 +209,7 @@ public class IsilsAPI implements Isils {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
+    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
     PgUtil.put(
         TABLE_NAME,
         entity,

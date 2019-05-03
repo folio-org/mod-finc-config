@@ -52,14 +52,22 @@ public class MetadataCollectionsHelper {
     this.isilHelper = new IsilHelper(vertx, tenantId);
   }
 
-  public static List<MetadataCollectionSelect> transform(
+  public static List<MetadataCollectionSelect> filterForIsil(
       List<MetadataCollection> metadataCollections, String isil) {
     return metadataCollections.stream()
-        .map(metadataCollection -> MetadataCollectionsHelper.transform(metadataCollection, isil))
+        .map(
+            metadataCollection -> MetadataCollectionsHelper.filterForIsil(metadataCollection, isil))
         .collect(Collectors.toList());
   }
 
-  public static MetadataCollectionSelect transform(
+  /**
+   * Filters selected and permitted status for given isil and hides information about other isils
+   *
+   * @param metadataCollection
+   * @param isil
+   * @return
+   */
+  public static MetadataCollectionSelect filterForIsil(
       MetadataCollection metadataCollection, String isil) {
     List<String> selectedBy = metadataCollection.getSelectedBy();
     boolean selected = selectedBy.contains(isil);
@@ -81,13 +89,14 @@ public class MetadataCollectionsHelper {
       throws FincSelectException {
     List<String> permittedFor = metadataCollection.getPermittedFor();
     boolean isPermitted = permittedFor.contains(isil);
+
     if (!isPermitted) {
       throw new FincSelectException("Selecting this metadata collection is not permitted");
     }
 
     List<String> selectedBy = metadataCollection.getSelectedBy();
     Boolean doSelect = select.getSelect();
-    if (doSelect && isPermitted && !selectedBy.contains(isil)) {
+    if (doSelect && !selectedBy.contains(isil)) {
       selectedBy.add(isil);
     } else if (!doSelect) {
       selectedBy.remove(isil);
@@ -146,7 +155,7 @@ public class MetadataCollectionsHelper {
                                       if (isilResult.succeeded()) {
                                         String isil = isilResult.result();
                                         List<MetadataCollectionSelect> transformedCollections =
-                                            this.transform(results, isil);
+                                            this.filterForIsil(results, isil);
                                         collectionsCollection.setMetadataCollectionSelects(
                                             transformedCollections);
                                         collectionsCollection.setTotalRecords(
@@ -291,7 +300,7 @@ public class MetadataCollectionsHelper {
                                       if (isilResult.succeeded()) {
                                         String isil = isilResult.result();
                                         MetadataCollectionSelect result =
-                                            MetadataCollectionsHelper.transform(
+                                            MetadataCollectionsHelper.filterForIsil(
                                                 metadataCollections.get(0), isil);
                                         asyncResultHandler.handle(
                                             Future.succeededFuture(

@@ -1,4 +1,4 @@
-package org.folio.mod_finc_config_test;
+package org.folio.finc.config;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
@@ -18,7 +18,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
-import org.folio.rest.jaxrs.model.MetadataSource;
+import org.folio.rest.jaxrs.model.MetadataCollection;
+import org.folio.rest.jaxrs.model.MetadataCollection.MetadataAvailable;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
@@ -29,33 +30,29 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class MetadataSourcesIT {
+public class MetadataCollectionsIT {
 
   private static final String APPLICATION_JSON = "application/json";
-  private static final String BASE_URI = "/metadata-sources";
-  private static final String TENANT = "diku";
+  private static final String BASE_URI = "/metadata-collections";
+  private static final String TENANT = "ubl";
 
   private static Vertx vertx;
-  private static MetadataSource metadataSource1;
-  private static MetadataSource metadataSource2;
-  private static MetadataSource metadataSource2Changed;
+  public static MetadataCollection metadataCollection;
+  public static MetadataCollection metadataCollectionChanged;
 
-  @Rule public Timeout timeout = Timeout.seconds(10000);
+  @Rule public Timeout timeout = Timeout.seconds(10);
 
   @BeforeClass
   public static void setUp(TestContext context) {
     vertx = Vertx.vertx();
 
     try {
-      String metadataSourceStr1 =
-          new String(Files.readAllBytes(Paths.get("ramls/examples/metadataSourceConfig.sample")));
-      metadataSource1 = Json.decodeValue(metadataSourceStr1, MetadataSource.class);
-      String metadataSourceStr2 =
-          new String(Files.readAllBytes(Paths.get("ramls/examples/metadataSourceConfig2.sample")));
-      metadataSource2 = Json.decodeValue(metadataSourceStr2, MetadataSource.class);
-      metadataSource2Changed =
-          Json.decodeValue(metadataSourceStr2, MetadataSource.class)
-              .withAccessUrl("www.changed.org");
+      String metadataCollectionStr =
+          new String(Files.readAllBytes(Paths.get("ramls/examples/metadataCollectionConfig.sample")));
+      metadataCollection = Json.decodeValue(metadataCollectionStr, MetadataCollection.class);
+      metadataCollectionChanged =
+          Json.decodeValue(metadataCollectionStr, MetadataCollection.class)
+              .withMetadataAvailable(MetadataAvailable.NO);
     } catch (Exception e) {
       context.fail(e);
     }
@@ -80,6 +77,8 @@ public class MetadataSourcesIT {
     String url = "http://localhost:" + port;
     TenantClient tenantClient =
         new TenantClient(url, Constants.MODULE_TENANT, Constants.MODULE_TENANT);
+    TenantClient tenantClientDiku =
+        new TenantClient(url, TENANT, TENANT);
     DeploymentOptions options =
         new DeploymentOptions().setConfig(new JsonObject().put("http.port", port)).setWorker(true);
 
@@ -88,11 +87,8 @@ public class MetadataSourcesIT {
         options,
         res -> {
           try {
-            tenantClient.postTenant(
-                null,
-                postTenantRes -> {
-                  async.complete();
-                });
+            tenantClient.postTenant(null, postTenantRes -> async.complete());
+            tenantClientDiku.postTenant(null, postTenantRes -> async.complete());
           } catch (Exception e) {
             context.fail(e);
           }
@@ -112,41 +108,41 @@ public class MetadataSourcesIT {
   }
 
   @Test
-  public void checkThatWeCanAddGetPutAndDeleteMetadataSources() {
+  public void checkThatWeCanAddGetPutAndDeleteMetadataCollections() {
     // POST
     given()
-        .body(Json.encode(metadataSource2))
+        .body(Json.encode(metadataCollection))
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
         .post(BASE_URI)
         .then()
         .statusCode(201)
-        .body("id", equalTo(metadataSource2.getId()))
-        .body("label", equalTo(metadataSource2.getLabel()))
-        .body("description", equalTo(metadataSource2.getDescription()));
+        .body("id", equalTo(metadataCollection.getId()))
+        .body("label", equalTo(metadataCollection.getLabel()))
+        .body("description", equalTo(metadataCollection.getDescription()));
 
     // GET
     given()
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
-        .get(BASE_URI + "/" + metadataSource2.getId())
+        .get(BASE_URI + "/" + metadataCollection.getId())
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
-        .body("id", equalTo(metadataSource2.getId()))
-        .body("label", equalTo(metadataSource2.getLabel()))
-        .body("status", equalTo(metadataSource2.getStatus().value()))
-        .body("accessUrl", equalTo(metadataSource2.getAccessUrl()));
+        .body("id", equalTo(metadataCollection.getId()))
+        .body("label", equalTo(metadataCollection.getLabel()))
+        .body("mdSource.id", equalTo(metadataCollection.getMdSource().getId()))
+        .body("facetLabel", equalTo(metadataCollection.getFacetLabel()));
 
     // PUT
     given()
-        .body(Json.encode(metadataSource2Changed))
+        .body(Json.encode(metadataCollectionChanged))
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
         .header("accept", "text/plain")
-        .put(BASE_URI + "/" + metadataSource2.getId())
+        .put(BASE_URI + "/" + metadataCollection.getId())
         .then()
         .statusCode(204);
 
@@ -155,21 +151,21 @@ public class MetadataSourcesIT {
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
-        .get(BASE_URI + "/" + metadataSource2.getId())
+        .get(BASE_URI + "/" + metadataCollection.getId())
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
-        .body("id", equalTo(metadataSource2Changed.getId()))
-        .body("label", equalTo(metadataSource2Changed.getLabel()))
-        .body("status", equalTo(metadataSource2Changed.getStatus().value()))
-        .body("accessUrl", equalTo(metadataSource2Changed.getAccessUrl()));
+        .body("id", equalTo(metadataCollectionChanged.getId()))
+        .body("label", equalTo(metadataCollectionChanged.getLabel()))
+        .body("mdSource.id", equalTo(metadataCollectionChanged.getMdSource().getId()))
+        .body("facetLabel", equalTo(metadataCollectionChanged.getFacetLabel()));
 
     // DELETE
     given()
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
         .header("accept", "text/plain")
-        .delete(BASE_URI + "/" + metadataSource2.getId())
+        .delete(BASE_URI + "/" + metadataCollectionChanged.getId())
         .then()
         .statusCode(204);
 
@@ -178,7 +174,7 @@ public class MetadataSourcesIT {
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
-        .get(BASE_URI + "/" + metadataSource2.getId())
+        .get(BASE_URI + "/" + metadataCollectionChanged.getId())
         .then()
         .statusCode(404);
 
@@ -196,16 +192,16 @@ public class MetadataSourcesIT {
   @Test
   public void checkThatWeCanSearchByCQL() {
     given()
-        .body(Json.encode(metadataSource1))
+        .body(Json.encode(metadataCollection))
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
         .post(BASE_URI)
         .then()
         .statusCode(201)
-        .body("id", equalTo(metadataSource1.getId()));
+        .body("id", equalTo(metadataCollection.getId()));
 
-    String cql = "?query=(label=\"Cambridge*\")";
+    String cql = "?query=(label=\"21st Century*\")";
     given()
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
@@ -214,10 +210,15 @@ public class MetadataSourcesIT {
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
-        .body("metadataSources.size()", equalTo(1))
-        .body("metadataSources[0].id", equalTo(metadataSource1.getId()))
-        .body("metadataSources[0].label", equalTo(metadataSource1.getLabel()))
-        .body("metadataSources[0].status", equalTo(metadataSource1.getStatus().value()));
+        .body("metadataCollections.size()", equalTo(1))
+        .body("metadataCollections[0].id", equalTo(metadataCollection.getId()))
+        .body("metadataCollections[0].label", equalTo(metadataCollection.getLabel()))
+        .body(
+            "metadataCollections[0].mdSource.id",
+            equalTo(metadataCollectionChanged.getMdSource().getId()))
+        .body(
+            "metadataCollections[0].facetLabel",
+            equalTo(metadataCollectionChanged.getFacetLabel()));
 
     String cql2 = "?query=(label=\"FOO*\")";
     given()
@@ -230,7 +231,7 @@ public class MetadataSourcesIT {
         .statusCode(200)
         .body("totalRecords", equalTo(0));
 
-    String cqlSolrShard = "?query=(solrShard==\"UBL main\")";
+    String cqlSolrShard = "?query=(collectionId==\"coe-123\")";
     given()
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
@@ -239,29 +240,34 @@ public class MetadataSourcesIT {
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
-        .body("metadataSources.size()", equalTo(1))
-        .body("metadataSources[0].id", equalTo(metadataSource1.getId()))
-        .body("metadataSources[0].label", equalTo(metadataSource1.getLabel()))
-        .body("metadataSources[0].status", equalTo(metadataSource1.getStatus().value()))
-        .body("metadataSources[0].solrShard", equalTo(metadataSource1.getSolrShard().value()));
+        .body("metadataCollections.size()", equalTo(1))
+        .body("metadataCollections[0].id", equalTo(metadataCollectionChanged.getId()))
+        .body("metadataCollections[0].label", equalTo(metadataCollectionChanged.getLabel()))
+        .body(
+            "metadataCollections[0].mdSource.id",
+            equalTo(metadataCollectionChanged.getMdSource().getId()))
+        .body(
+            "metadataCollections[0].facetLabel",
+            equalTo(metadataCollectionChanged.getFacetLabel()));
 
     // DELETE
     given()
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
         .header("accept", "text/plain")
-        .delete(BASE_URI + "/" + metadataSource1.getId())
+        .delete(BASE_URI + "/" + metadataCollectionChanged.getId())
         .then()
         .statusCode(204);
   }
 
   @Test
-  public void checkThatInvalidMetadataSourceIsNotPosted() {
-    MetadataSource metadataSourceInvalid =
-        Json.decodeValue(Json.encode(MetadataSourcesIT.metadataSource2), MetadataSource.class)
+  public void checkThatInvalidMetadataCollectionIsNotPosted() {
+    MetadataCollection metadataCollectionInvalid =
+        Json.decodeValue(
+                Json.encode(MetadataCollectionsIT.metadataCollection), MetadataCollection.class)
             .withLabel(null);
     given()
-        .body(Json.encode(metadataSourceInvalid))
+        .body(Json.encode(metadataCollectionInvalid))
         .header("X-Okapi-Tenant", TENANT)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)

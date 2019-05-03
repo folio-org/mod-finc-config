@@ -46,6 +46,7 @@ public class FincSelectAPI implements FincSelect {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
+    // Posting metadata collections is not allowed via finc-select
     vertxContext.runOnContext(
         aVoid -> {
           asyncResultHandler.handle(
