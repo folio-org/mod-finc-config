@@ -15,14 +15,13 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 import org.folio.finc.select.exception.FincSelectException;
 import org.folio.rest.RestVerticle;
+import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
+import org.folio.rest.jaxrs.model.FincSelectMetadataCollection;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollectionsGetOrder;
-import org.folio.rest.jaxrs.model.MetadataCollection;
-import org.folio.rest.jaxrs.model.MetadataCollectionSelect;
 import org.folio.rest.jaxrs.model.Select;
-import org.folio.rest.jaxrs.resource.FincSelect.GetFincSelectMetadataCollectionsByIdResponse;
-import org.folio.rest.jaxrs.resource.FincSelect.GetFincSelectMetadataCollectionsResponse;
-import org.folio.rest.jaxrs.resource.FincSelect.PutFincSelectMetadataCollectionsSelectByIdResponse;
-import org.folio.rest.jaxrs.resource.MetadataCollections.GetMetadataCollectionsResponse;
+import org.folio.rest.jaxrs.resource.FincSelectMetadataCollections.GetFincSelectMetadataCollectionsByIdResponse;
+import org.folio.rest.jaxrs.resource.FincSelectMetadataCollections.GetFincSelectMetadataCollectionsResponse;
+import org.folio.rest.jaxrs.resource.FincSelectMetadataCollections.PutFincSelectMetadataCollectionsSelectByIdResponse;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.Criteria.Limit;
@@ -52,8 +51,8 @@ public class MetadataCollectionsHelper {
     this.isilHelper = new IsilHelper(vertx, tenantId);
   }
 
-  public static List<MetadataCollectionSelect> filterForIsil(
-      List<MetadataCollection> metadataCollections, String isil) {
+  public static List<FincSelectMetadataCollection> filterForIsil(
+      List<FincConfigMetadataCollection> metadataCollections, String isil) {
     return metadataCollections.stream()
         .map(
             metadataCollection -> MetadataCollectionsHelper.filterForIsil(metadataCollection, isil))
@@ -67,8 +66,8 @@ public class MetadataCollectionsHelper {
    * @param isil
    * @return
    */
-  private static MetadataCollectionSelect filterForIsil(
-      MetadataCollection metadataCollection, String isil) {
+  private static FincSelectMetadataCollection filterForIsil(
+      FincConfigMetadataCollection metadataCollection, String isil) {
     List<String> selectedBy = metadataCollection.getSelectedBy();
     boolean selected = selectedBy.contains(isil);
     metadataCollection.setSelectedBy(null);
@@ -77,15 +76,15 @@ public class MetadataCollectionsHelper {
     boolean permitted = permittedFor.contains(isil);
     metadataCollection.setPermittedFor(null);
 
-    MetadataCollectionSelect metadataCollectionSelect =
-        Json.mapper.convertValue(metadataCollection, MetadataCollectionSelect.class);
-    metadataCollectionSelect.setSelected(selected);
-    metadataCollectionSelect.setPermitted(permitted);
-    return metadataCollectionSelect;
+    FincSelectMetadataCollection FincSelectMetadataCollection =
+        Json.mapper.convertValue(metadataCollection, FincSelectMetadataCollection.class);
+    FincSelectMetadataCollection.setSelected(selected);
+    FincSelectMetadataCollection.setPermitted(permitted);
+    return FincSelectMetadataCollection;
   }
 
-  private static MetadataCollection setSelectStatus(
-      MetadataCollection metadataCollection, Select select, String isil)
+  private static FincConfigMetadataCollection setSelectStatus(
+      FincConfigMetadataCollection metadataCollection, Select select, String isil)
       throws FincSelectException {
     List<String> permittedFor = metadataCollection.getPermittedFor();
     boolean isPermitted = permittedFor.contains(isil);
@@ -136,7 +135,7 @@ public class MetadataCollectionsHelper {
               PostgresClient.getInstance(vertxContext.owner(), fincId)
                   .get(
                       TABLE_NAME,
-                      MetadataCollection.class,
+                      FincConfigMetadataCollection.class,
                       fieldList,
                       cql,
                       true,
@@ -144,19 +143,20 @@ public class MetadataCollectionsHelper {
                       reply -> {
                         try {
                           if (reply.succeeded()) {
-                            org.folio.rest.jaxrs.model.MetadataCollectionSelects
+                            org.folio.rest.jaxrs.model.FincSelectMetadataCollections
                                 collectionsCollection =
-                                    new org.folio.rest.jaxrs.model.MetadataCollectionSelects();
-                            List<MetadataCollection> results = reply.result().getResults();
+                                    new org.folio.rest.jaxrs.model.FincSelectMetadataCollections();
+                            List<FincConfigMetadataCollection> results =
+                                reply.result().getResults();
                             isilHelper
                                 .getIsilForTenant(tenantId, okapiHeaders, vertxContext)
                                 .setHandler(
                                     isilResult -> {
                                       if (isilResult.succeeded()) {
                                         String isil = isilResult.result();
-                                        List<MetadataCollectionSelect> transformedCollections =
+                                        List<FincSelectMetadataCollection> transformedCollections =
                                             filterForIsil(results, isil);
-                                        collectionsCollection.setMetadataCollectionSelects(
+                                        collectionsCollection.setFincSelectMetadataCollections(
                                             transformedCollections);
                                         collectionsCollection.setTotalRecords(
                                             transformedCollections.size());
@@ -168,7 +168,7 @@ public class MetadataCollectionsHelper {
                                       } else {
                                         asyncResultHandler.handle(
                                             Future.succeededFuture(
-                                                GetMetadataCollectionsResponse
+                                                GetFincSelectMetadataCollectionsResponse
                                                     .respond500WithTextPlain(
                                                         messages.getMessage(
                                                             lang,
@@ -178,15 +178,16 @@ public class MetadataCollectionsHelper {
                           } else {
                             asyncResultHandler.handle(
                                 Future.succeededFuture(
-                                    GetMetadataCollectionsResponse.respond500WithTextPlain(
-                                        messages.getMessage(
-                                            lang, MessageConsts.InternalServerError))));
+                                    GetFincSelectMetadataCollectionsResponse
+                                        .respond500WithTextPlain(
+                                            messages.getMessage(
+                                                lang, MessageConsts.InternalServerError))));
                           }
                         } catch (Exception e) {
                           logger.debug(e.getLocalizedMessage());
                           asyncResultHandler.handle(
                               Future.succeededFuture(
-                                  GetMetadataCollectionsResponse.respond500WithTextPlain(
+                                  GetFincSelectMetadataCollectionsResponse.respond500WithTextPlain(
                                       messages.getMessage(
                                           lang, MessageConsts.InternalServerError))));
                         }
@@ -195,7 +196,7 @@ public class MetadataCollectionsHelper {
               logger.debug("IllegalStateException: " + e.getLocalizedMessage());
               asyncResultHandler.handle(
                   Future.succeededFuture(
-                      GetMetadataCollectionsResponse.respond400WithTextPlain(
+                      GetFincSelectMetadataCollectionsResponse.respond400WithTextPlain(
                           "CQL Illegal State Error for '" + "" + "': " + e.getLocalizedMessage())));
             } catch (Exception e) {
               Throwable cause = e;
@@ -208,12 +209,12 @@ public class MetadataCollectionsHelper {
                 logger.debug("BAD CQL");
                 asyncResultHandler.handle(
                     Future.succeededFuture(
-                        GetMetadataCollectionsResponse.respond400WithTextPlain(
+                        GetFincSelectMetadataCollectionsResponse.respond400WithTextPlain(
                             "CQL Parsing Error for '" + "" + "': " + cause.getLocalizedMessage())));
               } else {
                 asyncResultHandler.handle(
                     io.vertx.core.Future.succeededFuture(
-                        GetMetadataCollectionsResponse.respond500WithTextPlain(
+                        GetFincSelectMetadataCollectionsResponse.respond500WithTextPlain(
                             messages.getMessage(lang, MessageConsts.InternalServerError))));
               }
             }
@@ -225,12 +226,12 @@ public class MetadataCollectionsHelper {
         logger.debug("BAD CQL");
         asyncResultHandler.handle(
             Future.succeededFuture(
-                GetMetadataCollectionsResponse.respond400WithTextPlain(
+                GetFincSelectMetadataCollectionsResponse.respond400WithTextPlain(
                     "CQL Parsing Error for '" + "" + "': " + e.getLocalizedMessage())));
       } else {
         asyncResultHandler.handle(
             io.vertx.core.Future.succeededFuture(
-                GetMetadataCollectionsResponse.respond500WithTextPlain(
+                GetFincSelectMetadataCollectionsResponse.respond500WithTextPlain(
                     messages.getMessage(lang, MessageConsts.InternalServerError))));
       }
     }
@@ -260,7 +261,7 @@ public class MetadataCollectionsHelper {
               PostgresClient.getInstance(vertxContext.owner(), fincId)
                   .get(
                       TABLE_NAME,
-                      MetadataCollection.class,
+                      FincConfigMetadataCollection.class,
                       criterion,
                       true,
                       false,
@@ -273,7 +274,7 @@ public class MetadataCollectionsHelper {
                                           messages.getMessage(
                                               lang, MessageConsts.InternalServerError))));
                         } else {
-                          List<MetadataCollection> metadataCollections =
+                          List<FincConfigMetadataCollection> metadataCollections =
                               getReply.result().getResults();
                           if (metadataCollections.size() < 1) {
                             asyncResultHandler.handle(
@@ -299,7 +300,7 @@ public class MetadataCollectionsHelper {
                                     isilResult -> {
                                       if (isilResult.succeeded()) {
                                         String isil = isilResult.result();
-                                        MetadataCollectionSelect result =
+                                        FincSelectMetadataCollection result =
                                             MetadataCollectionsHelper.filterForIsil(
                                                 metadataCollections.get(0), isil);
                                         asyncResultHandler.handle(
@@ -366,7 +367,7 @@ public class MetadataCollectionsHelper {
                           PostgresClient.getInstance(vertxContext.owner(), fincId)
                               .get(
                                   TABLE_NAME,
-                                  MetadataCollection.class,
+                                  FincConfigMetadataCollection.class,
                                   criterion,
                                   true,
                                   false,
@@ -383,13 +384,13 @@ public class MetadataCollectionsHelper {
                                                           lang,
                                                           MessageConsts.InternalServerError))));
                                     } else {
-                                      List<MetadataCollection> mdCollections =
+                                      List<FincConfigMetadataCollection> mdCollections =
                                           getReply.result().getResults();
-                                      MetadataCollection metadataCollection = mdCollections.get(0);
-                                      MetadataCollection updated;
+                                      FincConfigMetadataCollection metadataCollection =
+                                          mdCollections.get(0);
+                                      FincConfigMetadataCollection updated;
                                       try {
-                                        updated =
-                                            setSelectStatus(metadataCollection, entity, isil);
+                                        updated = setSelectStatus(metadataCollection, entity, isil);
                                       } catch (FincSelectException e) {
                                         asyncResultHandler.handle(
                                             Future.succeededFuture(

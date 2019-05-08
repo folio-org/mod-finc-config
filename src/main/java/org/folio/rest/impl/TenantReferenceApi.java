@@ -30,9 +30,9 @@ public class TenantReferenceApi extends TenantAPI {
           TenantLoading tl = new TenantLoading();
           tl.withKey("loadSample")
               .withLead("sample-data")
-              .add("metadata-sources")
-              .add("metadata-collections")
-              .add("isils")
+              .add("finc-config/metadata-sources")
+              .add("finc-config/metadata-collections")
+              .add("finc-config/isils")
               .perform(
                   entity,
                   headers,

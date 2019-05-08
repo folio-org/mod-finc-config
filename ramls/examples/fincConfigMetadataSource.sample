@@ -61,14 +61,5 @@
     "uuid-789",
     "uuid-123"
   ],
-  "selectedBy": [
-    {
-      "isil": "DE-15",
-      "quantifier": "all"
-    },
-    {
-      "isil": "DE-14",
-      "quantifier": "some"
-    }
-  ]
+  "selectedBy": [ "DE-15", "DE-14" ]
 }

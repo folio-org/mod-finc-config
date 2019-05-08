@@ -9,18 +9,17 @@ import io.vertx.core.Vertx;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import org.folio.finc.select.MetadataCollectionsHelper;
+import org.folio.finc.select.MetadataSourcesHelper;
+import org.folio.rest.jaxrs.model.FincSelectMetadataCollection;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollectionsGetOrder;
-import org.folio.rest.jaxrs.model.FincSelectMetadataSourcesGetOrder;
-import org.folio.rest.jaxrs.model.MetadataCollectionSelect;
-import org.folio.rest.jaxrs.model.MetadataSourceSelect;
 import org.folio.rest.jaxrs.model.Select;
-import org.folio.rest.jaxrs.resource.FincSelect;
+import org.folio.rest.jaxrs.resource.FincSelectMetadataCollections;
 
-public class FincSelectAPI implements FincSelect {
+public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataCollections {
 
   private final MetadataCollectionsHelper metadataCollectionsHelper;
 
-  public FincSelectAPI(Vertx vertx, String tenantId) {
+  public FincSelectMetadataCollectionsAPI(Vertx vertx, String tenantId) {
     this.metadataCollectionsHelper = new MetadataCollectionsHelper(vertx, tenantId);
   }
 
@@ -42,7 +41,7 @@ public class FincSelectAPI implements FincSelect {
   @Override
   public void postFincSelectMetadataCollections(
       String lang,
-      MetadataCollectionSelect entity,
+      FincSelectMetadataCollection entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -51,7 +50,9 @@ public class FincSelectAPI implements FincSelect {
         aVoid -> {
           asyncResultHandler.handle(
               succeededFuture(
-                  FincSelect.PostFincSelectMetadataCollectionsResponse.status(501).build()));
+                  FincSelectMetadataCollections.PostFincSelectMetadataCollectionsResponse.status(
+                          501)
+                      .build()));
         });
   }
 
@@ -67,7 +68,7 @@ public class FincSelectAPI implements FincSelect {
   }
 
   @Override
-  public void getFincSelectMetadataCollectionsSelectById(
+  public void deleteFincSelectMetadataCollectionsById(
       String id,
       String lang,
       Map<String, String> okapiHeaders,
@@ -77,15 +78,17 @@ public class FincSelectAPI implements FincSelect {
         aVoid -> {
           asyncResultHandler.handle(
               succeededFuture(
-                  FincSelect.GetFincSelectMetadataCollectionsSelectByIdResponse.status(501)
+                  FincSelectMetadataCollections
+                      .DeleteFincSelectMetadataCollectionsSelectByIdResponse.status(501)
                       .build()));
         });
   }
 
   @Override
-  public void deleteFincSelectMetadataCollectionsSelectById(
+  public void putFincSelectMetadataCollectionsById(
       String id,
       String lang,
+      FincSelectMetadataCollection entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -93,7 +96,8 @@ public class FincSelectAPI implements FincSelect {
         aVoid -> {
           asyncResultHandler.handle(
               succeededFuture(
-                  FincSelect.DeleteFincSelectMetadataCollectionsSelectByIdResponse.status(501)
+                  FincSelectMetadataCollections.PutFincSelectMetadataCollectionsByIdResponse.status(
+                          501)
                       .build()));
         });
   }
@@ -111,7 +115,7 @@ public class FincSelectAPI implements FincSelect {
   }
 
   @Override
-  public void deleteFincSelectMetadataCollectionsById(
+  public void getFincSelectMetadataCollectionsSelectById(
       String id,
       String lang,
       Map<String, String> okapiHeaders,
@@ -121,63 +125,14 @@ public class FincSelectAPI implements FincSelect {
         aVoid -> {
           asyncResultHandler.handle(
               succeededFuture(
-                  FincSelect.DeleteFincSelectMetadataCollectionsByIdResponse.status(501).build()));
+                  FincSelectMetadataCollections.GetFincSelectMetadataCollectionsSelectByIdResponse
+                      .status(501)
+                      .build()));
         });
   }
 
   @Override
-  public void putFincSelectMetadataCollectionsById(
-      String id,
-      String lang,
-      MetadataCollectionSelect entity,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {
-    vertxContext.runOnContext(
-        aVoid -> {
-          asyncResultHandler.handle(
-              succeededFuture(
-                  FincSelect.PutFincSelectMetadataCollectionsByIdResponse.status(501).build()));
-        });
-  }
-
-  @Override
-  public void getFincSelectMetadataSources(
-      String query,
-      String orderBy,
-      FincSelectMetadataSourcesGetOrder order,
-      int offset,
-      int limit,
-      String lang,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {}
-
-  @Override
-  public void postFincSelectMetadataSources(
-      String lang,
-      MetadataSourceSelect entity,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {
-    vertxContext.runOnContext(
-        aVoid -> {
-          asyncResultHandler.handle(
-              succeededFuture(
-                  FincSelect.PostFincSelectMetadataSourcesResponse.status(501).build()));
-        });
-  }
-
-  @Override
-  public void getFincSelectMetadataSourcesById(
-      String id,
-      String lang,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {}
-
-  @Override
-  public void deleteFincSelectMetadataSourcesById(
+  public void deleteFincSelectMetadataCollectionsSelectById(
       String id,
       String lang,
       Map<String, String> okapiHeaders,
@@ -187,30 +142,9 @@ public class FincSelectAPI implements FincSelect {
         aVoid -> {
           asyncResultHandler.handle(
               succeededFuture(
-                  FincSelect.DeleteFincSelectMetadataSourcesByIdResponse.status(501).build()));
+                  FincSelectMetadataCollections
+                      .DeleteFincSelectMetadataCollectionsSelectByIdResponse.status(501)
+                      .build()));
         });
   }
-
-  @Override
-  public void putFincSelectMetadataSourcesById(
-      String id,
-      String lang,
-      MetadataSourceSelect entity,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {
-    vertxContext.runOnContext(
-        aVoid -> {
-          asyncResultHandler.handle(
-              succeededFuture(
-                  FincSelect.PutFincSelectMetadataSourcesByIdResponse.status(501).build()));
-        });
-  }
-
-  @Override
-  public void postFincSelectMetadataSourcesSelectById(
-      String id,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {}
 }

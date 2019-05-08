@@ -12,10 +12,9 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import org.folio.rest.RestVerticle;
-import org.folio.rest.annotations.Validate;
-import org.folio.rest.jaxrs.model.MetadataCollection;
-import org.folio.rest.jaxrs.model.MetadataCollectionsGetOrder;
-import org.folio.rest.jaxrs.resource.MetadataCollections;
+import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
+import org.folio.rest.jaxrs.model.FincConfigMetadataCollectionsGetOrder;
+import org.folio.rest.jaxrs.resource.FincConfigMetadataCollections;
 import org.folio.rest.persist.Criteria.Limit;
 import org.folio.rest.persist.Criteria.Offset;
 import org.folio.rest.persist.PgUtil;
@@ -31,14 +30,14 @@ import org.z3950.zing.cql.cql2pgjson.FieldException;
  * ATTENTION: API works tenant agnostic. Thus, don't use 'x-okapi-tenant' header, but {@value
  * Constants#MODULE_TENANT} as tenant.
  */
-public class MetadataCollectionsAPI implements MetadataCollections {
+public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataCollections {
 
   private static final String ID_FIELD = "_id";
   private static final String TABLE_NAME = "metadata_collections";
   private final Messages messages = Messages.getInstance();
-  private final Logger logger = LoggerFactory.getLogger(MetadataCollectionsAPI.class);
+  private final Logger logger = LoggerFactory.getLogger(FincConfigMetadataCollectionsAPI.class);
 
-  public MetadataCollectionsAPI(Vertx vertx, String tenantId) {
+  public FincConfigMetadataCollectionsAPI(Vertx vertx, String tenantId) {
     PostgresClient.getInstance(vertx).setIdField(ID_FIELD);
   }
 
@@ -50,11 +49,10 @@ public class MetadataCollectionsAPI implements MetadataCollections {
   }
 
   @Override
-  @Validate
-  public void getMetadataCollections(
+  public void getFincConfigMetadataCollections(
       String query,
       String orderBy,
-      MetadataCollectionsGetOrder order,
+      FincConfigMetadataCollectionsGetOrder order,
       int offset,
       int limit,
       String lang,
@@ -73,7 +71,7 @@ public class MetadataCollectionsAPI implements MetadataCollections {
               PostgresClient.getInstance(vertxContext.owner(), tenantId)
                   .get(
                       TABLE_NAME,
-                      MetadataCollection.class,
+                      FincConfigMetadataCollection.class,
                       fieldList,
                       cql,
                       true,
@@ -81,28 +79,31 @@ public class MetadataCollectionsAPI implements MetadataCollections {
                       reply -> {
                         try {
                           if (reply.succeeded()) {
-                            org.folio.rest.jaxrs.model.MetadataCollections collectionsCollection =
-                                new org.folio.rest.jaxrs.model.MetadataCollections();
-                            List<MetadataCollection> results = reply.result().getResults();
-                            collectionsCollection.setMetadataCollections(results);
+                            org.folio.rest.jaxrs.model.FincConfigMetadataCollections
+                                collectionsCollection =
+                                    new org.folio.rest.jaxrs.model.FincConfigMetadataCollections();
+                            List<FincConfigMetadataCollection> results =
+                                reply.result().getResults();
+                            collectionsCollection.setFincConfigMetadataCollections(results);
                             collectionsCollection.setTotalRecords(
                                 reply.result().getResultInfo().getTotalRecords());
                             asyncResultHandler.handle(
                                 Future.succeededFuture(
-                                    GetMetadataCollectionsResponse.respond200WithApplicationJson(
-                                        collectionsCollection)));
+                                    GetFincConfigMetadataCollectionsResponse
+                                        .respond200WithApplicationJson(collectionsCollection)));
                           } else {
                             asyncResultHandler.handle(
                                 Future.succeededFuture(
-                                    GetMetadataCollectionsResponse.respond500WithTextPlain(
-                                        messages.getMessage(
-                                            lang, MessageConsts.InternalServerError))));
+                                    GetFincConfigMetadataCollectionsResponse
+                                        .respond500WithTextPlain(
+                                            messages.getMessage(
+                                                lang, MessageConsts.InternalServerError))));
                           }
                         } catch (Exception e) {
                           logger.debug(e.getLocalizedMessage());
                           asyncResultHandler.handle(
                               Future.succeededFuture(
-                                  GetMetadataCollectionsResponse.respond500WithTextPlain(
+                                  GetFincConfigMetadataCollectionsResponse.respond500WithTextPlain(
                                       messages.getMessage(
                                           lang, MessageConsts.InternalServerError))));
                         }
@@ -111,7 +112,7 @@ public class MetadataCollectionsAPI implements MetadataCollections {
               logger.debug("IllegalStateException: " + e.getLocalizedMessage());
               asyncResultHandler.handle(
                   Future.succeededFuture(
-                      GetMetadataCollectionsResponse.respond400WithTextPlain(
+                      GetFincConfigMetadataCollectionsResponse.respond400WithTextPlain(
                           "CQL Illegal State Error for '" + "" + "': " + e.getLocalizedMessage())));
             } catch (Exception e) {
               Throwable cause = e;
@@ -124,12 +125,12 @@ public class MetadataCollectionsAPI implements MetadataCollections {
                 logger.debug("BAD CQL");
                 asyncResultHandler.handle(
                     Future.succeededFuture(
-                        GetMetadataCollectionsResponse.respond400WithTextPlain(
+                        GetFincConfigMetadataCollectionsResponse.respond400WithTextPlain(
                             "CQL Parsing Error for '" + "" + "': " + cause.getLocalizedMessage())));
               } else {
                 asyncResultHandler.handle(
                     io.vertx.core.Future.succeededFuture(
-                        GetMetadataCollectionsResponse.respond500WithTextPlain(
+                        GetFincConfigMetadataCollectionsResponse.respond500WithTextPlain(
                             messages.getMessage(lang, MessageConsts.InternalServerError))));
               }
             }
@@ -141,22 +142,21 @@ public class MetadataCollectionsAPI implements MetadataCollections {
         logger.debug("BAD CQL");
         asyncResultHandler.handle(
             Future.succeededFuture(
-                GetMetadataCollectionsResponse.respond400WithTextPlain(
+                GetFincConfigMetadataCollectionsResponse.respond400WithTextPlain(
                     "CQL Parsing Error for '" + "" + "': " + e.getLocalizedMessage())));
       } else {
         asyncResultHandler.handle(
             io.vertx.core.Future.succeededFuture(
-                GetMetadataCollectionsResponse.respond500WithTextPlain(
+                GetFincConfigMetadataCollectionsResponse.respond500WithTextPlain(
                     messages.getMessage(lang, MessageConsts.InternalServerError))));
       }
     }
   }
 
   @Override
-  @Validate
-  public void postMetadataCollections(
+  public void postFincConfigMetadataCollections(
       String lang,
-      MetadataCollection entity,
+      FincConfigMetadataCollection entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -167,13 +167,12 @@ public class MetadataCollectionsAPI implements MetadataCollections {
         entity,
         okapiHeaders,
         vertxContext,
-        PostMetadataCollectionsResponse.class,
+        PostFincConfigMetadataCollectionsResponse.class,
         asyncResultHandler);
   }
 
   @Override
-  @Validate
-  public void getMetadataCollectionsById(
+  public void getFincConfigMetadataCollectionsById(
       String id,
       String lang,
       Map<String, String> okapiHeaders,
@@ -183,17 +182,16 @@ public class MetadataCollectionsAPI implements MetadataCollections {
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
     PgUtil.getById(
         TABLE_NAME,
-        MetadataCollection.class,
+        FincConfigMetadataCollection.class,
         id,
         okapiHeaders,
         vertxContext,
-        GetMetadataCollectionsByIdResponse.class,
+        GetFincConfigMetadataCollectionsByIdResponse.class,
         asyncResultHandler);
   }
 
   @Override
-  @Validate
-  public void deleteMetadataCollectionsById(
+  public void deleteFincConfigMetadataCollectionsById(
       String id,
       String lang,
       Map<String, String> okapiHeaders,
@@ -206,16 +204,15 @@ public class MetadataCollectionsAPI implements MetadataCollections {
         id,
         okapiHeaders,
         vertxContext,
-        DeleteMetadataCollectionsByIdResponse.class,
+        DeleteFincConfigMetadataCollectionsByIdResponse.class,
         asyncResultHandler);
   }
 
   @Override
-  @Validate
-  public void putMetadataCollectionsById(
+  public void putFincConfigMetadataCollectionsById(
       String id,
       String lang,
-      MetadataCollection entity,
+      FincConfigMetadataCollection entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -227,7 +224,7 @@ public class MetadataCollectionsAPI implements MetadataCollections {
         id,
         okapiHeaders,
         vertxContext,
-        PutMetadataCollectionsByIdResponse.class,
+        PutFincConfigMetadataCollectionsByIdResponse.class,
         asyncResultHandler);
   }
 }

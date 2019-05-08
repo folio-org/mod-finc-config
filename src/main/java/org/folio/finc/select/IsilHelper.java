@@ -28,7 +28,7 @@ public class IsilHelper {
       String tenantId, Map<String, String> okapiHeaders, Context vertxContext) {
     Future<String> isilFuture = Future.future();
     String query = String.format("query=(tenant=%s)", tenantId);
-    isilsAPI.getIsils(
+    isilsAPI.getFincConfigIsils(
         query,
         0,
         1,

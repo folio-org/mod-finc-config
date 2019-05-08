@@ -12,9 +12,8 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import org.folio.rest.RestVerticle;
-import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.Isil;
-import org.folio.rest.jaxrs.resource.Isils;
+import org.folio.rest.jaxrs.resource.FincConfigIsils;
 import org.folio.rest.persist.Criteria.Limit;
 import org.folio.rest.persist.Criteria.Offset;
 import org.folio.rest.persist.PgUtil;
@@ -26,7 +25,7 @@ import org.folio.rest.utils.Constants;
 import org.z3950.zing.cql.cql2pgjson.CQL2PgJSON;
 import org.z3950.zing.cql.cql2pgjson.FieldException;
 
-public class IsilsAPI implements Isils {
+public class IsilsAPI implements FincConfigIsils {
 
   private static final String ID_FIELD = "_id";
   private static final String TABLE_NAME = "isils";
@@ -44,9 +43,8 @@ public class IsilsAPI implements Isils {
         .setOffset(new Offset(offset));
   }
 
-  @Validate
   @Override
-  public void getIsils(
+  public void getFincConfigIsils(
       String query,
       int offset,
       int limit,
@@ -82,12 +80,12 @@ public class IsilsAPI implements Isils {
                                 reply.result().getResultInfo().getTotalRecords());
                             asyncResultHandler.handle(
                                 Future.succeededFuture(
-                                    GetIsilsResponse.respond200WithApplicationJson(
+                                    GetFincConfigIsilsResponse.respond200WithApplicationJson(
                                         isilsCollection)));
                           } else {
                             asyncResultHandler.handle(
                                 Future.succeededFuture(
-                                    GetIsilsResponse.respond500WithTextPlain(
+                                    GetFincConfigIsilsResponse.respond500WithTextPlain(
                                         messages.getMessage(
                                             lang, MessageConsts.InternalServerError))));
                           }
@@ -95,7 +93,7 @@ public class IsilsAPI implements Isils {
                           logger.debug(e.getLocalizedMessage());
                           asyncResultHandler.handle(
                               Future.succeededFuture(
-                                  GetIsilsResponse.respond500WithTextPlain(
+                                  GetFincConfigIsilsResponse.respond500WithTextPlain(
                                       messages.getMessage(
                                           lang, MessageConsts.InternalServerError))));
                         }
@@ -104,7 +102,7 @@ public class IsilsAPI implements Isils {
               logger.debug("IllegalStateException: " + e.getLocalizedMessage());
               asyncResultHandler.handle(
                   Future.succeededFuture(
-                      GetIsilsResponse.respond400WithTextPlain(
+                      GetFincConfigIsilsResponse.respond400WithTextPlain(
                           "CQL Illegal State Error for '" + "" + "': " + e.getLocalizedMessage())));
             } catch (Exception e) {
               Throwable cause = e;
@@ -117,12 +115,12 @@ public class IsilsAPI implements Isils {
                 logger.debug("BAD CQL");
                 asyncResultHandler.handle(
                     Future.succeededFuture(
-                        GetIsilsResponse.respond400WithTextPlain(
+                        GetFincConfigIsilsResponse.respond400WithTextPlain(
                             "CQL Parsing Error for '" + "" + "': " + cause.getLocalizedMessage())));
               } else {
                 asyncResultHandler.handle(
                     io.vertx.core.Future.succeededFuture(
-                        GetIsilsResponse.respond500WithTextPlain(
+                        GetFincConfigIsilsResponse.respond500WithTextPlain(
                             messages.getMessage(lang, MessageConsts.InternalServerError))));
               }
             }
@@ -134,20 +132,19 @@ public class IsilsAPI implements Isils {
         logger.debug("BAD CQL");
         asyncResultHandler.handle(
             Future.succeededFuture(
-                GetIsilsResponse.respond400WithTextPlain(
+                GetFincConfigIsilsResponse.respond400WithTextPlain(
                     "CQL Parsing Error for '" + "" + "': " + e.getLocalizedMessage())));
       } else {
         asyncResultHandler.handle(
             io.vertx.core.Future.succeededFuture(
-                GetIsilsResponse.respond500WithTextPlain(
+                GetFincConfigIsilsResponse.respond500WithTextPlain(
                     messages.getMessage(lang, MessageConsts.InternalServerError))));
       }
     }
   }
 
-  @Validate
   @Override
-  public void postIsils(
+  public void postFincConfigIsils(
       String lang,
       Isil entity,
       Map<String, String> okapiHeaders,
@@ -159,13 +156,12 @@ public class IsilsAPI implements Isils {
         entity,
         okapiHeaders,
         vertxContext,
-        PostIsilsResponse.class,
+        PostFincConfigIsilsResponse.class,
         asyncResultHandler);
   }
 
-  @Validate
   @Override
-  public void getIsilsById(
+  public void getFincConfigIsilsById(
       String id,
       String lang,
       Map<String, String> okapiHeaders,
@@ -178,13 +174,12 @@ public class IsilsAPI implements Isils {
         id,
         okapiHeaders,
         vertxContext,
-        GetIsilsByIdResponse.class,
+        GetFincConfigIsilsByIdResponse.class,
         asyncResultHandler);
   }
 
-  @Validate
   @Override
-  public void deleteIsilsById(
+  public void deleteFincConfigIsilsById(
       String id,
       String lang,
       Map<String, String> okapiHeaders,
@@ -196,13 +191,12 @@ public class IsilsAPI implements Isils {
         id,
         okapiHeaders,
         vertxContext,
-        DeleteIsilsByIdResponse.class,
+        DeleteFincConfigIsilsByIdResponse.class,
         asyncResultHandler);
   }
 
-  @Validate
   @Override
-  public void putIsilsById(
+  public void putFincConfigIsilsById(
       String id,
       String lang,
       Isil entity,
@@ -216,7 +210,7 @@ public class IsilsAPI implements Isils {
         id,
         okapiHeaders,
         vertxContext,
-        PutIsilsByIdResponse.class,
+        PutFincConfigIsilsByIdResponse.class,
         asyncResultHandler);
   }
 }

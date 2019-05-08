@@ -2,12 +2,12 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
-    "metadataSources": {
+    "fincConfigMetadataCollections": {
       "type": "array",
-      "id": "metadataSourcesData",
+      "id": "fincConfigMetadataCollectionsData",
       "items": {
         "type": "object",
-        "$ref": "metadataSourceConfig.json"
+        "$ref": "fincConfigMetadataCollection.json"
       }
     },
     "totalRecords": {
@@ -15,7 +15,7 @@
     }
   },
   "required": [
-    "sources",
+    "metadataCollections",
     "totalRecords"
   ]
 }

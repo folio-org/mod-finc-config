@@ -12,10 +12,9 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import org.folio.rest.RestVerticle;
-import org.folio.rest.annotations.Validate;
-import org.folio.rest.jaxrs.model.MetadataSource;
-import org.folio.rest.jaxrs.model.MetadataSourcesGetOrder;
-import org.folio.rest.jaxrs.resource.MetadataSources;
+import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
+import org.folio.rest.jaxrs.model.FincConfigMetadataSourcesGetOrder;
+import org.folio.rest.jaxrs.resource.FincConfigMetadataSources;
 import org.folio.rest.persist.Criteria.Limit;
 import org.folio.rest.persist.Criteria.Offset;
 import org.folio.rest.persist.PgUtil;
@@ -31,14 +30,14 @@ import org.z3950.zing.cql.cql2pgjson.FieldException;
  * ATTENTION: API works tenant agnostic. Thus, don't use 'x-okapi-tenant' header, but {@value
  * Constants#MODULE_TENANT} as tenant.
  */
-public class MetadataSourcesAPI implements MetadataSources {
+public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
 
   private static final String ID_FIELD = "_id";
   private static final String TABLE_NAME = "metadata_sources";
   private final Messages messages = Messages.getInstance();
-  private final Logger logger = LoggerFactory.getLogger(MetadataSourcesAPI.class);
+  private final Logger logger = LoggerFactory.getLogger(FincConfigMetadataSourcesAPI.class);
 
-  public MetadataSourcesAPI(Vertx vertx, String tenantId) {
+  public FincConfigMetadataSourcesAPI(Vertx vertx, String tenantId) {
     PostgresClient.getInstance(vertx).setIdField(ID_FIELD);
   }
 
@@ -50,11 +49,10 @@ public class MetadataSourcesAPI implements MetadataSources {
   }
 
   @Override
-  @Validate
-  public void getMetadataSources(
+  public void getFincConfigMetadataSources(
       String query,
       String orderBy,
-      MetadataSourcesGetOrder order,
+      FincConfigMetadataSourcesGetOrder order,
       int offset,
       int limit,
       String lang,
@@ -73,7 +71,7 @@ public class MetadataSourcesAPI implements MetadataSources {
               PostgresClient.getInstance(vertxContext.owner(), tenantId)
                   .get(
                       TABLE_NAME,
-                      MetadataSource.class,
+                      FincConfigMetadataSource.class,
                       fieldList,
                       cql,
                       true,
@@ -81,21 +79,21 @@ public class MetadataSourcesAPI implements MetadataSources {
                       reply -> {
                         try {
                           if (reply.succeeded()) {
-                            org.folio.rest.jaxrs.model.MetadataSources sourcesCollection =
-                                new org.folio.rest.jaxrs.model.MetadataSources();
-                            List<MetadataSource> sources = reply.result().getResults();
-                            sourcesCollection.setMetadataSources(sources);
+                            org.folio.rest.jaxrs.model.FincConfigMetadataSources sourcesCollection =
+                                new org.folio.rest.jaxrs.model.FincConfigMetadataSources();
+                            List<FincConfigMetadataSource> sources = reply.result().getResults();
+                            sourcesCollection.setFincConfigMetadataSources(sources);
                             sourcesCollection.setTotalRecords(
                                 reply.result().getResultInfo().getTotalRecords());
 
                             asyncResultHandler.handle(
                                 Future.succeededFuture(
-                                    GetMetadataSourcesResponse.respond200WithApplicationJson(
-                                        sourcesCollection)));
+                                    GetFincConfigMetadataSourcesResponse
+                                        .respond200WithApplicationJson(sourcesCollection)));
                           } else {
                             asyncResultHandler.handle(
                                 Future.succeededFuture(
-                                    GetMetadataSourcesResponse.respond500WithTextPlain(
+                                    GetFincConfigMetadataSourcesResponse.respond500WithTextPlain(
                                         messages.getMessage(
                                             lang, MessageConsts.InternalServerError))));
                           }
@@ -103,7 +101,7 @@ public class MetadataSourcesAPI implements MetadataSources {
                           logger.debug(e.getLocalizedMessage());
                           asyncResultHandler.handle(
                               Future.succeededFuture(
-                                  GetMetadataSourcesResponse.respond500WithTextPlain(
+                                  GetFincConfigMetadataSourcesResponse.respond500WithTextPlain(
                                       messages.getMessage(
                                           lang, MessageConsts.InternalServerError))));
                         }
@@ -112,7 +110,7 @@ public class MetadataSourcesAPI implements MetadataSources {
               logger.debug("IllegalStateException: " + e.getLocalizedMessage());
               asyncResultHandler.handle(
                   Future.succeededFuture(
-                      GetMetadataSourcesResponse.respond400WithTextPlain(
+                      GetFincConfigMetadataSourcesResponse.respond400WithTextPlain(
                           "CQL Illegal State Error for '" + "" + "': " + e.getLocalizedMessage())));
             } catch (Exception e) {
               Throwable cause = e;
@@ -125,12 +123,12 @@ public class MetadataSourcesAPI implements MetadataSources {
                 logger.debug("BAD CQL");
                 asyncResultHandler.handle(
                     Future.succeededFuture(
-                        GetMetadataSourcesResponse.respond400WithTextPlain(
+                        GetFincConfigMetadataSourcesResponse.respond400WithTextPlain(
                             "CQL Parsing Error for '" + "" + "': " + cause.getLocalizedMessage())));
               } else {
                 asyncResultHandler.handle(
                     io.vertx.core.Future.succeededFuture(
-                        GetMetadataSourcesResponse.respond500WithTextPlain(
+                        GetFincConfigMetadataSourcesResponse.respond500WithTextPlain(
                             messages.getMessage(lang, MessageConsts.InternalServerError))));
               }
             }
@@ -142,22 +140,21 @@ public class MetadataSourcesAPI implements MetadataSources {
         logger.debug("BAD CQL");
         asyncResultHandler.handle(
             Future.succeededFuture(
-                GetMetadataSourcesResponse.respond400WithTextPlain(
+                GetFincConfigMetadataSourcesResponse.respond400WithTextPlain(
                     "CQL Parsing Error for '" + "" + "': " + e.getLocalizedMessage())));
       } else {
         asyncResultHandler.handle(
             io.vertx.core.Future.succeededFuture(
-                GetMetadataSourcesResponse.respond500WithTextPlain(
+                GetFincConfigMetadataSourcesResponse.respond500WithTextPlain(
                     messages.getMessage(lang, MessageConsts.InternalServerError))));
       }
     }
   }
 
   @Override
-  @Validate
-  public void postMetadataSources(
+  public void postFincConfigMetadataSources(
       String lang,
-      MetadataSource entity,
+      FincConfigMetadataSource entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -167,13 +164,12 @@ public class MetadataSourcesAPI implements MetadataSources {
         entity,
         okapiHeaders,
         vertxContext,
-        PostMetadataSourcesResponse.class,
+        PostFincConfigMetadataSourcesResponse.class,
         asyncResultHandler);
   }
 
   @Override
-  @Validate
-  public void getMetadataSourcesById(
+  public void getFincConfigMetadataSourcesById(
       String id,
       String lang,
       Map<String, String> okapiHeaders,
@@ -183,17 +179,16 @@ public class MetadataSourcesAPI implements MetadataSources {
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
     PgUtil.getById(
         TABLE_NAME,
-        MetadataSource.class,
+        FincConfigMetadataSource.class,
         id,
         okapiHeaders,
         vertxContext,
-        GetMetadataSourcesByIdResponse.class,
+        GetFincConfigMetadataSourcesByIdResponse.class,
         asyncResultHandler);
   }
 
   @Override
-  @Validate
-  public void deleteMetadataSourcesById(
+  public void deleteFincConfigMetadataSourcesById(
       String id,
       String lang,
       Map<String, String> okapiHeaders,
@@ -206,16 +201,15 @@ public class MetadataSourcesAPI implements MetadataSources {
         id,
         okapiHeaders,
         vertxContext,
-        DeleteMetadataSourcesByIdResponse.class,
+        DeleteFincConfigMetadataSourcesByIdResponse.class,
         asyncResultHandler);
   }
 
   @Override
-  @Validate
-  public void putMetadataSourcesById(
+  public void putFincConfigMetadataSourcesById(
       String id,
       String lang,
-      MetadataSource entity,
+      FincConfigMetadataSource entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -227,7 +221,7 @@ public class MetadataSourcesAPI implements MetadataSources {
         id,
         okapiHeaders,
         vertxContext,
-        PutMetadataSourcesByIdResponse.class,
+        PutFincConfigMetadataSourcesByIdResponse.class,
         asyncResultHandler);
   }
 }

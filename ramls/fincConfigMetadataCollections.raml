@@ -8,8 +8,8 @@ documentation:
     content: This documents the API calls that can be made to query and manage metadata collections
 
 types:
-  metadataCollection: !include schemas/metadataCollectionConfig.json
-  metadataCollections: !include schemas/metadataCollectionConfigs.json
+  fincConfigMetadataCollection: !include schemas/fincConfigMetadataCollection.json
+  fincConfigMetadataCollections: !include schemas/fincConfigMetadataCollections.json
   errors: !include ./raml-util/schemas/errors.schema
 
 traits:
@@ -23,14 +23,14 @@ resourceTypes:
   collection: !include ./raml-util/rtypes/collection.raml
   collection-item: !include ./raml-util/rtypes/item-collection.raml
 
-/metadata-collections:
+/finc-config/metadata-collections:
   displayName: Metadata Collections
   type:
     collection:
-      exampleCollection: !include examples/metadataCollectionConfig_collection.sample
-      exampleItem: !include examples/metadataCollectionConfig.sample
-      schemaCollection: metadataCollections
-      schemaItem: metadataCollection
+      exampleCollection: !include examples/fincConfigMetadataCollection_collection.sample
+      exampleItem: !include examples/fincConfigMetadataCollection.sample
+      schemaCollection: fincConfigMetadataCollections
+      schemaItem: fincConfigMetadataCollection
   get:
     is: [
       searchable: {description: "", example: "active=true sortBy username"},
@@ -44,8 +44,8 @@ resourceTypes:
   /{id}:
     type:
       collection-item:
-        exampleItem: !include examples/metadataCollectionConfig.sample
-        schema: metadataCollection
+        exampleItem: !include examples/fincConfigMetadataCollection.sample
+        schema: fincConfigMetadataCollection
     get:
       description: Get one metadata collection identified by id
     delete:

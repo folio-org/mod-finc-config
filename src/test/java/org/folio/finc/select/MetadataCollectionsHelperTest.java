@@ -1,14 +1,14 @@
 package org.folio.finc.select;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import io.vertx.core.Vertx;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.folio.rest.jaxrs.model.MetadataCollection;
-import org.folio.rest.jaxrs.model.MetadataCollection.UsageRestricted;
-import org.folio.rest.jaxrs.model.MetadataCollectionSelect;
+import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
+import org.folio.rest.jaxrs.model.FincConfigMetadataCollection.UsageRestricted;
+import org.folio.rest.jaxrs.model.FincSelectMetadataCollection;
 import org.junit.Test;
 
 public class MetadataCollectionsHelperTest {
@@ -20,7 +20,7 @@ public class MetadataCollectionsHelperTest {
 
   @Test
   public void testTransform() {
-    MetadataCollection collection1 = new MetadataCollection();
+    FincConfigMetadataCollection collection1 = new FincConfigMetadataCollection();
     collection1.setId("uuid-1234");
     collection1.setLabel(COLLECTION_1);
     collection1.setUsageRestricted(UsageRestricted.NO);
@@ -31,7 +31,7 @@ public class MetadataCollectionsHelperTest {
     collection1.setPermittedFor(permittedFor);
     collection1.setSelectedBy(permittedFor);
 
-    MetadataCollection collection2 = new MetadataCollection();
+    FincConfigMetadataCollection collection2 = new FincConfigMetadataCollection();
     collection2.setId("uuid-6789");
     collection2.setLabel(COLLECTION_2);
     collection2.setUsageRestricted(UsageRestricted.YES);
@@ -41,24 +41,24 @@ public class MetadataCollectionsHelperTest {
     collection2.setPermittedFor(permittedFor2);
     collection2.setSelectedBy(permittedFor2);
 
-    List<MetadataCollection> collections = new ArrayList<>();
+    List<FincConfigMetadataCollection> collections = new ArrayList<>();
     collections.add(collection1);
     collections.add(collection2);
 
-    List<MetadataCollectionSelect> transformed = MetadataCollectionsHelper
-        .filterForIsil(collections, DE_15);
-    transformed.stream().forEach(mdCollection -> {
-      String label = mdCollection.getLabel();
-      switch (label) {
-        case COLLECTION_1:
-          assertTrue(mdCollection.getSelected());
-          break;
-        case COLLECTION_2:
-          assertFalse(mdCollection.getSelected());
-          break;
-      }
-    });
-
-
+    List<FincSelectMetadataCollection> transformed =
+        MetadataCollectionsHelper.filterForIsil(collections, DE_15);
+    transformed.stream()
+        .forEach(
+            mdCollection -> {
+              String label = mdCollection.getLabel();
+              switch (label) {
+                case COLLECTION_1:
+                  assertTrue(mdCollection.getSelected());
+                  break;
+                case COLLECTION_2:
+                  assertFalse(mdCollection.getSelected());
+                  break;
+              }
+            });
   }
 }

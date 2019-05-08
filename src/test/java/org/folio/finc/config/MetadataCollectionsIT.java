@@ -18,8 +18,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
-import org.folio.rest.jaxrs.model.MetadataCollection;
-import org.folio.rest.jaxrs.model.MetadataCollection.MetadataAvailable;
+import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
+import org.folio.rest.jaxrs.model.FincConfigMetadataCollection.MetadataAvailable;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
@@ -33,12 +33,12 @@ import org.junit.runner.RunWith;
 public class MetadataCollectionsIT {
 
   private static final String APPLICATION_JSON = "application/json";
-  private static final String BASE_URI = "/metadata-collections";
+  private static final String BASE_URI = "/finc-config/metadata-collections";
   private static final String TENANT = "ubl";
 
   private static Vertx vertx;
-  private static MetadataCollection metadataCollection;
-  private static MetadataCollection metadataCollectionChanged;
+  private static FincConfigMetadataCollection metadataCollection;
+  private static FincConfigMetadataCollection metadataCollectionChanged;
 
   @Rule public Timeout timeout = Timeout.seconds(10);
 
@@ -48,10 +48,12 @@ public class MetadataCollectionsIT {
 
     try {
       String metadataCollectionStr =
-          new String(Files.readAllBytes(Paths.get("ramls/examples/metadataCollectionConfig.sample")));
-      metadataCollection = Json.decodeValue(metadataCollectionStr, MetadataCollection.class);
+          new String(
+              Files.readAllBytes(Paths.get("ramls/examples/fincConfigMetadataCollection.sample")));
+      metadataCollection =
+          Json.decodeValue(metadataCollectionStr, FincConfigMetadataCollection.class);
       metadataCollectionChanged =
-          Json.decodeValue(metadataCollectionStr, MetadataCollection.class)
+          Json.decodeValue(metadataCollectionStr, FincConfigMetadataCollection.class)
               .withMetadataAvailable(MetadataAvailable.NO);
     } catch (Exception e) {
       context.fail(e);
@@ -77,8 +79,7 @@ public class MetadataCollectionsIT {
     String url = "http://localhost:" + port;
     TenantClient tenantClient =
         new TenantClient(url, Constants.MODULE_TENANT, Constants.MODULE_TENANT);
-    TenantClient tenantClientDiku =
-        new TenantClient(url, TENANT, TENANT);
+    TenantClient tenantClientDiku = new TenantClient(url, TENANT, TENANT);
     DeploymentOptions options =
         new DeploymentOptions().setConfig(new JsonObject().put("http.port", port)).setWorker(true);
 
@@ -210,14 +211,14 @@ public class MetadataCollectionsIT {
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
-        .body("metadataCollections.size()", equalTo(1))
-        .body("metadataCollections[0].id", equalTo(metadataCollection.getId()))
-        .body("metadataCollections[0].label", equalTo(metadataCollection.getLabel()))
+        .body("fincConfigMetadataCollections.size()", equalTo(1))
+        .body("fincConfigMetadataCollections[0].id", equalTo(metadataCollection.getId()))
+        .body("fincConfigMetadataCollections[0].label", equalTo(metadataCollection.getLabel()))
         .body(
-            "metadataCollections[0].mdSource.id",
+            "fincConfigMetadataCollections[0].mdSource.id",
             equalTo(metadataCollectionChanged.getMdSource().getId()))
         .body(
-            "metadataCollections[0].facetLabel",
+            "fincConfigMetadataCollections[0].facetLabel",
             equalTo(metadataCollectionChanged.getFacetLabel()));
 
     String cql2 = "?query=(label=\"FOO*\")";
@@ -240,14 +241,14 @@ public class MetadataCollectionsIT {
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
-        .body("metadataCollections.size()", equalTo(1))
-        .body("metadataCollections[0].id", equalTo(metadataCollectionChanged.getId()))
-        .body("metadataCollections[0].label", equalTo(metadataCollectionChanged.getLabel()))
+        .body("fincConfigMetadataCollections.size()", equalTo(1))
+        .body("fincConfigMetadataCollections[0].id", equalTo(metadataCollectionChanged.getId()))
+        .body("fincConfigMetadataCollections[0].label", equalTo(metadataCollectionChanged.getLabel()))
         .body(
-            "metadataCollections[0].mdSource.id",
+            "fincConfigMetadataCollections[0].mdSource.id",
             equalTo(metadataCollectionChanged.getMdSource().getId()))
         .body(
-            "metadataCollections[0].facetLabel",
+            "fincConfigMetadataCollections[0].facetLabel",
             equalTo(metadataCollectionChanged.getFacetLabel()));
 
     // DELETE
@@ -262,9 +263,10 @@ public class MetadataCollectionsIT {
 
   @Test
   public void checkThatInvalidMetadataCollectionIsNotPosted() {
-    MetadataCollection metadataCollectionInvalid =
+    FincConfigMetadataCollection metadataCollectionInvalid =
         Json.decodeValue(
-                Json.encode(MetadataCollectionsIT.metadataCollection), MetadataCollection.class)
+                Json.encode(MetadataCollectionsIT.metadataCollection),
+          FincConfigMetadataCollection.class)
             .withLabel(null);
     given()
         .body(Json.encode(metadataCollectionInvalid))

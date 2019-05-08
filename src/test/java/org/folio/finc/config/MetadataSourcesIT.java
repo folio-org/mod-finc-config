@@ -18,7 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
-import org.folio.rest.jaxrs.model.MetadataSource;
+import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
@@ -32,13 +32,13 @@ import org.junit.runner.RunWith;
 public class MetadataSourcesIT {
 
   private static final String APPLICATION_JSON = "application/json";
-  private static final String BASE_URI = "/metadata-sources";
+  private static final String BASE_URI = "/finc-config/metadata-sources";
   private static final String TENANT = "diku";
 
   private static Vertx vertx;
-  private static MetadataSource metadataSource1;
-  private static MetadataSource metadataSource2;
-  private static MetadataSource metadataSource2Changed;
+  private static FincConfigMetadataSource metadataSource1;
+  private static FincConfigMetadataSource metadataSource2;
+  private static FincConfigMetadataSource metadataSource2Changed;
 
   @Rule public Timeout timeout = Timeout.seconds(10000);
 
@@ -48,13 +48,15 @@ public class MetadataSourcesIT {
 
     try {
       String metadataSourceStr1 =
-          new String(Files.readAllBytes(Paths.get("ramls/examples/metadataSourceConfig.sample")));
-      metadataSource1 = Json.decodeValue(metadataSourceStr1, MetadataSource.class);
+          new String(
+              Files.readAllBytes(Paths.get("ramls/examples/fincConfigMetadataSource.sample")));
+      metadataSource1 = Json.decodeValue(metadataSourceStr1, FincConfigMetadataSource.class);
       String metadataSourceStr2 =
-          new String(Files.readAllBytes(Paths.get("ramls/examples/metadataSourceConfig2.sample")));
-      metadataSource2 = Json.decodeValue(metadataSourceStr2, MetadataSource.class);
+          new String(
+              Files.readAllBytes(Paths.get("ramls/examples/fincConfigMetadataSource2.sample")));
+      metadataSource2 = Json.decodeValue(metadataSourceStr2, FincConfigMetadataSource.class);
       metadataSource2Changed =
-          Json.decodeValue(metadataSourceStr2, MetadataSource.class)
+          Json.decodeValue(metadataSourceStr2, FincConfigMetadataSource.class)
               .withAccessUrl("www.changed.org");
     } catch (Exception e) {
       context.fail(e);
@@ -88,9 +90,7 @@ public class MetadataSourcesIT {
         options,
         res -> {
           try {
-            tenantClient.postTenant(
-                null,
-                postTenantRes -> async.complete());
+            tenantClient.postTenant(null, postTenantRes -> async.complete());
           } catch (Exception e) {
             context.fail(e);
           }
@@ -212,10 +212,10 @@ public class MetadataSourcesIT {
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
-        .body("metadataSources.size()", equalTo(1))
-        .body("metadataSources[0].id", equalTo(metadataSource1.getId()))
-        .body("metadataSources[0].label", equalTo(metadataSource1.getLabel()))
-        .body("metadataSources[0].status", equalTo(metadataSource1.getStatus().value()));
+        .body("fincConfigMetadataSources.size()", equalTo(1))
+        .body("fincConfigMetadataSources[0].id", equalTo(metadataSource1.getId()))
+        .body("fincConfigMetadataSources[0].label", equalTo(metadataSource1.getLabel()))
+        .body("fincConfigMetadataSources[0].status", equalTo(metadataSource1.getStatus().value()));
 
     String cql2 = "?query=(label=\"FOO*\")";
     given()
@@ -237,11 +237,11 @@ public class MetadataSourcesIT {
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
-        .body("metadataSources.size()", equalTo(1))
-        .body("metadataSources[0].id", equalTo(metadataSource1.getId()))
-        .body("metadataSources[0].label", equalTo(metadataSource1.getLabel()))
-        .body("metadataSources[0].status", equalTo(metadataSource1.getStatus().value()))
-        .body("metadataSources[0].solrShard", equalTo(metadataSource1.getSolrShard().value()));
+        .body("fincConfigMetadataSources.size()", equalTo(1))
+        .body("fincConfigMetadataSources[0].id", equalTo(metadataSource1.getId()))
+        .body("fincConfigMetadataSources[0].label", equalTo(metadataSource1.getLabel()))
+        .body("fincConfigMetadataSources[0].status", equalTo(metadataSource1.getStatus().value()))
+        .body("fincConfigMetadataSources[0].solrShard", equalTo(metadataSource1.getSolrShard().value()));
 
     // DELETE
     given()
@@ -255,8 +255,9 @@ public class MetadataSourcesIT {
 
   @Test
   public void checkThatInvalidMetadataSourceIsNotPosted() {
-    MetadataSource metadataSourceInvalid =
-        Json.decodeValue(Json.encode(MetadataSourcesIT.metadataSource2), MetadataSource.class)
+    FincConfigMetadataSource metadataSourceInvalid =
+        Json.decodeValue(
+          Json.encode(MetadataSourcesIT.metadataSource2), FincConfigMetadataSource.class)
             .withLabel(null);
     given()
         .body(Json.encode(metadataSourceInvalid))

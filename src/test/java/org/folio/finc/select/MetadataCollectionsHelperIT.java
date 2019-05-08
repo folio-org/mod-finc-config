@@ -18,8 +18,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
+import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.Isil;
-import org.folio.rest.jaxrs.model.MetadataCollection;
 import org.folio.rest.jaxrs.model.Select;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
@@ -37,13 +37,13 @@ public class MetadataCollectionsHelperIT {
   private static final String BASE_URI = "/finc-select/metadata-collections";
   private static final String TENANT_UBL = "ubl";
   private static final String TENANT_DIKU = "ubl";
-  private static MetadataCollection metadataCollectionPermitted;
-  private static MetadataCollection metadataCollectionForbidden;
+  private static FincConfigMetadataCollection metadataCollectionPermitted;
+  private static FincConfigMetadataCollection metadataCollectionForbidden;
   private static Isil isil1;
   private static Vertx vertx;
-  @Rule public Timeout timeout = Timeout.seconds(10);
   private final Select unselect = new Select().withSelect(false);
   private final Select select = new Select().withSelect(true);
+  @Rule public Timeout timeout = Timeout.seconds(10);
 
   @BeforeClass
   public static void setUp(TestContext context) {
@@ -53,15 +53,15 @@ public class MetadataCollectionsHelperIT {
 
       String metadataCollectionStr =
           new String(
-              Files.readAllBytes(Paths.get("ramls/examples/metadataCollectionConfig.sample")));
+              Files.readAllBytes(Paths.get("ramls/examples/fincConfigMetadataCollection.sample")));
       metadataCollectionPermitted =
-          Json.decodeValue(metadataCollectionStr, MetadataCollection.class);
+          Json.decodeValue(metadataCollectionStr, FincConfigMetadataCollection.class);
 
       String metadataCollectionStr2 =
           new String(
-              Files.readAllBytes(Paths.get("ramls/examples/metadataCollectionConfig2.sample")));
+              Files.readAllBytes(Paths.get("ramls/examples/fincConfigMetadataCollection2.sample")));
       metadataCollectionForbidden =
-          Json.decodeValue(metadataCollectionStr2, MetadataCollection.class);
+        Json.decodeValue(metadataCollectionStr2, FincConfigMetadataCollection.class);
     } catch (Exception e) {
       context.fail(e);
     }
@@ -123,7 +123,7 @@ public class MetadataCollectionsHelperIT {
         .header("X-Okapi-Tenant", TENANT_UBL)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
-        .post("/metadata-collections")
+        .post("/finc-config/metadata-collections")
         .then()
         .statusCode(201)
         .body("id", equalTo(metadataCollectionPermitted.getId()))
@@ -136,7 +136,7 @@ public class MetadataCollectionsHelperIT {
         .header("X-Okapi-Tenant", TENANT_UBL)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
-        .post("/metadata-collections")
+        .post("/finc-config/metadata-collections")
         .then()
         .statusCode(201)
         .body("id", equalTo(metadataCollectionForbidden.getId()))
@@ -149,7 +149,7 @@ public class MetadataCollectionsHelperIT {
         .header("X-Okapi-Tenant", TENANT_UBL)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
-        .post("/isils")
+        .post("/finc-config/isils")
         .then()
         .statusCode(201)
         .body("isil", equalTo(isil1.getIsil()));
