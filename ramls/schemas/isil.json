@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Isil",
+  "description": "Isil to tenant configuration",
+  "properties": {
+    "id": {
+      "description": "A UUID identifying this group",
+      "type": "string"
+    },
+    "library": {
+      "description": "Descriptive name of the library",
+      "type": "string"
+    },
+    "isil": {
+      "description": "Isil of this library",
+      "type": "string"
+    },
+    "tenant": {
+      "description": "Tenant of this library",
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "../raml-util/schemas/metadata.schema",
+      "readonly": true
+    }
+  },
+  "required": [
+    "library",
+    "isil",
+    "tenant"
+  ]
+}

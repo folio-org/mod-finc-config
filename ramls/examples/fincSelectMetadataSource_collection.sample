@@ -1,0 +1,70 @@
+{
+  "metadataSources": [
+    {
+      "id": "6dd325f8-b1d5-4568-a0d7-aecf6b8d6697",
+      "label": "Cambridge University Press Journals",
+      "description": "This is a test metadata source",
+      "status": "active",
+      "vendor": {
+        "id": "uuid-1234",
+        "name": "Test vendor"
+      },
+      "contacts": {
+        "internal": [
+          {
+            "id": "uuid-4321",
+            "name": "Erika Mustermann",
+            "role": "metadata",
+            "isInternal": "1"
+          },
+          {
+            "id": "uuid-4322",
+            "name": "Max Mustermann",
+            "role": "technical",
+            "isInternal": "1"
+          }
+        ],
+        "external": [
+          {
+            "id": "uuid-4323",
+            "name": "John Doe",
+            "role": "management",
+            "isInternal": "0"
+          },
+          {
+            "id": "uuid-4324",
+            "name": "Jane Doe",
+            "role": "technical",
+            "isInternal": "0"
+          }
+        ]
+      },
+      "indexingLevel": "bibliographic",
+      "licensingNote": "Test licensing note",
+      "contracts": [
+          "http://contract1.de"
+      ],
+      "lastProcessed": "2018-01-01",
+      "tickets": [
+        "http://redmine.de/123",
+        "http://redmine.de/456"
+      ],
+      "accessUrl": "http://access.url",
+      "sourceId": 1,
+      "solrShard": "UBL main",
+      "deliveryMethods": [
+          "API Download"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "updateRhythm": "monthly",
+      "inferiorTo": [
+        "uuid-789",
+        "uuid-123"
+      ],
+      "selected": true
+    }
+  ],
+  "totalRecords": 1
+}

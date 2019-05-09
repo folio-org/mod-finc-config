@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "description": "Collection of metadata collections in finc select",
+  "properties": {
+    "fincSelectMetadataCollections": {
+      "type": "array",
+      "id": "fincSelectMetadataCollectionData",
+      "items": {
+        "type": "object",
+        "$ref": "fincSelectMetadataCollection.json"
+      }
+    },
+    "totalRecords": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "sources",
+    "totalRecords"
+  ]
+}

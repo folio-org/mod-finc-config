@@ -28,6 +28,20 @@
           "tOps": "ADD"
         }
       ]
+    },
+    {
+      "tableName": "isils",
+      "generateId": true,
+      "fromModuleVersion": "1.0",
+      "populateJsonWithId": true,
+      "pkColumnName": "_id",
+      "withMetadata": true,
+      "uniqueIndex": [
+        {
+          "fieldName": "isil",
+          "tOps": "ADD"
+        }
+      ]
     }
   ],
   "views": [

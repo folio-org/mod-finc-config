@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "description": "Collection of isil to tenant configurations",
+  "properties": {
+    "isils": {
+      "description": "List of isil items",
+      "id": "isils",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "$ref": "isil.json"
+      }
+    },
+    "totalRecords": {
+      "type": "integer"
+    }
+  }
+}

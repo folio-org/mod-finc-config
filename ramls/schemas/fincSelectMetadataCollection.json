@@ -1,0 +1,127 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Metadata Collection Schema",
+  "description": "Metadata collection in finc select",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string",
+      "description": "A unique name for this metadata collection"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description for this metadata collection"
+    },
+    "mdSource": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Id of linked metadata source"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of linked metadata source"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "metadataAvailable": {
+      "type": "string",
+      "enum": [
+        "yes",
+        "no",
+        "undetermined"
+      ]
+    },
+    "usageRestricted": {
+      "type": "string",
+      "enum": [
+        "yes",
+        "no"
+      ]
+    },
+    "permitted": {
+      "type": "boolean"
+    },
+    "freeContent": {
+      "type": "string",
+      "enum": [
+        "yes",
+        "no",
+        "undetermined"
+      ]
+    },
+    "lod": {
+      "type": "object",
+      "properties": {
+        "publication": {
+          "type": "string",
+          "enum": [
+            "permitted (interpreted)",
+            "permitted (explicit)",
+            "permitted (explicit) under conditions",
+            "prohibited (interpreted)",
+            "prohibited (explicit)",
+            "silent"
+          ]
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "collectionId": {
+      "type": "string"
+    },
+    "facetLabel": {
+      "type": "string"
+    },
+    "productIsil": {
+      "type": "string"
+    },
+    "tickets": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
+    },
+    "contentFiles": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
+    },
+    "solrMegaCollections": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
+    },
+    "selected": {
+      "type": "boolean"
+    },
+    "filters": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "label",
+    "usageRestricted",
+    "solrMegaCollections"
+  ],
+  "additionalProperties": false
+}

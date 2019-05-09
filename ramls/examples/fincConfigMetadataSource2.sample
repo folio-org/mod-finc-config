@@ -1,0 +1,47 @@
+{
+  "id": "f6f03fb4-3368-4bc0-bc02-3bf6e19604a5",
+  "label": "Early Music Online",
+  "description": "This is a test metadata source 2",
+  "status": "active",
+  "vendor": {
+  "id": "uuid-1235",
+  "name": "Test vendor second"
+  },
+  "contacts": {
+    "internal": [
+      {
+        "id": "uuid-4321",
+        "name": "Erika Mustermann",
+        "role": "metadata",
+        "isInternal": "1"
+      }
+    ],
+    "external": [
+      {
+        "id": "uuid-4324",
+        "name": "Jane Doe",
+        "role": "technical",
+        "isInternal": "0"
+      }
+    ]
+  },
+  "contracts": [
+      "http://contract2.de"
+  ],
+  "lastProcessed": "2017-12-12",
+  "tickets": [
+    "http://redmine.de/456"
+  ],
+  "accessUrl": "http://access.url",
+  "sourceId": 2,
+  "solrShard": "UBL main",
+  "deliveryMethods": [
+      "API Download"
+  ],
+  "formats": [
+    "xml",
+    "json"
+  ],
+  "updateRhythm": "monthly",
+  "selectedBy": [ "DE-14" ]
+}

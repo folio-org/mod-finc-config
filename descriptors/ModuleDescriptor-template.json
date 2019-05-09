@@ -3,28 +3,28 @@
   "name": "mod-finc-config",
   "provides": [
     {
-      "id": "metadata-sources",
+      "id": "finc-config/metadata-sources",
       "version": "0.1",
       "handlers": [
         {
           "methods": [
             "GET"
           ],
-          "pathPattern": "/metadata-sources",
+          "pathPattern": "/finc-config/metadata-sources",
           "permissionsRequired": ["metadatasources.collection.get"]
         },
         {
           "methods": [
             "GET"
           ],
-          "pathPattern": "/metadata-sources/{id}",
+          "pathPattern": "/finc-config/metadata-sources/{id}",
           "permissionsRequired": ["metadatasources.item.get"]
         },
         {
           "methods": [
             "POST"
           ],
-          "pathPattern": "/metadata-sources",
+          "pathPattern": "/finc-config/metadata-sources",
           "permissionsRequired": ["metadatasources.item.post"]
         },
         {
@@ -38,49 +38,133 @@
           "methods": [
             "DELETE"
           ],
-          "pathPattern": "/metadata-sources/{id}",
+          "pathPattern": "/finc-config/metadata-sources/{id}",
           "permissionsRequired": ["metadatasources.item.delete"]
         }
       ]
     },
     {
-      "id": "metadata-collections",
+      "id": "finc-config/metadata-collections",
       "version": "0.1",
       "handlers": [
         {
           "methods": [
             "GET"
           ],
-          "pathPattern": "/metadata-collections",
+          "pathPattern": "/finc-config/metadata-collections",
           "permissionsRequired": ["metadatacollections.collection.get"]
         },
         {
           "methods": [
             "GET"
           ],
-          "pathPattern": "/metadata-collections/{id}",
+          "pathPattern": "/finc-config/metadata-collections/{id}",
           "permissionsRequired": ["metadatacollections.item.get"]
         },
         {
           "methods": [
             "POST"
           ],
-          "pathPattern": "/metadata-collections",
+          "pathPattern": "/finc-config/metadata-collections",
           "permissionsRequired": ["metadatacollections.item.post"]
         },
         {
           "methods": [
             "PUT"
           ],
-          "pathPattern": "/metadata-collections/{id}",
+          "pathPattern": "/finc-config/metadata-collections/{id}",
           "permissionsRequired": ["metadatacollections.item.put"]
         },
         {
           "methods": [
             "DELETE"
           ],
-          "pathPattern": "/metadata-collections/{id}",
+          "pathPattern": "/finc-config/metadata-collections/{id}",
           "permissionsRequired": ["metadatacollections.item.delete"]
+        }
+      ]
+    },
+    {
+      "id": "finc-config/isils",
+      "version": "0.1",
+      "handlers": [
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-config/isils"
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-config/isils/{id}"
+        },
+        {
+          "methods": [
+            "POST"
+          ],
+          "pathPattern": "/finc-config/isils"
+        },
+        {
+          "methods": [
+            "PUT"
+          ],
+          "pathPattern": "/finc-config/isils/{id}"
+        },
+        {
+          "methods": [
+            "DELETE"
+          ],
+          "pathPattern": "/finc-config/isils/{id}"
+        }
+      ]
+    },
+    {
+      "id": "finc-select/metadata-collections",
+      "version": "0.1",
+      "handlers": [
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-select/metadata-collections"
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-select/metadata-collections/{id}"
+        },
+        {
+          "methods": [
+            "PUT"
+          ],
+          "pathPattern": "/finc-select/metadata-collections/{id}/select"
+        }
+      ]
+    },
+    {
+      "id": "finc-select/metadata-sources",
+      "version": "0.1",
+      "handlers": [
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-select/metadata-sources"
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-select/metadata-sources/{id}"
+        },
+        {
+          "methods": [
+            "PUT"
+          ],
+          "pathPattern": "/finc-select/metadata-sources/{id}/select"
         }
       ]
     },

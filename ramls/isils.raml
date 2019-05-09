@@ -1,0 +1,45 @@
+#%RAML 1.0
+title: Isils
+version: v1.0.1
+baseUri: http://github.com/org/folio/mod-finc-config
+
+documentation:
+  - title: mod-finc-config Isils API
+    content: This documents the API calls that can be made to query and manage isils of the system
+
+types:
+  isil: !include schemas/isil.json
+  isils: !include schemas/isils.json
+  errors: !include raml-util/schemas/errors.schema
+
+traits:
+  pageable: !include raml-util/traits/pageable.raml
+  searchable: !include raml-util/traits/searchable.raml
+  language: !include raml-util/traits/language.raml
+  validate: !include raml-util/traits/validation.raml
+
+resourceTypes:
+  collection: !include raml-util/rtypes/collection.raml
+  collection-item: !include raml-util/rtypes/item-collection.raml
+
+/finc-config/isils:
+  type:
+    collection:
+      exampleCollection: !include examples/isil_collection.sample
+      exampleItem: !include examples/isil1.sample
+      schemaCollection: isils
+      schemaItem: isil
+  get:
+    is: [
+      searchable: {description: "", example: ""},
+      pageable
+    ]
+    description: Return a list of isisls
+  post:
+    is: [validate]
+    description: Create an isil
+  /{id}:
+    type:
+      collection-item:
+        exampleItem: !include examples/isil1.sample
+        schema: isil

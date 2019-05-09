@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "description": "Collection of metadata sources in finc config",
+  "properties": {
+    "fincConfigMetadataSources": {
+      "type": "array",
+      "id": "fincConfigMetadataSourcesData",
+      "items": {
+        "type": "object",
+        "$ref": "fincConfigMetadataSource.json"
+      }
+    },
+    "totalRecords": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "sources",
+    "totalRecords"
+  ]
+}
