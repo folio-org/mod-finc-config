@@ -43,5 +43,5 @@
     "json"
   ],
   "updateRhythm": "monthly",
-  "selectedBy": [ "DE-15", "DE-14" ]
+  "selectedBy": [ "DE-14" ]
 }

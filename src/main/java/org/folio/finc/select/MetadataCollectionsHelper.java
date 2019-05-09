@@ -76,11 +76,11 @@ public class MetadataCollectionsHelper {
     boolean permitted = permittedFor.contains(isil);
     metadataCollection.setPermittedFor(null);
 
-    FincSelectMetadataCollection FincSelectMetadataCollection =
+    FincSelectMetadataCollection fincSelectMetadataCollection =
         Json.mapper.convertValue(metadataCollection, FincSelectMetadataCollection.class);
-    FincSelectMetadataCollection.setSelected(selected);
-    FincSelectMetadataCollection.setPermitted(permitted);
-    return FincSelectMetadataCollection;
+    fincSelectMetadataCollection.setSelected(selected);
+    fincSelectMetadataCollection.setPermitted(permitted);
+    return fincSelectMetadataCollection;
   }
 
   private static FincConfigMetadataCollection setSelectStatus(
