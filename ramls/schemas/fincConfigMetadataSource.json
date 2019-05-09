@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Metadata Source Schema",
+  "description": "Metadata source in finc config",
   "type": "object",
   "properties": {
     "id": {

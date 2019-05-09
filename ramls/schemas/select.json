@@ -1,5 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Object to select resp. deselect metadata sources or collections",
   "type": "object",
   "title": "Select",
   "properties": {

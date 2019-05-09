@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "title": "Isil",
+  "description": "Isil to tenant configuration",
   "properties": {
     "id": {
       "description": "A UUID identifying this group",

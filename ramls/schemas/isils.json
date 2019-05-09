@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
-  "description": "Collection of isils",
+  "description": "Collection of isil to tenant configurations",
   "properties": {
     "isils": {
       "description": "List of isil items",
