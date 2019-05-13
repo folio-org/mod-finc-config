@@ -31,7 +31,7 @@
           "methods": [
             "PUT"
           ],
-          "pathPattern": "/metadata-sources/{id}",
+          "pathPattern": "/finc-config/metadata-sources/{id}",
           "permissionsRequired": ["metadatasources.item.put"]
         },
         {
