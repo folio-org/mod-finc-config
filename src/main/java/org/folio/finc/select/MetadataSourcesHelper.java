@@ -5,14 +5,14 @@ import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
+import org.folio.finc.select.isil.filter.IsilFilter;
+import org.folio.finc.select.isil.filter.MetadataSourcesIsilFilter;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource;
@@ -39,36 +39,12 @@ public class MetadataSourcesHelper {
   private final Messages messages = Messages.getInstance();
   private final Logger logger = LoggerFactory.getLogger(MetadataSourcesHelper.class);
   private final IsilHelper isilHelper;
+  private final IsilFilter<FincSelectMetadataSource, FincConfigMetadataSource> isilFilter;
 
   public MetadataSourcesHelper(Vertx vertx, String tenantId) {
     PostgresClient.getInstance(vertx).setIdField(ID_FIELD);
     this.isilHelper = new IsilHelper(vertx, tenantId);
-  }
-
-  public static List<FincSelectMetadataSource> filterForIsil(
-      List<FincConfigMetadataSource> metadataSources, String isil) {
-    return metadataSources.stream()
-        .map(metadataSource -> MetadataSourcesHelper.filterForIsil(metadataSource, isil))
-        .collect(Collectors.toList());
-  }
-
-  /**
-   * Filters selected and permitted status for given isil and hides information about other isils
-   *
-   * @param metadataSource
-   * @param isil
-   * @return
-   */
-  private static FincSelectMetadataSource filterForIsil(
-      FincConfigMetadataSource metadataSource, String isil) {
-    List<String> selectedBy = metadataSource.getSelectedBy();
-    boolean selected = selectedBy.contains(isil);
-    metadataSource.setSelectedBy(null);
-
-    FincSelectMetadataSource metadataSourceSelect =
-        Json.mapper.convertValue(metadataSource, FincSelectMetadataSource.class);
-    metadataSourceSelect.setSelected(selected);
-    return metadataSourceSelect;
+    this.isilFilter = new MetadataSourcesIsilFilter();
   }
 
   private CQLWrapper getCQL(String query, int limit, int offset) throws FieldException {
@@ -120,7 +96,7 @@ public class MetadataSourcesHelper {
                                       if (isilResult.succeeded()) {
                                         String isil = isilResult.result();
                                         List<FincSelectMetadataSource> transformedSources =
-                                            filterForIsil(results, isil);
+                                            isilFilter.filterForIsil(results, isil);
                                         sourcesCollection.setFincSelectMetadataSources(
                                             transformedSources);
                                         sourcesCollection.setTotalRecords(
@@ -135,9 +111,7 @@ public class MetadataSourcesHelper {
                                             Future.succeededFuture(
                                                 GetFincSelectMetadataSourcesResponse
                                                     .respond500WithTextPlain(
-                                                        messages.getMessage(
-                                                            lang,
-                                                            MessageConsts.InternalServerError))));
+                                                        isilResult.cause().getMessage())));
                                       }
                                     });
                           } else {
@@ -264,8 +238,7 @@ public class MetadataSourcesHelper {
                                       if (isilResult.succeeded()) {
                                         String isil = isilResult.result();
                                         FincSelectMetadataSource result =
-                                            MetadataSourcesHelper.filterForIsil(
-                                                metadataSources.get(0), isil);
+                                          isilFilter.filterForIsil(metadataSources.get(0), isil);
                                         asyncResultHandler.handle(
                                             Future.succeededFuture(
                                                 GetFincSelectMetadataSourcesByIdResponse
@@ -275,9 +248,7 @@ public class MetadataSourcesHelper {
                                             Future.succeededFuture(
                                                 GetFincSelectMetadataSourcesByIdResponse
                                                     .respond500WithTextPlain(
-                                                        messages.getMessage(
-                                                            lang,
-                                                            MessageConsts.InternalServerError))));
+                                                        isilResult.cause().getMessage())));
                                       }
                                     });
                           }

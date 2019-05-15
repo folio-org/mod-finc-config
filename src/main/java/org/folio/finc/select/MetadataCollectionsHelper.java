@@ -5,15 +5,15 @@ import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 import org.folio.finc.select.exception.FincSelectException;
+import org.folio.finc.select.isil.filter.IsilFilter;
+import org.folio.finc.select.isil.filter.MetadataCollectionIsilFilter;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollection;
@@ -45,42 +45,12 @@ public class MetadataCollectionsHelper {
   private final Messages messages = Messages.getInstance();
   private final Logger logger = LoggerFactory.getLogger(MetadataCollectionsHelper.class);
   private final IsilHelper isilHelper;
+  private final IsilFilter<FincSelectMetadataCollection, FincConfigMetadataCollection> isilFilter;
 
   public MetadataCollectionsHelper(Vertx vertx, String tenantId) {
     PostgresClient.getInstance(vertx).setIdField(ID_FIELD);
     this.isilHelper = new IsilHelper(vertx, tenantId);
-  }
-
-  public static List<FincSelectMetadataCollection> filterForIsil(
-      List<FincConfigMetadataCollection> metadataCollections, String isil) {
-    return metadataCollections.stream()
-        .map(
-            metadataCollection -> MetadataCollectionsHelper.filterForIsil(metadataCollection, isil))
-        .collect(Collectors.toList());
-  }
-
-  /**
-   * Filters selected and permitted status for given isil and hides information about other isils
-   *
-   * @param metadataCollection
-   * @param isil
-   * @return
-   */
-  private static FincSelectMetadataCollection filterForIsil(
-      FincConfigMetadataCollection metadataCollection, String isil) {
-    List<String> selectedBy = metadataCollection.getSelectedBy();
-    boolean selected = selectedBy.contains(isil);
-    metadataCollection.setSelectedBy(null);
-
-    List<String> permittedFor = metadataCollection.getPermittedFor();
-    boolean permitted = permittedFor.contains(isil);
-    metadataCollection.setPermittedFor(null);
-
-    FincSelectMetadataCollection fincSelectMetadataCollection =
-        Json.mapper.convertValue(metadataCollection, FincSelectMetadataCollection.class);
-    fincSelectMetadataCollection.setSelected(selected);
-    fincSelectMetadataCollection.setPermitted(permitted);
-    return fincSelectMetadataCollection;
+    this.isilFilter = new MetadataCollectionIsilFilter();
   }
 
   private static FincConfigMetadataCollection setSelectStatus(
@@ -155,7 +125,7 @@ public class MetadataCollectionsHelper {
                                       if (isilResult.succeeded()) {
                                         String isil = isilResult.result();
                                         List<FincSelectMetadataCollection> transformedCollections =
-                                            filterForIsil(results, isil);
+                                            isilFilter.filterForIsil(results, isil);
                                         collectionsCollection.setFincSelectMetadataCollections(
                                             transformedCollections);
                                         collectionsCollection.setTotalRecords(
@@ -170,9 +140,7 @@ public class MetadataCollectionsHelper {
                                             Future.succeededFuture(
                                                 GetFincSelectMetadataCollectionsResponse
                                                     .respond500WithTextPlain(
-                                                        messages.getMessage(
-                                                            lang,
-                                                            MessageConsts.InternalServerError))));
+                                                        isilResult.cause().getMessage())));
                                       }
                                     });
                           } else {
@@ -301,7 +269,7 @@ public class MetadataCollectionsHelper {
                                       if (isilResult.succeeded()) {
                                         String isil = isilResult.result();
                                         FincSelectMetadataCollection result =
-                                            MetadataCollectionsHelper.filterForIsil(
+                                            isilFilter.filterForIsil(
                                                 metadataCollections.get(0), isil);
                                         asyncResultHandler.handle(
                                             Future.succeededFuture(
@@ -312,9 +280,7 @@ public class MetadataCollectionsHelper {
                                             Future.succeededFuture(
                                                 GetFincSelectMetadataCollectionsByIdResponse
                                                     .respond500WithTextPlain(
-                                                        messages.getMessage(
-                                                            lang,
-                                                            MessageConsts.InternalServerError))));
+                                                        isilResult.cause().getMessage())));
                                       }
                                     });
                           }
