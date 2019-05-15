@@ -1,20 +1,30 @@
-package org.folio.finc.select;
+package org.folio.finc.select.isil.filter;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.folio.finc.select.isil.filter.IsilFilter;
+import org.folio.finc.select.isil.filter.MetadataSourcesIsilFilter;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource;
+import org.junit.Before;
 import org.junit.Test;
 
-public class MetadataSourcesHelperTest {
+public class MetadataSourcesIsilFilterTest {
 
   private static final String SOURCE_1 = "Source 1";
   private static final String SOURCE_2 = "Source 2";
   private static final String DE_14 = "DE-14";
   private static final String DE_15 = "DE-15";
+
+  private IsilFilter<FincSelectMetadataSource, FincConfigMetadataSource> isilFilter;
+
+  @Before
+  public void setUp() {
+    isilFilter = new MetadataSourcesIsilFilter();
+  }
 
   @Test
   public void testFilterForIsil() {
@@ -37,8 +47,7 @@ public class MetadataSourcesHelperTest {
     sources.add(source1);
     sources.add(source2);
 
-    List<FincSelectMetadataSource> transformed =
-        MetadataSourcesHelper.filterForIsil(sources, DE_15);
+    List<FincSelectMetadataSource> transformed = isilFilter.filterForIsil(sources, DE_15);
     transformed.stream()
         .forEach(
             mdSource -> {
