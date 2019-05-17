@@ -9,8 +9,10 @@ import io.vertx.core.Vertx;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import org.folio.finc.select.MetadataSourcesHelper;
+import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSourcesGetOrder;
+import org.folio.rest.jaxrs.model.Select;
 import org.folio.rest.jaxrs.resource.FincSelectMetadataSources;
 
 public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
@@ -22,6 +24,7 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
   }
 
   @Override
+  @Validate
   public void getFincSelectMetadataSources(
       String query,
       String orderBy,
@@ -33,10 +36,11 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     this.metadataSourcesHelper.getFincSelectMetadataSources(
-        query, orderBy, order, offset, limit, lang, okapiHeaders, asyncResultHandler, vertxContext);
+        query, offset, limit, lang, okapiHeaders, asyncResultHandler, vertxContext);
   }
 
   @Override
+  @Validate
   public void postFincSelectMetadataSources(
       String lang,
       FincSelectMetadataSource entity,
@@ -44,23 +48,27 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     vertxContext.runOnContext(
-        aVoid -> {
-          asyncResultHandler.handle(
-              succeededFuture(
-                  FincSelectMetadataSources.PostFincSelectMetadataSourcesResponse.status(501)
-                      .build()));
-        });
+        aVoid ->
+            asyncResultHandler.handle(
+                succeededFuture(
+                    FincSelectMetadataSources.PostFincSelectMetadataSourcesResponse.status(501)
+                        .build())));
   }
 
   @Override
+  @Validate
   public void getFincSelectMetadataSourcesById(
       String id,
       String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {}
+      Context vertxContext) {
+    this.metadataSourcesHelper.getFincSelectMetadataSourcesById(
+        id, lang, okapiHeaders, asyncResultHandler, vertxContext);
+  }
 
   @Override
+  @Validate
   public void deleteFincSelectMetadataSourcesById(
       String id,
       String lang,
@@ -68,15 +76,16 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     vertxContext.runOnContext(
-        aVoid -> {
-          asyncResultHandler.handle(
-              succeededFuture(
-                  FincSelectMetadataSources.DeleteFincSelectMetadataSourcesByIdResponse.status(501)
-                      .build()));
-        });
+        aVoid ->
+            asyncResultHandler.handle(
+                succeededFuture(
+                    FincSelectMetadataSources.DeleteFincSelectMetadataSourcesByIdResponse.status(
+                            501)
+                        .build())));
   }
 
   @Override
+  @Validate
   public void putFincSelectMetadataSourcesById(
       String id,
       String lang,
@@ -85,25 +94,72 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     vertxContext.runOnContext(
-        aVoid -> {
-          asyncResultHandler.handle(
-              succeededFuture(
-                  FincSelectMetadataSources.PutFincSelectMetadataSourcesByIdResponse.status(501)
-                      .build()));
-        });
+        aVoid ->
+            asyncResultHandler.handle(
+                succeededFuture(
+                    FincSelectMetadataSources.PutFincSelectMetadataSourcesByIdResponse.status(501)
+                        .build())));
   }
 
   @Override
+  @Validate
   public void getFincSelectMetadataSourcesCollectionsById(
       String id,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {}
+      Context vertxContext) {
+    vertxContext.runOnContext(
+        aVoid ->
+            asyncResultHandler.handle(
+                succeededFuture(
+                    FincSelectMetadataSources.GetFincSelectMetadataSourcesResponse.status(501)
+                        .build())));
+  }
 
   @Override
+  @Validate
   public void putFincSelectMetadataSourcesCollectionsSelectAllById(
       String id,
+      String lang,
+      Select entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {}
+      Context vertxContext) {
+    this.metadataSourcesHelper.putFincSelectMetadataSourcesCollectionsSelectAllById(
+        id, entity, okapiHeaders, asyncResultHandler, vertxContext);
+  }
+
+  @Override
+  @Validate
+  public void getFincSelectMetadataSourcesCollectionsSelectAllById(
+      String id,
+      String lang,
+      Map<String, String> okapiHeaders,
+      Handler<AsyncResult<Response>> asyncResultHandler,
+      Context vertxContext) {
+    vertxContext.runOnContext(
+        aVoid ->
+            asyncResultHandler.handle(
+                succeededFuture(
+                    FincSelectMetadataSources
+                        .GetFincSelectMetadataSourcesCollectionsSelectAllByIdResponse.status(501)
+                        .build())));
+  }
+
+  @Override
+  @Validate
+  public void deleteFincSelectMetadataSourcesCollectionsSelectAllById(
+      String id,
+      String lang,
+      Map<String, String> okapiHeaders,
+      Handler<AsyncResult<Response>> asyncResultHandler,
+      Context vertxContext) {
+    vertxContext.runOnContext(
+        aVoid ->
+            asyncResultHandler.handle(
+                succeededFuture(
+                    FincSelectMetadataSources
+                        .DeleteFincSelectMetadataSourcesCollectionsSelectAllByIdResponse.status(501)
+                        .build())));
+  }
 }

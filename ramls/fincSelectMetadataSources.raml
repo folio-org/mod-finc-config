@@ -52,6 +52,10 @@ resourceTypes:
       get:
         description: Get metadata collections assigned to this metadata source
       /select-all:
+        type:
+          collection-item:
+            exampleItem: !include examples/select.sample
+            schema: select
         put:
           description: Post, if all metadata collections of this source are selected resp. deselected
 

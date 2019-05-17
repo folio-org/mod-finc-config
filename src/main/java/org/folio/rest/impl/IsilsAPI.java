@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import org.folio.rest.RestVerticle;
+import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.jaxrs.resource.FincConfigIsils;
 import org.folio.rest.persist.Criteria.Limit;
@@ -44,6 +45,7 @@ public class IsilsAPI implements FincConfigIsils {
   }
 
   @Override
+  @Validate
   public void getFincConfigIsils(
       String query,
       int offset,
@@ -144,6 +146,7 @@ public class IsilsAPI implements FincConfigIsils {
   }
 
   @Override
+  @Validate
   public void postFincConfigIsils(
       String lang,
       Isil entity,
@@ -161,6 +164,7 @@ public class IsilsAPI implements FincConfigIsils {
   }
 
   @Override
+  @Validate
   public void getFincConfigIsilsById(
       String id,
       String lang,
@@ -179,6 +183,7 @@ public class IsilsAPI implements FincConfigIsils {
   }
 
   @Override
+  @Validate
   public void deleteFincConfigIsilsById(
       String id,
       String lang,
@@ -196,6 +201,7 @@ public class IsilsAPI implements FincConfigIsils {
   }
 
   @Override
+  @Validate
   public void putFincConfigIsilsById(
       String id,
       String lang,
