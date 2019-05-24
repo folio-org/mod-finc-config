@@ -1,0 +1,27 @@
+{
+  "id": "e0ceb1f0-a489-4f52-869d-fdc09c6fd909",
+  "label": "MD Collection Test 3",
+  "description": "This is a test metadata collection",
+  "mdSource": {
+    "id": "f6f03fb4-3368-4bc0-bc02-3bf6e19604a5",
+    "name": "Early Music Online"
+  },
+  "metadataAvailable": "yes",
+  "usageRestricted": "no",
+  "permittedFor": [
+    "DE-15",
+    "DE-14"
+  ],
+  "freeContent": "undetermined",
+  "lod": {
+    "publication": "permitted (explicit)",
+    "note": "Note for test publication"
+  },
+  "collectionId": "coe-123",
+  "facetLabel": "012.1 21st Century COE",
+  "solrMegaCollections": [
+    "21st Century COE Program"
+  ],
+  "selectedBy": [],
+  "filters": []
+}

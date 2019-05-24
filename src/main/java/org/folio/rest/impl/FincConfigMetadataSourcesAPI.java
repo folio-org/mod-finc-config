@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import org.folio.rest.RestVerticle;
+import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSourcesGetOrder;
 import org.folio.rest.jaxrs.resource.FincConfigMetadataSources;
@@ -49,6 +50,7 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
   }
 
   @Override
+  @Validate
   public void getFincConfigMetadataSources(
       String query,
       String orderBy,
@@ -152,6 +154,7 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
   }
 
   @Override
+  @Validate
   public void postFincConfigMetadataSources(
       String lang,
       FincConfigMetadataSource entity,
@@ -169,6 +172,7 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
   }
 
   @Override
+  @Validate
   public void getFincConfigMetadataSourcesById(
       String id,
       String lang,
@@ -188,6 +192,7 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
   }
 
   @Override
+  @Validate
   public void deleteFincConfigMetadataSourcesById(
       String id,
       String lang,
@@ -206,6 +211,7 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
   }
 
   @Override
+  @Validate
   public void putFincConfigMetadataSourcesById(
       String id,
       String lang,

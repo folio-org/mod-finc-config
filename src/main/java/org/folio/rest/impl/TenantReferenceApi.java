@@ -6,12 +6,14 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import java.util.Map;
 import javax.ws.rs.core.Response;
+import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.tools.utils.TenantLoading;
 
 public class TenantReferenceApi extends TenantAPI {
 
   @Override
+  @Validate
   public void postTenant(
       TenantAttributes entity,
       Map<String, String> headers,

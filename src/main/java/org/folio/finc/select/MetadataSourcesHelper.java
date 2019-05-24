@@ -2,23 +2,30 @@ package org.folio.finc.select;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.folio.finc.select.isil.filter.IsilFilter;
 import org.folio.finc.select.isil.filter.MetadataSourcesIsilFilter;
+import org.folio.finc.select.verticles.AbstractSelectMetadataSourceVerticle;
+import org.folio.finc.select.verticles.factory.SelectMetadataSourceVerticleFactory;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSourcesGetOrder;
+import org.folio.rest.jaxrs.model.Select;
 import org.folio.rest.jaxrs.resource.FincSelectMetadataSources.GetFincSelectMetadataSourcesByIdResponse;
 import org.folio.rest.jaxrs.resource.FincSelectMetadataSources.GetFincSelectMetadataSourcesResponse;
+import org.folio.rest.jaxrs.resource.FincSelectMetadataSources.PutFincSelectMetadataSourcesCollectionsSelectAllByIdResponse;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.Criteria.Limit;
@@ -56,8 +63,6 @@ public class MetadataSourcesHelper {
 
   public void getFincSelectMetadataSources(
       String query,
-      String orderBy,
-      FincSelectMetadataSourcesGetOrder order,
       int offset,
       int limit,
       String lang,
@@ -213,7 +218,7 @@ public class MetadataSourcesHelper {
                         } else {
                           List<FincConfigMetadataSource> metadataSources =
                               getReply.result().getResults();
-                          if (metadataSources.size() < 1) {
+                          if (metadataSources.isEmpty()) {
                             asyncResultHandler.handle(
                                 Future.succeededFuture(
                                     GetFincSelectMetadataSourcesByIdResponse
@@ -238,7 +243,7 @@ public class MetadataSourcesHelper {
                                       if (isilResult.succeeded()) {
                                         String isil = isilResult.result();
                                         FincSelectMetadataSource result =
-                                          isilFilter.filterForIsil(metadataSources.get(0), isil);
+                                            isilFilter.filterForIsil(metadataSources.get(0), isil);
                                         asyncResultHandler.handle(
                                             Future.succeededFuture(
                                                 GetFincSelectMetadataSourcesByIdResponse
@@ -268,5 +273,61 @@ public class MetadataSourcesHelper {
               GetFincSelectMetadataSourcesByIdResponse.respond500WithTextPlain(
                   messages.getMessage(lang, MessageConsts.InternalServerError))));
     }
+  }
+
+  public void putFincSelectMetadataSourcesCollectionsSelectAllById(
+      String id,
+      Select entity,
+      Map<String, String> okapiHeaders,
+      Handler<AsyncResult<Response>> asyncResultHandler,
+      Context vertxContext) {
+    try {
+      vertxContext.runOnContext(
+          v -> {
+            String tenantId =
+                TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
+            String msg =
+                String.format(
+                    "Will (un)select metadata collections of metadata source %s for tenant %s.",
+                    id, tenantId);
+            logger.info(msg);
+            deploySelectSourceVerticle(vertxContext.owner(), id, tenantId, entity);
+            String result = new JsonObject().put("message", msg).toString();
+            asyncResultHandler.handle(
+                Future.succeededFuture(
+                    Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build()));
+          });
+    } catch (Exception e) {
+      asyncResultHandler.handle(
+          Future.succeededFuture(
+              PutFincSelectMetadataSourcesCollectionsSelectAllByIdResponse.respond500WithTextPlain(
+                  e.getCause())));
+    }
+  }
+
+  public void deploySelectSourceVerticle(
+      Vertx vertx, String metadataSourceId, String tenantId, Select select) {
+
+    AbstractSelectMetadataSourceVerticle verticle =
+        SelectMetadataSourceVerticleFactory.create(vertx, vertx.getOrCreateContext(), select);
+
+    vertx = Vertx.vertx();
+    JsonObject cfg = vertx.getOrCreateContext().config();
+    cfg.put("tenantId", tenantId);
+    cfg.put("metadataSourceId", metadataSourceId);
+    Future<String> deploy = Future.future();
+    vertx.deployVerticle(
+        verticle, new DeploymentOptions().setConfig(cfg).setWorker(true), deploy.completer());
+
+    deploy.setHandler(
+        ar -> {
+          if (ar.failed()) {
+            logger.error(
+                String.format(
+                    "Failed to deploy SelectVerticle for metadata source %s and for tenant %s: %s",
+                    metadataSourceId, tenantId, ar.cause().getMessage()),
+                ar.cause());
+          }
+        });
   }
 }
