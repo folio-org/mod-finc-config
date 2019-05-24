@@ -22,6 +22,7 @@
     <raml-module-builder.version>23.11.0</raml-module-builder.version>
     <ramlfiles_path>${basedir}/ramls</ramlfiles_path>
     <database_setup_path>${basedir}/database-setup</database_setup_path>
+    <okapi.version>2.26.1</okapi.version>
     <vertx-version>3.5.4</vertx-version>
   </properties>
 
@@ -38,6 +39,11 @@
       <groupId>org.folio</groupId>
       <artifactId>domain-models-runtime</artifactId>
       <version>${raml-module-builder.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.folio.okapi</groupId>
+      <artifactId>okapi-common</artifactId>
+      <version>${okapi.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
