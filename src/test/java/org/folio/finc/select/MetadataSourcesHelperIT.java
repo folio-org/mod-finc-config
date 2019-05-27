@@ -1,8 +1,10 @@
 package org.folio.finc.select;
 
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.parsing.Parser;
@@ -16,10 +18,12 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import org.folio.finc.mocks.MockOrganization;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.Isil;
+import org.folio.rest.jaxrs.model.Organization;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
@@ -37,9 +41,11 @@ public class MetadataSourcesHelperIT {
   private static final String TENANT_UBL = "ubl";
   private static final String TENANT_DIKU = "ubl";
   private static FincConfigMetadataSource metadatasourceSelected;
+  private static Organization organizationUUID1234;
   private static Isil isil1;
   private static Vertx vertx;
   @Rule public Timeout timeout = Timeout.seconds(10);
+  @Rule public WireMockRule wireMockRule = new WireMockRule(options().dynamicPort());
 
   @BeforeClass
   public static void setUp(TestContext context) {
@@ -51,6 +57,10 @@ public class MetadataSourcesHelperIT {
           new String(
               Files.readAllBytes(Paths.get("ramls/examples/fincConfigMetadataSource.sample")));
       metadatasourceSelected = Json.decodeValue(metadataSourcesStr, FincConfigMetadataSource.class);
+
+      organizationUUID1234 = new Organization();
+      organizationUUID1234.setName("Organization Name 1234");
+      organizationUUID1234.setId("uuid-1234");
     } catch (Exception e) {
       context.fail(e);
     }
@@ -106,10 +116,14 @@ public class MetadataSourcesHelperIT {
 
   @Test
   public void checkThatWeCanSelectAndUnselect() {
+    String mockedOkapiUrl = "http://localhost:" + wireMockRule.port();
+    MockOrganization.mockOrganizationFound(organizationUUID1234);
+
     // POST
     given()
         .body(Json.encode(metadatasourceSelected))
         .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("x-okapi-url", mockedOkapiUrl)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
         .post("/finc-config/metadata-sources")
@@ -123,6 +137,7 @@ public class MetadataSourcesHelperIT {
     given()
         .body(Json.encode(isil1))
         .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("x-okapi-url", mockedOkapiUrl)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
         .post("/finc-config/isils")
@@ -133,6 +148,7 @@ public class MetadataSourcesHelperIT {
     // Get all metadata sources
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("x-okapi-url", mockedOkapiUrl)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
         .get(BASE_URI)

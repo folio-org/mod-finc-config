@@ -1,8 +1,10 @@
 package org.folio.finc.config;
 
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.parsing.Parser;
@@ -16,9 +18,11 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import org.folio.finc.mocks.MockOrganization;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
+import org.folio.rest.jaxrs.model.Organization;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
@@ -33,14 +37,18 @@ public class MetadataSourcesIT {
 
   private static final String APPLICATION_JSON = "application/json";
   private static final String BASE_URI = "/finc-config/metadata-sources";
+  private static final String ORGANIZATION_URL = "/organizations-storage/organizations/";
   private static final String TENANT = "diku";
 
   private static Vertx vertx;
   private static FincConfigMetadataSource metadataSource1;
   private static FincConfigMetadataSource metadataSource2;
   private static FincConfigMetadataSource metadataSource2Changed;
+  private static Organization organizationUUID1234;
+  private static Organization organizationUUID1235;
 
   @Rule public Timeout timeout = Timeout.seconds(10000);
+  @Rule public WireMockRule wireMockRule = new WireMockRule(options().dynamicPort());
 
   @BeforeClass
   public static void setUp(TestContext context) {
@@ -58,6 +66,14 @@ public class MetadataSourcesIT {
       metadataSource2Changed =
           Json.decodeValue(metadataSourceStr2, FincConfigMetadataSource.class)
               .withAccessUrl("www.changed.org");
+
+      organizationUUID1234 = new Organization();
+      organizationUUID1234.setName("Organization Name 1234");
+      organizationUUID1234.setId("uuid-1234");
+
+      organizationUUID1235 = new Organization();
+      organizationUUID1235.setName("Organization Name 1235");
+      organizationUUID1235.setId("uuid-1235");
     } catch (Exception e) {
       context.fail(e);
     }
@@ -111,10 +127,13 @@ public class MetadataSourcesIT {
 
   @Test
   public void checkThatWeCanAddGetPutAndDeleteMetadataSources() {
+    String mockedOkapiUrl = "http://localhost:" + wireMockRule.port();
+    MockOrganization.mockOrganizationFound(organizationUUID1235);
     // POST
     given()
         .body(Json.encode(metadataSource2))
         .header("X-Okapi-Tenant", TENANT)
+        .header("x-okapi-url", mockedOkapiUrl)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
         .post(BASE_URI)
@@ -127,6 +146,7 @@ public class MetadataSourcesIT {
     // GET
     given()
         .header("X-Okapi-Tenant", TENANT)
+        .header("x-okapi-url", mockedOkapiUrl)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
         .get(BASE_URI + "/" + metadataSource2.getId())
@@ -142,6 +162,7 @@ public class MetadataSourcesIT {
     given()
         .body(Json.encode(metadataSource2Changed))
         .header("X-Okapi-Tenant", TENANT)
+        .header("x-okapi-url", mockedOkapiUrl)
         .header("content-type", APPLICATION_JSON)
         .header("accept", "text/plain")
         .put(BASE_URI + "/" + metadataSource2.getId())
@@ -151,6 +172,7 @@ public class MetadataSourcesIT {
     // GET changed resource
     given()
         .header("X-Okapi-Tenant", TENANT)
+        .header("x-okapi-url", mockedOkapiUrl)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
         .get(BASE_URI + "/" + metadataSource2.getId())
@@ -165,6 +187,7 @@ public class MetadataSourcesIT {
     // DELETE
     given()
         .header("X-Okapi-Tenant", TENANT)
+        .header("x-okapi-url", mockedOkapiUrl)
         .header("content-type", APPLICATION_JSON)
         .header("accept", "text/plain")
         .delete(BASE_URI + "/" + metadataSource2.getId())
@@ -174,6 +197,7 @@ public class MetadataSourcesIT {
     // GET again
     given()
         .header("X-Okapi-Tenant", TENANT)
+        .header("x-okapi-url", mockedOkapiUrl)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
         .get(BASE_URI + "/" + metadataSource2.getId())
@@ -183,6 +207,7 @@ public class MetadataSourcesIT {
     // GET all
     given()
         .header("X-Okapi-Tenant", TENANT)
+        .header("x-okapi-url", mockedOkapiUrl)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
         .get(BASE_URI)
@@ -193,9 +218,13 @@ public class MetadataSourcesIT {
 
   @Test
   public void checkThatWeCanSearchByCQL() {
+    String mockedOkapiUrl = "http://localhost:" + wireMockRule.port();
+
+    MockOrganization.mockOrganizationFound(organizationUUID1234);
     given()
         .body(Json.encode(metadataSource1))
         .header("X-Okapi-Tenant", TENANT)
+        .header("x-okapi-url", mockedOkapiUrl)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
         .post(BASE_URI)
@@ -206,6 +235,7 @@ public class MetadataSourcesIT {
     String cql = "?query=(label=\"Cambridge*\")";
     given()
         .header("X-Okapi-Tenant", TENANT)
+        .header("x-okapi-url", mockedOkapiUrl)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
         .get(BASE_URI + cql)
@@ -220,6 +250,7 @@ public class MetadataSourcesIT {
     String cql2 = "?query=(label=\"FOO*\")";
     given()
         .header("X-Okapi-Tenant", TENANT)
+        .header("x-okapi-url", mockedOkapiUrl)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
         .get(BASE_URI + cql2)
@@ -231,6 +262,7 @@ public class MetadataSourcesIT {
     String cqlSolrShard = "?query=(solrShard==\"UBL main\")";
     given()
         .header("X-Okapi-Tenant", TENANT)
+        .header("x-okapi-url", mockedOkapiUrl)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
         .get(BASE_URI + cqlSolrShard)
@@ -241,11 +273,14 @@ public class MetadataSourcesIT {
         .body("fincConfigMetadataSources[0].id", equalTo(metadataSource1.getId()))
         .body("fincConfigMetadataSources[0].label", equalTo(metadataSource1.getLabel()))
         .body("fincConfigMetadataSources[0].status", equalTo(metadataSource1.getStatus().value()))
-        .body("fincConfigMetadataSources[0].solrShard", equalTo(metadataSource1.getSolrShard().value()));
+        .body(
+            "fincConfigMetadataSources[0].solrShard",
+            equalTo(metadataSource1.getSolrShard().value()));
 
     // DELETE
     given()
         .header("X-Okapi-Tenant", TENANT)
+        .header("x-okapi-url", mockedOkapiUrl)
         .header("content-type", APPLICATION_JSON)
         .header("accept", "text/plain")
         .delete(BASE_URI + "/" + metadataSource1.getId())
@@ -257,7 +292,7 @@ public class MetadataSourcesIT {
   public void checkThatInvalidMetadataSourceIsNotPosted() {
     FincConfigMetadataSource metadataSourceInvalid =
         Json.decodeValue(
-          Json.encode(MetadataSourcesIT.metadataSource2), FincConfigMetadataSource.class)
+                Json.encode(MetadataSourcesIT.metadataSource2), FincConfigMetadataSource.class)
             .withLabel(null);
     given()
         .body(Json.encode(metadataSourceInvalid))
@@ -268,4 +303,16 @@ public class MetadataSourcesIT {
         .then()
         .statusCode(422);
   }
+
+  /*private void mockOrganizationFound(Organization organization) {
+    String orgaId = organization.getId();
+    String orgaUrl = ORGANIZATION_URL + orgaId;
+    givenThat(
+      get(urlPathEqualTo(orgaUrl))
+        .willReturn(
+          aResponse()
+            .withHeader("Content-type", "application/json")
+            .withBody(Json.encode(organization))
+            .withStatus(200)));
+  }*/
 }
