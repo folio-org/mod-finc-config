@@ -3,6 +3,7 @@ package org.folio.finc.select;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.Async;
@@ -10,9 +11,14 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
+import org.folio.rest.jaxrs.model.FincConfigMetadataCollections;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
+import org.folio.rest.jaxrs.model.FincConfigMetadataSources;
 import org.folio.rest.jaxrs.model.Isil;
+import org.folio.rest.jaxrs.model.Isils;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.utils.Constants;
 import org.junit.runner.RunWith;
@@ -70,102 +76,82 @@ public abstract class AbstractSelectMetadataSourceVerticleTest {
     }
   }
 
-  static Future<Void> writeDataToDB(TestContext context) {
-    Async async = context.async(7);
-    PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
-        .save(
-            "isils",
-            isil1.getId(),
-            isil1,
-            asyncResult -> {
-              if (asyncResult.succeeded()) {
-                logger.info("Loaded isil");
-                async.countDown();
-              } else {
-                context.fail("Could not load isil");
-              }
-            });
+  static Future<Void> writeDataToDB(TestContext context, Vertx vertx) {
+    Async async = context.async(3);
+    Future<Void> result = Future.future();
 
-    PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
-        .save(
-            "isils",
-            isil2.getId(),
-            isil2,
-            asyncResult -> {
-              if (asyncResult.succeeded()) {
-                logger.info("Loaded isil");
-                async.countDown();
-              } else {
-                context.fail("Could not load isil");
-              }
-            });
+    vertx.executeBlocking(
+        future -> {
+          List<Isil> isilList = Arrays.asList(isil1, isil2);
+          Isils isils = new Isils().withIsils(isilList);
+          JsonArray i =
+              isils.getIsils().stream()
+                  .map(Json::encode)
+                  .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+          PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
+              .saveBatch(
+                  "isils",
+                  i,
+                  asyncResult -> {
+                    if (asyncResult.succeeded()) {
+                      logger.info("Loaded isils");
+                      async.countDown();
+                    } else {
+                      context.fail("Could not load isils");
+                    }
+                  });
 
-    PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
-        .save(
-            "metadata_sources",
-            metadataSource1.getId(),
-            metadataSource1,
-            asyncResult -> {
-              if (asyncResult.succeeded()) {
-                logger.info("Loaded metadata source 1");
-                async.countDown();
-              } else {
-                context.fail("Could not load metadata source 1");
-              }
-            });
-    PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
-        .save(
-            "metadata_sources",
-            metadataSource2.getId(),
-            metadataSource2,
-            asyncResult -> {
-              if (asyncResult.succeeded()) {
-                logger.info("Loaded metadata source 2");
-                async.countDown();
-              } else {
-                context.fail("Could not load metadata source 2");
-              }
-            });
-    PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
-        .save(
-            "metadata_collections",
-            metadataCollection1.getId(),
-            metadataCollection1,
-            asyncResult -> {
-              if (asyncResult.succeeded()) {
-                logger.info("Loaded metadata collection 1");
-                async.countDown();
-              } else {
-                context.fail("Could not load metadata collection 1");
-              }
-            });
-    PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
-        .save(
-            "metadata_collections",
-            metadataCollection2.getId(),
-            metadataCollection2,
-            asyncResult -> {
-              if (asyncResult.succeeded()) {
-                logger.info("Loaded metadata collection 2");
-                async.countDown();
-              } else {
-                context.fail("Could not load metadata collection 2");
-              }
-            });
-    PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
-        .save(
-            "metadata_collections",
-            metadataCollection3.getId(),
-            metadataCollection3,
-            asyncResult -> {
-              if (asyncResult.succeeded()) {
-                logger.info("Loaded metadata collection 3");
-                async.countDown();
-              } else {
-                context.fail("Could not load metadata collection 3");
-              }
-            });
-    async.await();
-    return Future.succeededFuture();
+          List<FincConfigMetadataSource> sourcesList =
+              Arrays.asList(metadataSource1, metadataSource2);
+          FincConfigMetadataSources fincConfigMetadataSources =
+              new FincConfigMetadataSources().withFincConfigMetadataSources(sourcesList);
+          JsonArray sources =
+              fincConfigMetadataSources.getFincConfigMetadataSources().stream()
+                  .map(Json::encode)
+                  .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+          PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
+              .saveBatch(
+                  "metadata_sources",
+                  sources,
+                  asyncResult -> {
+                    if (asyncResult.succeeded()) {
+                      logger.info("Loaded metadata sources");
+                      async.countDown();
+                    } else {
+                      context.fail("Could not load metadata sources");
+                    }
+                  });
+          List<FincConfigMetadataCollection> collectionsList =
+              Arrays.asList(metadataCollection1, metadataCollection2, metadataCollection3);
+          FincConfigMetadataCollections fincConfigMetadataCollections =
+              new FincConfigMetadataCollections()
+                  .withFincConfigMetadataCollections(collectionsList);
+          JsonArray collections =
+              fincConfigMetadataCollections.getFincConfigMetadataCollections().stream()
+                  .map(Json::encode)
+                  .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+          PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
+              .saveBatch(
+                  "metadata_collections",
+                  collections,
+                  asyncResult -> {
+                    if (asyncResult.succeeded()) {
+                      logger.info("Loaded metadata collections");
+                      async.countDown();
+                    } else {
+                      context.fail("Could not load metadata collections");
+                    }
+                  });
+          async.await();
+          result.complete();
+        },
+        asyncResult -> {
+          if (asyncResult.succeeded()) {
+            result.complete();
+          } else {
+            result.fail("Cannot load testdata");
+          }
+        });
+    return result;
   }
 }

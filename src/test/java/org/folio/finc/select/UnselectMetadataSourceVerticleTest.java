@@ -6,8 +6,6 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
@@ -25,14 +23,11 @@ import org.junit.Rule;
 import org.junit.Test;
 
 public class UnselectMetadataSourceVerticleTest extends AbstractSelectMetadataSourceVerticleTest {
-  private static final Logger logger =
-    LoggerFactory.getLogger(SelectMetadataSourceVerticleTest.class);
 
   private static final String TENANT_UBL = "ubl";
   private static Vertx vertx;
   private static UnselectMetadataSourceVerticle cut;
-  @Rule
-  public Timeout timeout = Timeout.seconds(1000);
+  @Rule public Timeout timeout = Timeout.seconds(1000);
 
   @BeforeClass
   public static void setUp(TestContext context) {
@@ -57,30 +52,30 @@ public class UnselectMetadataSourceVerticleTest extends AbstractSelectMetadataSo
 
     String url = "http://localhost:" + port;
     TenantClient tenantClientFinc =
-      new TenantClient(url, Constants.MODULE_TENANT, Constants.MODULE_TENANT);
+        new TenantClient(url, Constants.MODULE_TENANT, Constants.MODULE_TENANT);
     TenantClient tenantClientUBL = new TenantClient(url, TENANT_UBL, TENANT_UBL);
     DeploymentOptions options =
-      new DeploymentOptions().setConfig(new JsonObject().put("http.port", port)).setWorker(true);
+        new DeploymentOptions().setConfig(new JsonObject().put("http.port", port)).setWorker(true);
 
     vertx.deployVerticle(
-      RestVerticle.class.getName(),
-      options,
-      res -> {
-        try {
-          tenantClientFinc.postTenant(null, postTenantRes -> async.countDown());
-          tenantClientUBL.postTenant(
-            null,
-            postTenantRes -> {
-              Future<Void> future = writeDataToDB(context);
-              future.setHandler(
-                ar -> {
-                  if (ar.succeeded()) async.countDown();
+        RestVerticle.class.getName(),
+        options,
+        res -> {
+          try {
+            tenantClientFinc.postTenant(null, postTenantRes -> async.countDown());
+            tenantClientUBL.postTenant(
+                null,
+                postTenantRes -> {
+                  Future<Void> future = writeDataToDB(context, vertx);
+                  future.setHandler(
+                      ar -> {
+                        if (ar.succeeded()) async.countDown();
+                      });
                 });
-            });
-        } catch (Exception e) {
-          context.fail(e);
-        }
-      });
+          } catch (Exception e) {
+            context.fail(e);
+          }
+        });
     cut = new UnselectMetadataSourceVerticle(vertx, vertx.getOrCreateContext());
   }
 
@@ -89,11 +84,11 @@ public class UnselectMetadataSourceVerticleTest extends AbstractSelectMetadataSo
     RestAssured.reset();
     Async async = context.async();
     vertx.close(
-      context.asyncAssertSuccess(
-        res -> {
-          PostgresClient.stopEmbeddedPostgres();
-          async.complete();
-        }));
+        context.asyncAssertSuccess(
+            res -> {
+              PostgresClient.stopEmbeddedPostgres();
+              async.complete();
+            }));
   }
 
   @Before
@@ -105,42 +100,52 @@ public class UnselectMetadataSourceVerticleTest extends AbstractSelectMetadataSo
     cfg2.put("metadataSourceId", metadataSource2.getId());
     cfg2.put("testing", true);
     vertx.deployVerticle(
-      cut,
-      new DeploymentOptions().setConfig(cfg2).setWorker(true),
-      context.asyncAssertSuccess(
-        h -> {
-          async.complete();
-        }));
+        cut,
+        new DeploymentOptions().setConfig(cfg2).setWorker(true),
+        context.asyncAssertSuccess(
+            h -> {
+              async.complete();
+            }));
   }
 
   @Test
   public void testSuccessfulUnSelect(TestContext context) {
     Async async = context.async();
     cut.selectAllCollections(metadataSource1.getId(), TENANT_UBL)
-      .setHandler(
-        aVoid -> {
-          if (aVoid.succeeded()) {
-            try {
-              PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
-                .getById(
-                  "metadata_collections",
-                  metadataCollection1.getId(),
-                  FincConfigMetadataCollection.class,
-                  collectionAsyncResult -> {
-                    if (collectionAsyncResult.succeeded()) {
-                      context.assertFalse(
-                        collectionAsyncResult.result().getSelectedBy().contains("DE-15"));
-                      async.complete();
-                    } else {
-                      context.fail(collectionAsyncResult.cause().toString());
-                    }
-                  });
-            } catch (Exception e) {
-              context.fail(e);
-            }
-          } else {
-            context.fail();
-          }
-        });
+        .setHandler(
+            aVoid -> {
+              if (aVoid.succeeded()) {
+                try {
+                  String where =
+                      String.format(
+                          " WHERE (jsonb->>'label' = '%s')", metadataCollection1.getLabel());
+                  PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
+                      .get(
+                          "metadata_collections",
+                          FincConfigMetadataCollection.class,
+                          where,
+                          true,
+                          true,
+                          ar -> {
+                            if (ar.succeeded()) {
+                              if (ar.result() != null) {
+                                FincConfigMetadataCollection collection =
+                                    ar.result().getResults().get(0);
+                                context.assertFalse(collection.getSelectedBy().contains("DE-15"));
+                              } else {
+                                context.fail("No results found.");
+                              }
+                              async.complete();
+                            } else {
+                              context.fail(ar.cause().toString());
+                            }
+                          });
+                } catch (Exception e) {
+                  context.fail(e);
+                }
+              } else {
+                context.fail();
+              }
+            });
   }
 }

@@ -6,8 +6,6 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
@@ -28,9 +26,6 @@ import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
 public class SelectMetadataSourceVerticleTest extends AbstractSelectMetadataSourceVerticleTest {
-
-  private static final Logger logger =
-      LoggerFactory.getLogger(SelectMetadataSourceVerticleTest.class);
 
   private static final String TENANT_UBL = "ubl";
   private static Vertx vertx;
@@ -74,7 +69,7 @@ public class SelectMetadataSourceVerticleTest extends AbstractSelectMetadataSour
             tenantClientUBL.postTenant(
                 null,
                 postTenantRes -> {
-                  Future<Void> future = writeDataToDB(context);
+                  Future<Void> future = writeDataToDB(context, vertx);
                   future.setHandler(
                       ar -> {
                         if (ar.succeeded()) async.countDown();
@@ -124,18 +119,28 @@ public class SelectMetadataSourceVerticleTest extends AbstractSelectMetadataSour
             aVoid -> {
               if (aVoid.succeeded()) {
                 try {
+                  String where =
+                      String.format(
+                          " WHERE (jsonb->>'label' = '%s')", metadataCollection3.getLabel());
                   PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
-                      .getById(
+                      .get(
                           "metadata_collections",
-                          metadataCollection3.getId(),
                           FincConfigMetadataCollection.class,
-                          collectionAsyncResult -> {
-                            if (collectionAsyncResult.succeeded()) {
-                              context.assertTrue(
-                                  collectionAsyncResult.result().getSelectedBy().contains("DE-15"));
+                          where,
+                          true,
+                          true,
+                          ar -> {
+                            if (ar.succeeded()) {
+                              if (ar.result() != null) {
+                                FincConfigMetadataCollection collection =
+                                    ar.result().getResults().get(0);
+                                context.assertTrue(collection.getSelectedBy().contains("DE-15"));
+                              } else {
+                                context.fail("No results found.");
+                              }
                               async.complete();
                             } else {
-                              context.fail(collectionAsyncResult.cause().toString());
+                              context.fail(ar.cause().toString());
                             }
                           });
                 } catch (Exception e) {
@@ -155,18 +160,28 @@ public class SelectMetadataSourceVerticleTest extends AbstractSelectMetadataSour
             aVoid -> {
               if (aVoid.succeeded()) {
                 try {
+                  String where =
+                      String.format(
+                          " WHERE (jsonb->>'label' = '%s')", metadataCollection2.getLabel());
                   PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
-                      .getById(
+                      .get(
                           "metadata_collections",
-                          metadataCollection2.getId(),
                           FincConfigMetadataCollection.class,
-                          collectionAsyncResult -> {
-                            if (collectionAsyncResult.succeeded()) {
-                              context.assertFalse(
-                                  collectionAsyncResult.result().getSelectedBy().contains("DE-15"));
+                          where,
+                          true,
+                          true,
+                          ar -> {
+                            if (ar.succeeded()) {
+                              if (ar.result() != null) {
+                                FincConfigMetadataCollection collection =
+                                    ar.result().getResults().get(0);
+                                context.assertFalse(collection.getSelectedBy().contains("DE-15"));
+                              } else {
+                                context.fail("No results found.");
+                              }
                               async.complete();
                             } else {
-                              context.fail(collectionAsyncResult.cause().toString());
+                              context.fail(ar.cause().toString());
                             }
                           });
                 } catch (Exception e) {
