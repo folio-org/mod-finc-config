@@ -3,9 +3,9 @@
   "label": "Cambridge University Press Journals",
   "description": "This is a test metadata source",
   "status": "active",
-  "vendor": {
+  "organization": {
     "id": "uuid-1234",
-    "name": "Test vendor"
+    "name": "Test organization"
   },
   "contacts": {
     "internal": [

@@ -3,9 +3,9 @@
   "label": "Early Music Online",
   "description": "This is a test metadata source 2",
   "status": "active",
-  "vendor": {
-  "id": "uuid-1235",
-  "name": "Test vendor second"
+  "organization": {
+    "id": "uuid-1235",
+    "name": "Test organization second"
   },
   "contacts": {
     "internal": [

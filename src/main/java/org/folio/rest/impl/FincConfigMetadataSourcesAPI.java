@@ -23,6 +23,7 @@ import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
+import org.folio.rest.utils.AttributeNameAdder;
 import org.folio.rest.utils.Constants;
 import org.z3950.zing.cql.cql2pgjson.CQL2PgJSON;
 import org.z3950.zing.cql.cql2pgjson.FieldException;
@@ -161,14 +162,28 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
-    PgUtil.post(
-        TABLE_NAME,
-        entity,
-        okapiHeaders,
-        vertxContext,
-        PostFincConfigMetadataSourcesResponse.class,
-        asyncResultHandler);
+
+    Future<FincConfigMetadataSource> sourceWithName =
+        AttributeNameAdder.resolveAndAddAttributeNames(entity, okapiHeaders, vertxContext);
+
+    sourceWithName.setHandler(
+        ar -> {
+          if (ar.succeeded()) {
+            okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
+            PgUtil.post(
+                TABLE_NAME,
+                entity,
+                okapiHeaders,
+                vertxContext,
+                PostFincConfigMetadataSourcesResponse.class,
+                asyncResultHandler);
+          } else {
+            logger.error(ar.cause());
+            asyncResultHandler.handle(
+                Future.succeededFuture(
+                    PostFincConfigMetadataSourcesResponse.respond500WithTextPlain(ar.cause())));
+          }
+        });
   }
 
   @Override
@@ -220,14 +235,28 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     logger.debug("Update metadata source: " + id);
-    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
-    PgUtil.put(
-        TABLE_NAME,
-        entity,
-        id,
-        okapiHeaders,
-        vertxContext,
-        PutFincConfigMetadataSourcesByIdResponse.class,
-        asyncResultHandler);
+
+    Future<FincConfigMetadataSource> sourceWithName =
+        AttributeNameAdder.resolveAndAddAttributeNames(entity, okapiHeaders, vertxContext);
+
+    sourceWithName.setHandler(
+        ar -> {
+          if (ar.succeeded()) {
+            okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
+            PgUtil.put(
+                TABLE_NAME,
+                entity,
+                id,
+                okapiHeaders,
+                vertxContext,
+                PutFincConfigMetadataSourcesByIdResponse.class,
+                asyncResultHandler);
+          } else {
+            logger.error(ar.cause());
+            asyncResultHandler.handle(
+                Future.succeededFuture(
+                    PutFincConfigMetadataSourcesByIdResponse.respond500WithTextPlain(ar.cause())));
+          }
+        });
   }
 }

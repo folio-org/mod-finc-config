@@ -26,16 +26,16 @@
         "terminated"
       ]
     },
-    "vendor": {
+    "organization": {
       "type": "object",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Id of the the sources content’s vendor, linked via uuid from vendor app."
+          "description": "Id of the the sources content’s organization, linked via uuid from organizations app."
         },
         "name": {
           "type": "string",
-          "description": "Vendor's name. If not given, it will be determined by backend module."
+          "description": "Organization's name. If not given, it will be determined by backend module."
         }
       }
     },

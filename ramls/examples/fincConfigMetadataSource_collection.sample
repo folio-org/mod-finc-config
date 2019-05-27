@@ -8,20 +8,12 @@
       "solrShard": "UBL main",
       "lastProcessed": "2018-06-14",
       "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
-      "vendors": [
-        {
-          "id": "uuid-4564",
-          "name": "Cambridge University Press",
-          "ticketLink": "10167",
-          "status": "technical implementation"
-        },
-        {
-          "id": "uuid-1678",
-          "name": "Cambridge University Press",
-          "ticketLink": "10168",
-          "status": "closed"
-        }
-      ],
+      "organization": {
+        "id": "uuid-4564",
+        "name": "Cambridge University Press",
+        "ticketLink": "10167",
+        "status": "technical implementation"
+      },
       "contacts": {
         "internal": [
           {
@@ -61,20 +53,12 @@
       "solrShard": "UBL ai",
       "lastProcessed": "2018-11-23",
       "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
-      "vendors": [
-        {
-          "id": "uuid-1240",
-          "name": "Oxford Scholarship Online",
-          "ticketLink": "10181",
-          "status": "technical implementation"
-        },
-        {
-          "id": "uuid-9635",
-          "name": "Oxford Scholarship Online",
-          "ticketLink": "10182",
-          "status": "closed"
-        }
-      ],
+      "organization": {
+        "id": "uuid-1240",
+        "name": "Oxford Scholarship Online",
+        "ticketLink": "10181",
+        "status": "technical implementation"
+      },
       "contacts": {
         "internal": [
           {
