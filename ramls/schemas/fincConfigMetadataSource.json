@@ -63,7 +63,7 @@
     "indexingLevel": {
       "type": "string"
     },
-    "licensingNote": {
+    "generalNotes": {
       "type": "string"
     },
     "contracts": {

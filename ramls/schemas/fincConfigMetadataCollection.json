@@ -123,6 +123,9 @@
       "items": {
         "type": "object"
       }
+    },
+    "generalNotes": {
+      "type": "string"
     }
   },
   "required": [
