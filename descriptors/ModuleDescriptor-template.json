@@ -164,7 +164,7 @@
           "methods": [
             "PUT"
           ],
-          "pathPattern": "/finc-select/metadata-sources/{id}/select"
+          "pathPattern": "/finc-select/metadata-sources/{id}/collections/select-all"
         }
       ]
     },
