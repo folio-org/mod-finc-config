@@ -40,7 +40,7 @@
         ]
       },
       "indexingLevel": "bibliographic",
-      "licensingNote": "Test licensing note",
+      "generalNotes": "Test licensing note",
       "contracts": [
           "http://contract1.de"
       ],
