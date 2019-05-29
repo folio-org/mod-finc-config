@@ -61,7 +61,7 @@ public class MetadataCollectionsHelperIT {
           new String(
               Files.readAllBytes(Paths.get("ramls/examples/fincConfigMetadataCollection2.sample")));
       metadataCollectionForbidden =
-        Json.decodeValue(metadataCollectionStr2, FincConfigMetadataCollection.class);
+          Json.decodeValue(metadataCollectionStr2, FincConfigMetadataCollection.class);
     } catch (Exception e) {
       context.fail(e);
     }
@@ -119,56 +119,78 @@ public class MetadataCollectionsHelperIT {
   public void checkThatWeCanQueryForPermittedAndSelected() {
     // POST
     given()
-      .body(Json.encode(metadataCollectionPermitted))
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", APPLICATION_JSON)
-      .header("accept", APPLICATION_JSON)
-      .post("/finc-config/metadata-collections")
-      .then()
-      .statusCode(201)
-      .body("id", equalTo(metadataCollectionPermitted.getId()))
-      .body("label", equalTo(metadataCollectionPermitted.getLabel()))
-      .body("description", equalTo(metadataCollectionPermitted.getDescription()));
+        .body(Json.encode(metadataCollectionPermitted))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", APPLICATION_JSON)
+        .header("accept", APPLICATION_JSON)
+        .post("/finc-config/metadata-collections")
+        .then()
+        .statusCode(201)
+        .body("id", equalTo(metadataCollectionPermitted.getId()))
+        .body("label", equalTo(metadataCollectionPermitted.getLabel()))
+        .body("description", equalTo(metadataCollectionPermitted.getDescription()));
 
     // POST
     given()
-      .body(Json.encode(metadataCollectionForbidden))
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", APPLICATION_JSON)
-      .header("accept", APPLICATION_JSON)
-      .post("/finc-config/metadata-collections")
-      .then()
-      .statusCode(201)
-      .body("id", equalTo(metadataCollectionForbidden.getId()))
-      .body("label", equalTo(metadataCollectionForbidden.getLabel()))
-      .body("description", equalTo(metadataCollectionForbidden.getDescription()));
+        .body(Json.encode(metadataCollectionForbidden))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", APPLICATION_JSON)
+        .header("accept", APPLICATION_JSON)
+        .post("/finc-config/metadata-collections")
+        .then()
+        .statusCode(201)
+        .body("id", equalTo(metadataCollectionForbidden.getId()))
+        .body("label", equalTo(metadataCollectionForbidden.getLabel()))
+        .body("description", equalTo(metadataCollectionForbidden.getDescription()));
 
     // POST isil
     given()
-      .body(Json.encode(isil1))
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", APPLICATION_JSON)
-      .header("accept", APPLICATION_JSON)
-      .post("/finc-config/isils")
-      .then()
-      .statusCode(201)
-      .body("isil", equalTo(isil1.getIsil()));
+        .body(Json.encode(isil1))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", APPLICATION_JSON)
+        .header("accept", APPLICATION_JSON)
+        .post("/finc-config/isils")
+        .then()
+        .statusCode(201)
+        .body("isil", equalTo(isil1.getIsil()));
 
     // GET
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", APPLICATION_JSON)
-      .header("accept", APPLICATION_JSON)
-      .get(BASE_URI + "?query=(selected=true AND permitted=true)")
-      .then()
-      .contentType(ContentType.JSON)
-      .statusCode(200)
-      .body("fincSelectMetadataCollections.size()", equalTo(1))
-      .body("fincSelectMetadataCollections[0].id", equalTo(metadataCollectionPermitted.getId()))
-      .body("fincSelectMetadataCollections[0].label", equalTo(metadataCollectionPermitted.getLabel()))
-      .body("fincSelectMetadataCollections[0].selected", equalTo(true))
-      .body("fincSelectMetadataCollections[0].permitted", equalTo(true));
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", APPLICATION_JSON)
+        .header("accept", APPLICATION_JSON)
+        .get(BASE_URI + "?query=(selected=true AND permitted=true)")
+        .then()
+        .contentType(ContentType.JSON)
+        .statusCode(200)
+        .body("fincSelectMetadataCollections.size()", equalTo(1))
+        .body("fincSelectMetadataCollections[0].id", equalTo(metadataCollectionPermitted.getId()))
+        .body(
+            "fincSelectMetadataCollections[0].label",
+            equalTo(metadataCollectionPermitted.getLabel()))
+        .body("fincSelectMetadataCollections[0].selected", equalTo(true))
+        .body("fincSelectMetadataCollections[0].permitted", equalTo(true));
 
+    // DELETE
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete("/finc-config/metadata-collections/" + metadataCollectionPermitted.getId())
+        .then()
+        .statusCode(204);
+
+    // DELETE
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete("/finc-config/metadata-collections/" + metadataCollectionForbidden.getId())
+        .then()
+        .statusCode(204);
+
+    // DELETE isil
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete("/finc-config/isils/" + isil1.getId())
+        .then()
+        .statusCode(204);
   }
 
   @Test
@@ -295,5 +317,26 @@ public class MetadataCollectionsHelperIT {
         .put(BASE_URI + "/" + metadataCollectionForbidden.getId() + "/select")
         .then()
         .statusCode(404);
+
+    // DELETE
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete("/finc-config/metadata-collections/" + metadataCollectionPermitted.getId())
+        .then()
+        .statusCode(204);
+
+    // DELETE
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete("/finc-config/metadata-collections/" + metadataCollectionForbidden.getId())
+        .then()
+        .statusCode(204);
+
+    // DELETE isil
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete("/finc-config/isils/" + isil1.getId())
+        .then()
+        .statusCode(204);
   }
 }
