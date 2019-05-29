@@ -50,12 +50,12 @@ public class OrgaizationNameResolver {
               logger.info("Found organization name " + orgaName + " for id " + organizationId);
               future.complete(orgaName);
             } else {
-              future.fail(
-                  String.format(
-                      "%s %s: %s",
-                      ar.result().statusCode(),
-                      ar.result().statusMessage(),
-                      ar.result().bodyAsString()));
+              logger.warn(
+                  "Failure while looking for organization name for id "
+                      + organizationId
+                      + ". Will proceed without setting orga name.",
+                  ar.cause());
+              future.complete();
             }
           } else {
             future.fail(ar.cause());
