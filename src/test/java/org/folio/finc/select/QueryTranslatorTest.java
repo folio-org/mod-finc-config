@@ -134,4 +134,11 @@ public class QueryTranslatorTest {
     assertEquals(expected, result);
   }
 
+  @Test
+  public void translateNullQuery() {
+    String query = null;
+    String result = QueryTranslator.translate(query, isil);
+    assertNull(result);
+  }
+
 }

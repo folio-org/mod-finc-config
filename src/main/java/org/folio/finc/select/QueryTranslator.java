@@ -1,5 +1,6 @@
 package org.folio.finc.select;
 
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -7,6 +8,10 @@ import java.util.regex.Pattern;
 public class QueryTranslator {
 
   public static String translate(String query, String isil) {
+
+    if (query == null || "".equals(query)) {
+      return query;
+    }
     String result = processSelectedQuery(query, isil);
     return processPermittedQuery(result, isil);
   }
