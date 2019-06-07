@@ -39,23 +39,22 @@ import org.z3950.zing.cql.cql2pgjson.FieldException;
  * Helper class to fetch metadata collections for finc-select. Filters out information if an item is
  * selected by resp. permitted for another organization than the requesting one.
  */
-public class MetadataCollectionsHelper {
+public class SelectMetadataCollectionsHelper {
   private static final String ID_FIELD = "_id";
   private static final String TABLE_NAME = "metadata_collections";
   private final Messages messages = Messages.getInstance();
-  private final Logger logger = LoggerFactory.getLogger(MetadataCollectionsHelper.class);
+  private final Logger logger = LoggerFactory.getLogger(SelectMetadataCollectionsHelper.class);
   private final IsilHelper isilHelper;
   private final IsilFilter<FincSelectMetadataCollection, FincConfigMetadataCollection> isilFilter;
 
-  public MetadataCollectionsHelper(Vertx vertx, String tenantId) {
+  public SelectMetadataCollectionsHelper(Vertx vertx, String tenantId) {
     PostgresClient.getInstance(vertx).setIdField(ID_FIELD);
     this.isilHelper = new IsilHelper(vertx, tenantId);
     this.isilFilter = new MetadataCollectionIsilFilter();
   }
 
   private static FincConfigMetadataCollection setSelectStatus(
-      FincConfigMetadataCollection metadataCollection, Select select, String isil)
-      throws FincSelectException {
+      FincConfigMetadataCollection metadataCollection, Select select, String isil) {
     List<String> permittedFor = metadataCollection.getPermittedFor();
     boolean isPermitted = permittedFor.contains(isil);
 

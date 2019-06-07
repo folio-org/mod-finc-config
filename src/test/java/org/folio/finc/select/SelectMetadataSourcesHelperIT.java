@@ -34,7 +34,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class MetadataSourcesHelperIT {
+public class SelectMetadataSourcesHelperIT {
 
   private static final String APPLICATION_JSON = "application/json";
   private static final String BASE_URI = "/finc-select/metadata-sources";

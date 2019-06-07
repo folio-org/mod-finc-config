@@ -10,6 +10,8 @@ documentation:
 types:
   fincConfigMetadataSource: !include schemas/fincConfigMetadataSource.json
   fincConfigMetadataSources: !include schemas/fincConfigMetadataSources.json
+  tinyMetadataSource: !include schemas/tinyMetadataSource.json
+  tinyMetadataSources: !include schemas/tinyMetadataSources.json
   errors: !include ./raml-util/schemas/errors.schema
 
 traits:
@@ -52,4 +54,13 @@ resourceTypes:
       description: Delete an metadata source identified by id
     put:
       description: Put an metadata source identified by id
+/finc-config/tiny-metadata-sources:
+  type:
+    collection:
+      exampleCollection: !include examples/tinyMetadataSource_collection.sample
+      exampleItem: !include examples/tinyMetadataSource.sample
+      schemaCollection: tinyMetadataSources
+      schemaItem: tinyMetadataSource
+  get:
+    description: Get all tiny metadata sources
 

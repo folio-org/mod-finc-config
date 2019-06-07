@@ -4,6 +4,11 @@
       "run": "after",
       "snippet": "CREATE OR REPLACE VIEW isil_mdc_view AS SELECT DISTINCT metadata_collections._id AS _id, metadata_collections.jsonb AS jsonb, (isils.jsonb->>'tenant') AS tenant FROM metadata_collections metadata_collections JOIN isils isils ON (metadata_collections.jsonb->'permittedFor')::jsonb ? (isils.jsonb->>'isil');",
       "fromModuleVersion": "1.0"
+    },
+    {
+      "run": "after",
+      "snippet": "CREATE OR REPLACE VIEW metadata_sources_tiny AS SELECT _id AS _id, jsonb_build_object('id', jsonb->>'id', 'label', jsonb->>'label') AS jsonb FROM finc_mod_finc_config.metadata_sources;",
+      "fromModuleVersion": "1.0"
     }
   ],
   "tables": [

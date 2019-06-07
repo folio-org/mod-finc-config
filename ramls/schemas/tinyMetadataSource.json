@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Metadata Source Tiny Schema",
+  "description": "Tiny metadata source in finc select",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string",
+      "description": "A unique name for this metadata source"
+    }
+  },
+  "required": [
+    "id",
+    "label"
+  ],
+  "additionalProperties": false
+}
