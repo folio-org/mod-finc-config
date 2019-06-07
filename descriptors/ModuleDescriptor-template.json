@@ -11,35 +11,51 @@
             "GET"
           ],
           "pathPattern": "/finc-config/metadata-sources",
-          "permissionsRequired": ["metadatasources.collection.get"]
+          "permissionsRequired": [
+            "metadatasources.collection.get"
+          ]
         },
         {
           "methods": [
             "GET"
           ],
           "pathPattern": "/finc-config/metadata-sources/{id}",
-          "permissionsRequired": ["metadatasources.item.get"]
+          "permissionsRequired": [
+            "metadatasources.item.get"
+          ]
         },
         {
           "methods": [
             "POST"
           ],
           "pathPattern": "/finc-config/metadata-sources",
-          "permissionsRequired": ["metadatasources.item.post"]
+          "permissionsRequired": [
+            "metadatasources.item.post"
+          ]
         },
         {
           "methods": [
             "PUT"
           ],
           "pathPattern": "/finc-config/metadata-sources/{id}",
-          "permissionsRequired": ["metadatasources.item.put"]
+          "permissionsRequired": [
+            "metadatasources.item.put"
+          ]
         },
         {
           "methods": [
             "DELETE"
           ],
           "pathPattern": "/finc-config/metadata-sources/{id}",
-          "permissionsRequired": ["metadatasources.item.delete"]
+          "permissionsRequired": [
+            "metadatasources.item.delete"
+          ]
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-config/tiny-metadata-sources"
         }
       ]
     },
@@ -52,35 +68,45 @@
             "GET"
           ],
           "pathPattern": "/finc-config/metadata-collections",
-          "permissionsRequired": ["metadatacollections.collection.get"]
+          "permissionsRequired": [
+            "metadatacollections.collection.get"
+          ]
         },
         {
           "methods": [
             "GET"
           ],
           "pathPattern": "/finc-config/metadata-collections/{id}",
-          "permissionsRequired": ["metadatacollections.item.get"]
+          "permissionsRequired": [
+            "metadatacollections.item.get"
+          ]
         },
         {
           "methods": [
             "POST"
           ],
           "pathPattern": "/finc-config/metadata-collections",
-          "permissionsRequired": ["metadatacollections.item.post"]
+          "permissionsRequired": [
+            "metadatacollections.item.post"
+          ]
         },
         {
           "methods": [
             "PUT"
           ],
           "pathPattern": "/finc-config/metadata-collections/{id}",
-          "permissionsRequired": ["metadatacollections.item.put"]
+          "permissionsRequired": [
+            "metadatacollections.item.put"
+          ]
         },
         {
           "methods": [
             "DELETE"
           ],
           "pathPattern": "/finc-config/metadata-collections/{id}",
-          "permissionsRequired": ["metadatacollections.item.delete"]
+          "permissionsRequired": [
+            "metadatacollections.item.delete"
+          ]
         }
       ]
     },
@@ -184,62 +210,62 @@
       ]
     }
   ],
-  "permissionSets" : [
+  "permissionSets": [
     {
-      "permissionName" : "metadatacollections.collection.get",
-      "displayName" : "metadata collection collection get",
-      "description" : "Get a collection of metatdata-collections"
+      "permissionName": "metadatacollections.collection.get",
+      "displayName": "metadata collection collection get",
+      "description": "Get a collection of metatdata-collections"
     },
     {
-      "permissionName" : "metadatacollections.item.get",
-      "displayName" : "metadata collection item get",
-      "description" : "Get a item of metatdata-collection"
+      "permissionName": "metadatacollections.item.get",
+      "displayName": "metadata collection item get",
+      "description": "Get a item of metatdata-collection"
     },
     {
-      "permissionName" : "metadatacollections.item.post",
-      "displayName" : "metadata collection item post",
-      "description" : "Create a new metatdata-collection"
+      "permissionName": "metadatacollections.item.post",
+      "displayName": "metadata collection item post",
+      "description": "Create a new metatdata-collection"
     },
     {
-      "permissionName" : "metadatacollections.item.put",
-      "displayName" : "metadata collection item put",
-      "description" : "Update an existing metatdata-collection"
+      "permissionName": "metadatacollections.item.put",
+      "displayName": "metadata collection item put",
+      "description": "Update an existing metatdata-collection"
     },
     {
-      "permissionName" : "metadatacollections.item.delete",
-      "displayName" : "metadata collection item delete",
-      "description" : "Delete a metatdata-collection"
+      "permissionName": "metadatacollections.item.delete",
+      "displayName": "metadata collection item delete",
+      "description": "Delete a metatdata-collection"
     },
     {
-      "permissionName" : "metadatasources.collection.get",
-      "displayName" : "metadata sources collection get",
-      "description" : "Get a collection of metatdata-sources"
+      "permissionName": "metadatasources.collection.get",
+      "displayName": "metadata sources collection get",
+      "description": "Get a collection of metatdata-sources"
     },
     {
-      "permissionName" : "metadatasources.item.get",
-      "displayName" : "metadata sources item get",
-      "description" : "Get an item of metatdata-sources"
+      "permissionName": "metadatasources.item.get",
+      "displayName": "metadata sources item get",
+      "description": "Get an item of metatdata-sources"
     },
     {
-      "permissionName" : "metadatasources.item.post",
-      "displayName" : "metadata sources item post",
-      "description" : "Create a new metatdata-source"
+      "permissionName": "metadatasources.item.post",
+      "displayName": "metadata sources item post",
+      "description": "Create a new metatdata-source"
     },
     {
-      "permissionName" : "metadatasources.item.put",
-      "displayName" : "metadata source item put",
-      "description" : "Update an existing metatdata-source"
+      "permissionName": "metadatasources.item.put",
+      "displayName": "metadata source item put",
+      "description": "Update an existing metatdata-source"
     },
     {
-      "permissionName" : "metadatasources.item.delete",
-      "displayName" : "metadata source item delete",
-      "description" : "Delete a metatdata-source"
+      "permissionName": "metadatasources.item.delete",
+      "displayName": "metadata source item delete",
+      "description": "Delete a metatdata-source"
     },
     {
-      "permissionName" : "finc-config.all",
-      "displayName" : "finc-config all",
-      "description" : "All permissions for the mod-finc-config module",
-      "subPermissions" : [
+      "permissionName": "finc-config.all",
+      "displayName": "finc-config all",
+      "description": "All permissions for the mod-finc-config module",
+      "subPermissions": [
         "metadatacollections.collection.get",
         "metadatacollections.item.get",
         "metadatacollections.item.post",
