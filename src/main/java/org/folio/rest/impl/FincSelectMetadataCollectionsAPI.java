@@ -8,7 +8,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import java.util.Map;
 import javax.ws.rs.core.Response;
-import org.folio.finc.select.MetadataCollectionsHelper;
+import org.folio.finc.select.SelectMetadataCollectionsHelper;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollection;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollectionsGetOrder;
@@ -17,10 +17,10 @@ import org.folio.rest.jaxrs.resource.FincSelectMetadataCollections;
 
 public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataCollections {
 
-  private final MetadataCollectionsHelper metadataCollectionsHelper;
+  private final SelectMetadataCollectionsHelper selectMetadataCollectionsHelper;
 
   public FincSelectMetadataCollectionsAPI(Vertx vertx, String tenantId) {
-    this.metadataCollectionsHelper = new MetadataCollectionsHelper(vertx, tenantId);
+    this.selectMetadataCollectionsHelper = new SelectMetadataCollectionsHelper(vertx, tenantId);
   }
 
   @Override
@@ -35,7 +35,7 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    this.metadataCollectionsHelper.getFincSelectMetadataCollections(
+    this.selectMetadataCollectionsHelper.getFincSelectMetadataCollections(
         query, orderBy, order, offset, limit, lang, okapiHeaders, asyncResultHandler, vertxContext);
   }
 
@@ -65,7 +65,7 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    metadataCollectionsHelper.getFincSelectMetadataCollectionsById(
+    selectMetadataCollectionsHelper.getFincSelectMetadataCollectionsById(
         id, lang, okapiHeaders, asyncResultHandler, vertxContext);
   }
 
@@ -113,7 +113,7 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    metadataCollectionsHelper.putFincSelectMetadataCollectionsSelectById(
+    selectMetadataCollectionsHelper.putFincSelectMetadataCollectionsSelectById(
         id, lang, entity, okapiHeaders, asyncResultHandler, vertxContext);
   }
 

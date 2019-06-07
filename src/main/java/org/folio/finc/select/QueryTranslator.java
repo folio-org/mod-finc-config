@@ -1,11 +1,14 @@
 package org.folio.finc.select;
 
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class QueryTranslator {
+
+  private QueryTranslator() {
+    throw new IllegalStateException("Utility class");
+  }
 
   public static String translate(String query, String isil) {
 

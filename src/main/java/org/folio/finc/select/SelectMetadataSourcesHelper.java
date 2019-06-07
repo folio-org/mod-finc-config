@@ -21,7 +21,6 @@ import org.folio.finc.select.verticles.factory.SelectMetadataSourceVerticleFacto
 import org.folio.rest.RestVerticle;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource;
-import org.folio.rest.jaxrs.model.FincSelectMetadataSourcesGetOrder;
 import org.folio.rest.jaxrs.model.Select;
 import org.folio.rest.jaxrs.resource.FincSelectMetadataSources.GetFincSelectMetadataSourcesByIdResponse;
 import org.folio.rest.jaxrs.resource.FincSelectMetadataSources.GetFincSelectMetadataSourcesResponse;
@@ -40,15 +39,15 @@ import org.z3950.zing.cql.cql2pgjson.CQL2PgJSON;
 import org.z3950.zing.cql.cql2pgjson.FieldException;
 
 /** Helper class to fetch metadata sources for finc-select. */
-public class MetadataSourcesHelper {
+public class SelectMetadataSourcesHelper {
   private static final String ID_FIELD = "_id";
   private static final String TABLE_NAME = "metadata_sources";
   private final Messages messages = Messages.getInstance();
-  private final Logger logger = LoggerFactory.getLogger(MetadataSourcesHelper.class);
+  private final Logger logger = LoggerFactory.getLogger(SelectMetadataSourcesHelper.class);
   private final IsilHelper isilHelper;
   private final IsilFilter<FincSelectMetadataSource, FincConfigMetadataSource> isilFilter;
 
-  public MetadataSourcesHelper(Vertx vertx, String tenantId) {
+  public SelectMetadataSourcesHelper(Vertx vertx, String tenantId) {
     PostgresClient.getInstance(vertx).setIdField(ID_FIELD);
     this.isilHelper = new IsilHelper(vertx, tenantId);
     this.isilFilter = new MetadataSourcesIsilFilter();
