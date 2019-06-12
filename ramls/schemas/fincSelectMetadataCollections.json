@@ -6,6 +6,7 @@
     "fincSelectMetadataCollections": {
       "type": "array",
       "id": "fincSelectMetadataCollectionData",
+      "description": "List of metadata collections for finc select",
       "items": {
         "type": "object",
         "$ref": "fincSelectMetadataCollection.json"

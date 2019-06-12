@@ -17,6 +17,7 @@
     },
     "status": {
       "type": "string",
+      "description" : "Current status of metadata source",
       "enum": [
         "wish",
         "negotiation",
@@ -28,6 +29,7 @@
     },
     "organization": {
       "type": "object",
+      "description": "The organization delivering content of this metadata source",
       "properties": {
         "id": {
           "type": "string",
@@ -41,9 +43,11 @@
     },
     "contacts": {
       "type": "object",
+      "description": "Internal and external contact persons",
       "properties": {
         "internal": {
           "type": "array",
+          "description": "Internal contact persons",
           "minItems": 0,
           "items": {
             "type": "object",
@@ -52,6 +56,7 @@
         },
         "external": {
           "type": "array",
+          "description": "External contact persons",
           "minItems": 0,
           "items": {
             "type": "object",
@@ -61,10 +66,12 @@
       }
     },
     "indexingLevel": {
-      "type": "string"
+      "type": "string",
+      "description": "Level used for indexing (e.g. bibliographic)"
     },
     "generalNotes": {
-      "type": "string"
+      "type": "string",
+      "description": "General notes not fitting into the other fields"
     },
     "contracts": {
       "description": "Links to contracts in agreements/license app or link to file upload app",
@@ -76,23 +83,28 @@
     },
     "lastProcessed": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "Date of last processing"
     },
     "tickets": {
       "type": "array",
+      "description": "Links to internal tickets corresponding to this metadata source",
       "minItems": 0,
       "items": {
         "type": "string"
       }
     },
     "accessUrl": {
-      "type": "string"
+      "type": "string",
+      "description": "URL to access metadata source"
     },
     "sourceId": {
-      "type": "integer"
+      "type": "integer",
+      "description": "The source id"
     },
     "solrShard": {
       "type": "string",
+      "description": "Used solr shard",
       "enum": [
         "UBL main",
         "UBL ai",
@@ -102,6 +114,7 @@
     },
     "deliveryMethods": {
       "type": "array",
+      "description": "Available delivery methods (e.g. API download)",
       "minItems": 0,
       "items": {
         "type": "string"
@@ -109,16 +122,19 @@
     },
     "formats": {
       "type": "array",
+      "description": "Available formats (e.g. MARC)",
       "minItems": 0,
       "items": {
         "type": "string"
       }
     },
     "updateRhythm": {
-      "type": "string"
+      "type": "string",
+      "description": "Metadata source's update rhythm"
     },
     "inferiorTo": {
       "type": "array",
+      "description": "Link to other metadata sources",
       "minItems": 0,
       "items": {
         "type": "string"
@@ -126,6 +142,7 @@
     },
     "selectedBy": {
       "type": "array",
+      "description": "List of tenants/libraries which selected this metadata source",
       "minItems": 0,
       "items": {
         "type": "string"

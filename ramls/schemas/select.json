@@ -5,7 +5,8 @@
   "title": "Select",
   "properties": {
     "select": {
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Boolean which describes if entity shall be selected resp. deselected"
     }
   },
   "required": [
