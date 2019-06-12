@@ -5,6 +5,7 @@
   "properties": {
     "tinyMetadataSources": {
       "type": "array",
+      "description": "List of tiny metadata sources",
       "id": "tinyMetadataSourcesData",
       "items": {
         "type": "object",

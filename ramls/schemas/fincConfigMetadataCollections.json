@@ -5,6 +5,7 @@
   "properties": {
     "fincConfigMetadataCollections": {
       "type": "array",
+      "description": "List of metadata collections in finc config",
       "id": "fincConfigMetadataCollectionsData",
       "items": {
         "type": "object",

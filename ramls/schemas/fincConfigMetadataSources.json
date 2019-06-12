@@ -6,6 +6,7 @@
     "fincConfigMetadataSources": {
       "type": "array",
       "id": "fincConfigMetadataSourcesData",
+      "description": "List of metadata sources in finc config",
       "items": {
         "type": "object",
         "$ref": "fincConfigMetadataSource.json"

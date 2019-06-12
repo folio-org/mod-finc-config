@@ -2,12 +2,15 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "title": "Contact",
+  "description": "Contact schema",
   "properties": {
     "name": {
-      "type": "string"
+      "type": "string",
+      "description": "The name"
     },
     "role": {
-      "type": "string"
+      "type": "string",
+      "description": "The contact's role"
     }
   },
   "required": [
