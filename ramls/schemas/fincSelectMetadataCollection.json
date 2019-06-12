@@ -68,6 +68,7 @@
       "properties": {
         "publication": {
           "type": "string",
+          "description": "Indicator if publication is permitted",
           "enum": [
             "permitted (interpreted)",
             "permitted (explicit)",
