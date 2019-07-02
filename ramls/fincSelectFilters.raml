@@ -30,7 +30,7 @@ resourceTypes:
   type:
     collection:
       exampleCollection: !include examples/fincSelectFilter_collection.sample
-      exampleItem: !include examples/fincSelectFilter.sample
+      exampleItem: !include examples/fincSelectFilter1.sample
       schemaCollection: fincSelectFilters
       schemaItem: fincSelectFilter
   get:
@@ -75,7 +75,7 @@ resourceTypes:
   /{id}:
     type:
       collection-item:
-        exampleItem: !include examples/fincSelectFilter.sample
+        exampleItem: !include examples/fincSelectFilter1.sample
         schema: fincSelectFilter
     get:
       description: Get one finc select filter identified by id
