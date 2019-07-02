@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Finc Select Filter Files Schema",
+  "description": "The filter files which can be contained in a filter",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string",
+      "description": "A unique name for this filter file"
+    },
+    "criteria": {
+      "type": "string",
+      "description": "The criteria of this filter"
+    },
+    "filter": {
+      "type": "string",
+      "description": "ID of corresponding filter"
+    },
+    "file": {
+      "type": "string",
+      "format": "base64",
+      "description": "The filter file encoded in base64"
+    }
+  },
+  "required": [
+    "id",
+    "label"
+  ],
+  "additionalProperties": false
+}

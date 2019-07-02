@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Finc Select Filter Schema",
+  "description": "Filter of a metadata collection in finc select",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string",
+      "description": "A unique name for this filter"
+    },
+    "type": {
+      "type": "string",
+      "description": "The type of this filter",
+      "enum": [
+        "Whitelist",
+        "Blacklist"
+      ]
+    },
+    "isil": {
+      "type": "string",
+      "description": "Isil of library using this filter"
+    }
+  },
+  "required": [
+    "id",
+    "label",
+    "type"
+  ],
+  "additionalProperties": false
+}

@@ -8,13 +8,11 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import java.util.Map;
 import javax.ws.rs.core.Response;
-import org.folio.finc.TinyMetadataSourcesHelper;
 import org.folio.finc.select.SelectMetadataSourcesHelper;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSourcesGetOrder;
 import org.folio.rest.jaxrs.model.Select;
-import org.folio.rest.jaxrs.model.TinyMetadataSource;
 import org.folio.rest.jaxrs.resource.FincSelectMetadataSources;
 
 public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {

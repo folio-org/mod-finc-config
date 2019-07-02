@@ -195,6 +195,42 @@
       ]
     },
     {
+      "id": "finc-select/filters",
+      "version": "0.1",
+      "handlers": [
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-select/filters"
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-select/filters/{id}"
+        },
+        {
+          "methods": [
+            "PUT"
+          ],
+          "pathPattern": "/finc-select/filters/{id}"
+        },
+        {
+          "methods": [
+            "DELETE"
+          ],
+          "pathPattern": "/finc-select/filters/{id}"
+        },
+        {
+          "methods": [
+            "POST"
+          ],
+          "pathPattern": "/finc-select/filters"
+        }
+      ]
+    },
+    {
       "id": "_tenant",
       "version": "1.2",
       "interfaceType": "system",
