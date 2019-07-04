@@ -10,7 +10,6 @@ import org.folio.finc.select.SelectFiltersHelper;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.jaxrs.model.FincSelectFilterFile;
-import org.folio.rest.jaxrs.model.FincSelectFiltersFilesGetOrder;
 import org.folio.rest.jaxrs.model.FincSelectFiltersGetOrder;
 import org.folio.rest.jaxrs.resource.FincSelectFilters;
 
@@ -49,51 +48,6 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
     selectFiltersHelper.postFincSelectFilters(
         lang, entity, okapiHeaders, asyncResultHandler, vertxContext);
   }
-
-  @Override
-  public void getFincSelectFiltersFiles(
-      String query,
-      String orderBy,
-      FincSelectFiltersFilesGetOrder order,
-      int offset,
-      int limit,
-      String lang,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {}
-
-  @Override
-  public void postFincSelectFiltersFiles(
-      String lang,
-      FincSelectFilterFile entity,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {}
-
-  @Override
-  public void getFincSelectFiltersFilesById(
-      String id,
-      String lang,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {}
-
-  @Override
-  public void deleteFincSelectFiltersFilesById(
-      String id,
-      String lang,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {}
-
-  @Override
-  public void putFincSelectFiltersFilesById(
-      String id,
-      String lang,
-      FincSelectFilterFile entity,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {}
 
   @Override
   @Validate

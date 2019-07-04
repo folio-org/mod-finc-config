@@ -21,8 +21,19 @@
     },
     "file": {
       "type": "string",
-      "format": "base64",
-      "description": "The filter file encoded in base64"
+      "description": "Id of the filter file"
+    },
+    "isil": {
+      "type": "string",
+      "description": "Isil of the library this filter file belongs to"
+    },
+    "filename": {
+      "type": "string",
+      "description": "The file's filename"
+    },
+    "created": {
+      "type": "string",
+      "description": "The file's creation date"
     }
   },
   "required": [
