@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
+import org.folio.cql2pgjson.CQL2PgJSON;
+import org.folio.cql2pgjson.exception.FieldException;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.Isil;
@@ -23,18 +25,15 @@ import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
 import org.folio.rest.utils.Constants;
-import org.z3950.zing.cql.cql2pgjson.CQL2PgJSON;
-import org.z3950.zing.cql.cql2pgjson.FieldException;
 
 public class IsilsAPI implements FincConfigIsils {
 
-  private static final String ID_FIELD = "_id";
   private static final String TABLE_NAME = "isils";
   private final Messages messages = Messages.getInstance();
   private final Logger logger = LoggerFactory.getLogger(IsilsAPI.class);
 
   public IsilsAPI(Vertx vertx, String tenantId) {
-    PostgresClient.getInstance(vertx).setIdField(ID_FIELD);
+    PostgresClient.getInstance(vertx);
   }
 
   private CQLWrapper getCQL(String query, int limit, int offset) throws FieldException {

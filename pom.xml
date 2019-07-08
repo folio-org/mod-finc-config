@@ -21,10 +21,10 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
-    <raml-module-builder.version>23.11.0</raml-module-builder.version>
+    <raml-module-builder.version>26.1.0</raml-module-builder.version>
     <ramlfiles_path>${basedir}/ramls</ramlfiles_path>
     <database_setup_path>${basedir}/database-setup</database_setup_path>
-    <okapi.version>2.26.1</okapi.version>
+    <okapi.version>2.30.1</okapi.version>
     <vertx-version>3.5.4</vertx-version>
   </properties>
 

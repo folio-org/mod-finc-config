@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
+import org.folio.cql2pgjson.CQL2PgJSON;
+import org.folio.cql2pgjson.exception.FieldException;
 import org.folio.finc.select.exception.FincSelectException;
 import org.folio.finc.select.isil.filter.IsilFilter;
 import org.folio.finc.select.isil.filter.MetadataCollectionIsilFilter;
@@ -32,15 +34,13 @@ import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
 import org.folio.rest.tools.utils.TenantTool;
 import org.folio.rest.utils.Constants;
-import org.z3950.zing.cql.cql2pgjson.CQL2PgJSON;
-import org.z3950.zing.cql.cql2pgjson.FieldException;
 
 /**
  * Helper class to fetch metadata collections for finc-select. Filters out information if an item is
  * selected by resp. permitted for another organization than the requesting one.
  */
 public class SelectMetadataCollectionsHelper {
-  private static final String ID_FIELD = "_id";
+  private static final String ID_FIELD = "id";
   private static final String TABLE_NAME = "metadata_collections";
   private final Messages messages = Messages.getInstance();
   private final Logger logger = LoggerFactory.getLogger(SelectMetadataCollectionsHelper.class);
@@ -48,7 +48,7 @@ public class SelectMetadataCollectionsHelper {
   private final IsilFilter<FincSelectMetadataCollection, FincConfigMetadataCollection> isilFilter;
 
   public SelectMetadataCollectionsHelper(Vertx vertx, String tenantId) {
-    PostgresClient.getInstance(vertx).setIdField(ID_FIELD);
+    PostgresClient.getInstance(vertx);
     this.isilHelper = new IsilHelper(vertx, tenantId);
     this.isilFilter = new MetadataCollectionIsilFilter();
   }
@@ -233,11 +233,7 @@ public class SelectMetadataCollectionsHelper {
                 TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
             try {
               Criteria idCrit =
-                  new Criteria()
-                      .addField(ID_FIELD)
-                      .setJSONB(false)
-                      .setOperation("=")
-                      .setValue("'" + id + "'");
+                  new Criteria().addField(ID_FIELD).setJSONB(false).setOperation("=").setVal(id);
               Criterion criterion = new Criterion(idCrit);
               logger.debug("Using criterion: " + criterion.toString());
               PostgresClient.getInstance(vertxContext.owner(), fincId)
@@ -330,11 +326,7 @@ public class SelectMetadataCollectionsHelper {
             String tenantId =
                 TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
             Criteria idCrit =
-                new Criteria()
-                    .addField(ID_FIELD)
-                    .setJSONB(false)
-                    .setOperation("=")
-                    .setValue("'" + id + "'");
+                new Criteria().addField(ID_FIELD).setJSONB(false).setOperation("=").setVal(id);
             Criterion criterion = new Criterion(idCrit);
             logger.debug("Using criterion: " + criterion.toString());
             this.isilHelper

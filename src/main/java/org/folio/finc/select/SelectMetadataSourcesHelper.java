@@ -35,12 +35,12 @@ import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
 import org.folio.rest.tools.utils.TenantTool;
 import org.folio.rest.utils.Constants;
-import org.z3950.zing.cql.cql2pgjson.CQL2PgJSON;
-import org.z3950.zing.cql.cql2pgjson.FieldException;
+import org.folio.cql2pgjson.CQL2PgJSON;
+import org.folio.cql2pgjson.exception.FieldException;
 
 /** Helper class to fetch metadata sources for finc-select. */
 public class SelectMetadataSourcesHelper {
-  private static final String ID_FIELD = "_id";
+  private static final String ID_FIELD = "id";
   private static final String TABLE_NAME = "metadata_sources";
   private final Messages messages = Messages.getInstance();
   private final Logger logger = LoggerFactory.getLogger(SelectMetadataSourcesHelper.class);
@@ -48,7 +48,7 @@ public class SelectMetadataSourcesHelper {
   private final IsilFilter<FincSelectMetadataSource, FincConfigMetadataSource> isilFilter;
 
   public SelectMetadataSourcesHelper(Vertx vertx, String tenantId) {
-    PostgresClient.getInstance(vertx).setIdField(ID_FIELD);
+    PostgresClient.getInstance(vertx);
     this.isilHelper = new IsilHelper(vertx, tenantId);
     this.isilFilter = new MetadataSourcesIsilFilter();
   }
@@ -197,7 +197,7 @@ public class SelectMetadataSourcesHelper {
                       .addField(ID_FIELD)
                       .setJSONB(false)
                       .setOperation("=")
-                      .setValue("'" + id + "'");
+                      .setVal(id);
               Criterion criterion = new Criterion(idCrit);
               logger.debug("Using criterion: " + criterion.toString());
               PostgresClient.getInstance(vertxContext.owner(), fincId)

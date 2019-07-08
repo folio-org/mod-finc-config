@@ -25,7 +25,7 @@ public class TinyMetadataSourcesHelper {
   private final Messages messages = Messages.getInstance();
 
   public TinyMetadataSourcesHelper(Vertx vertx) {
-    PostgresClient.getInstance(vertx).setIdField(FincConfigMetadataSourcesAPI.ID_FIELD);
+    PostgresClient.getInstance(vertx);
   }
 
   public void getTinyMetadataSources(
