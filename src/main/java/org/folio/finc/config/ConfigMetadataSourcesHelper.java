@@ -10,6 +10,8 @@ import io.vertx.core.logging.LoggerFactory;
 import java.util.Arrays;
 import java.util.List;
 import javax.ws.rs.core.Response;
+import org.folio.cql2pgjson.CQL2PgJSON;
+import org.folio.cql2pgjson.exception.FieldException;
 import org.folio.rest.impl.FincConfigMetadataSourcesAPI;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSourcesGetOrder;
@@ -21,8 +23,6 @@ import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
 import org.folio.rest.utils.Constants;
-import org.z3950.zing.cql.cql2pgjson.CQL2PgJSON;
-import org.z3950.zing.cql.cql2pgjson.FieldException;
 
 public class ConfigMetadataSourcesHelper {
 
@@ -30,7 +30,7 @@ public class ConfigMetadataSourcesHelper {
   private final Messages messages = Messages.getInstance();
 
   public ConfigMetadataSourcesHelper(Vertx vertx, String tenantId) {
-    PostgresClient.getInstance(vertx).setIdField(FincConfigMetadataSourcesAPI.ID_FIELD);
+    PostgresClient.getInstance(vertx);//.setIdField(FincConfigMetadataSourcesAPI.ID_FIELD);
   }
 
   private CQLWrapper getCQL(String query, int limit, int offset) throws FieldException {

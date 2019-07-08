@@ -24,8 +24,8 @@ import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
 import org.folio.rest.utils.Constants;
-import org.z3950.zing.cql.cql2pgjson.CQL2PgJSON;
-import org.z3950.zing.cql.cql2pgjson.FieldException;
+import org.folio.cql2pgjson.CQL2PgJSON;
+import org.folio.cql2pgjson.exception.FieldException;
 
 /**
  * ATTENTION: API works tenant agnostic. Thus, don't use 'x-okapi-tenant' header, but {@value
@@ -33,13 +33,13 @@ import org.z3950.zing.cql.cql2pgjson.FieldException;
  */
 public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataCollections {
 
-  private static final String ID_FIELD = "_id";
+  private static final String ID_FIELD = "id";
   private static final String TABLE_NAME = "metadata_collections";
   private final Messages messages = Messages.getInstance();
   private final Logger logger = LoggerFactory.getLogger(FincConfigMetadataCollectionsAPI.class);
 
   public FincConfigMetadataCollectionsAPI(Vertx vertx, String tenantId) {
-    PostgresClient.getInstance(vertx).setIdField(ID_FIELD);
+    PostgresClient.getInstance(vertx);//.setIdField(ID_FIELD);
   }
 
   private CQLWrapper getCQL(String query, int limit, int offset) throws FieldException {
