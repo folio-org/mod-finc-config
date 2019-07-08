@@ -1,0 +1,45 @@
+#%RAML 1.0
+title: Files for Finc Select
+version: v1
+baseUri: http://localhost/mod-finc-config
+
+documentation:
+  - title: mod-finc-config API
+    content: This documents the API calls that can be made to query and manage files
+
+traits:
+  orderable: !include ./raml-util/traits/orderable.raml
+  pageable: !include ./raml-util/traits/pageable.raml
+  searchable: !include ./raml-util/traits/searchable.raml
+  language: !include ./raml-util/traits/language.raml
+
+resourceTypes:
+  collection-item: !include ./raml-util/rtypes/item-collection.raml
+
+/finc-select/files:
+  displayName: Finc select files
+  /{id}:
+    get:
+      description: Get file by id
+      responses:
+        200:
+          body:
+            application/octet-stream:
+        500:
+          description: Server Error
+          body:
+            text/plain:
+    put:
+      description: Upload/update a finc select file
+      body:
+        application/octet-stream:
+      responses:
+        204:
+        404:
+          body:
+            text/plain:
+        500:
+          body:
+            text/plain:
+    delete:
+      description: Delete a file identified by id

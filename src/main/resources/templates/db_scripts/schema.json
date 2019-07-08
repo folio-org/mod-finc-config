@@ -74,6 +74,14 @@
       "populateJsonWithId": true,
       "pkColumnName": "_id",
       "withMetadata": true
+    },
+    {
+      "tableName": "files",
+      "generateId": true,
+      "fromModuleVersion": "0.2",
+      "populateJsonWithId": true,
+      "pkColumnName": "_id",
+      "withMetadata": true
     }
   ],
   "views": [
