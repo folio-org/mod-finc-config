@@ -11,7 +11,7 @@ import org.folio.rest.utils.Constants;
 
 public class FileDAOImpl implements FileDAO {
 
-  private static final String ID_FIELD = "_id";
+  private static final String ID_FIELD = "id";
 
   @Override
   public Future<File> getById(String id, String isil, Context vertxContext) {
@@ -90,11 +90,11 @@ public class FileDAOImpl implements FileDAO {
             .addField(ID_FIELD)
             .setJSONB(false)
             .setOperation("=")
-            .setValue("'" + id + "'");
+            .setVal(id);
     Criterion criterion = new Criterion(idCrit);
 
     Criteria isilCrit =
-        new Criteria().addField("'isil'").setJSONB(true).setOperation("=").setValue(isil);
+        new Criteria().addField("'isil'").setJSONB(true).setOperation("=").setVal(isil);
     criterion.addCriterion(isilCrit);
     return criterion;
   }

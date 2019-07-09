@@ -28,7 +28,7 @@ import org.folio.rest.tools.utils.TenantTool;
 
 public class FincSelectFilterFilesAPI implements FincSelectFilterFiles {
 
-  private static final String ID_FIELD = "_id";
+  private static final String ID_FIELD = "id";
   private static final String TABLE_NAME = "filter_files";
   private final Logger logger = LoggerFactory.getLogger(FincSelectFilterFilesAPI.class);
   private final Messages messages = Messages.getInstance();
@@ -36,7 +36,7 @@ public class FincSelectFilterFilesAPI implements FincSelectFilterFiles {
   private final FilterFileDAO filterFileDAO;
 
   public FincSelectFilterFilesAPI(Vertx vertx, String tenantId) {
-    PostgresClient.getInstance(vertx).setIdField(ID_FIELD);
+    PostgresClient.getInstance(vertx);
     this.isilHelper = new IsilHelper(vertx, tenantId);
     this.filterFileDAO = new FilterFileDAOImpl();
   }

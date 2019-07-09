@@ -9,6 +9,8 @@ import javax.ws.rs.core.Response;
 import org.folio.rest.impl.IsilsAPI;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.jaxrs.model.Isils;
+import org.folio.rest.persist.Criteria.Criteria;
+import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.utils.Constants;
 
@@ -57,14 +59,20 @@ public class IsilHelper {
 
   public Future<String> fetchIsil(String tenantId, Context context) {
     Future<String> future = Future.future();
-    String where = String.format(" WHERE (jsonb->>'tenant' = '%s')", tenantId);
+//    String where = String.format(" WHERE (jsonb->>'tenant' = '%s')", tenantId);
+    Criteria tenantCrit =
+      new Criteria()
+        .addField("'tenant'")
+        .setJSONB(true)
+        .setOperation("=")
+        .setVal(tenantId);
+    Criterion criterion = new Criterion(tenantCrit);
     PostgresClient.getInstance(context.owner(), Constants.MODULE_TENANT)
         .get(
             TABLE_NAME,
             Isil.class,
-            where,
-            false,
-            false,
+            criterion,
+          false,
             ar -> {
               if (ar.succeeded()) {
                 List<Isil> isils = ar.result().getResults();

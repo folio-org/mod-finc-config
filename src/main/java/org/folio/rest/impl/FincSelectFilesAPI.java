@@ -148,6 +148,42 @@ public class FincSelectFilesAPI implements FincSelectFiles {
   }
 
   @Override
+  public void postFincSelectFilesById(String id, InputStream entity,
+    Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler,
+    Context vertxContext) {
+    String tenantId =
+      TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
+
+    byte[] bytes = new byte[0];
+    try {
+      bytes = IOUtils.toByteArray(entity);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    String base64Data = Base64.getEncoder().encodeToString(bytes);
+
+    isilHelper
+      .fetchIsil(tenantId, vertxContext)
+      .compose(
+        isil -> {
+          File file = new File().withData(base64Data).withId(id).withIsil(isil);
+          return fileDAO.upsert(file, id, vertxContext);
+        })
+      .setHandler(
+        ar -> {
+          if (ar.succeeded()) {
+            asyncResultHandler.handle(
+              Future.succeededFuture(PutFincSelectFilesByIdResponse.respond204()));
+          } else {
+            asyncResultHandler.handle(
+              Future.succeededFuture(
+                PutFincSelectFilesByIdResponse.respond500WithTextPlain(
+                  "Internal server error")));
+          }
+        });
+  }
+
+  @Override
   public void putFincSelectFilesById(
       String id,
       InputStream entity,
@@ -194,5 +230,7 @@ public class FincSelectFilesAPI implements FincSelectFiles {
       String id,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {}
+      Context vertxContext) {
+
+  }
 }

@@ -29,12 +29,12 @@ resourceTypes:
           description: Server Error
           body:
             text/plain:
-    put:
+    post:
       description: Upload/update a finc select file
       body:
         application/octet-stream:
       responses:
-        204:
+        200:
         404:
           body:
             text/plain:

@@ -16,12 +16,12 @@ import org.folio.rest.persist.Criteria.Offset;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.utils.Constants;
-import org.z3950.zing.cql.cql2pgjson.CQL2PgJSON;
-import org.z3950.zing.cql.cql2pgjson.FieldException;
+import org.folio.cql2pgjson.CQL2PgJSON;
+import org.folio.cql2pgjson.exception.FieldException;
 
 public class FilterDAOImpl implements FilterDAO {
 
-  private static final String ID_FIELD = "_id";
+  private static final String ID_FIELD = "id";
 
   private final Logger logger = LoggerFactory.getLogger(FilterDAOImpl.class);
 
@@ -198,11 +198,11 @@ public class FilterDAOImpl implements FilterDAO {
             .addField(ID_FIELD)
             .setJSONB(false)
             .setOperation("=")
-            .setValue("'" + id + "'");
+            .setVal(id);
     Criterion criterion = new Criterion(idCrit);
 
     Criteria isilCrit =
-        new Criteria().addField("'isil'").setJSONB(true).setOperation("=").setValue(isil);
+        new Criteria().addField("'isil'").setJSONB(true).setOperation("=").setVal(isil);
     criterion.addCriterion(isilCrit);
     return criterion;
   }

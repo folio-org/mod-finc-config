@@ -12,7 +12,7 @@
     },
     {
       "run": "after",
-      "snippet": "CREATE OR REPLACE VIEW filters_wo_isil AS SELECT _id AS _id, jsonb - 'isil' AS jsonb FROM finc_mod_finc_config.filters;",
+      "snippet": "CREATE OR REPLACE VIEW filters_wo_isil AS SELECT id AS id, jsonb - 'isil' AS jsonb FROM finc_mod_finc_config.filters;",
       "fromModuleVersion": "1.0"
     }
   ],
@@ -52,26 +52,17 @@
     },
     {
       "tableName": "filters",
-      "generateId": true,
       "fromModuleVersion": "0.2",
-      "populateJsonWithId": true,
-      "pkColumnName": "_id",
       "withMetadata": true
     },
     {
       "tableName": "filter_files",
-      "generateId": true,
       "fromModuleVersion": "0.2",
-      "populateJsonWithId": true,
-      "pkColumnName": "_id",
       "withMetadata": true
     },
     {
       "tableName": "files",
-      "generateId": true,
       "fromModuleVersion": "0.2",
-      "populateJsonWithId": true,
-      "pkColumnName": "_id",
       "withMetadata": true
     }
   ],
