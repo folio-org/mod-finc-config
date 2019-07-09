@@ -3,6 +3,7 @@ package org.folio.finc.select;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.parsing.Parser;
 import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
@@ -31,10 +32,10 @@ import org.junit.runner.RunWith;
 public class IsilHelperIT {
 
   private static final String APPLICATION_JSON = "application/json";
-  private static final String ISIL_1_ID = "dba74989-3270-430d-8679-96416a33527c";
+  private static final String ISIL_1_ID = "a50a2cb5-a7d3-41fb-876f-48d6d202e31c";
   private static Vertx vertx;
 
-  @Rule public Timeout timeout = Timeout.seconds(10);
+  @Rule public Timeout timeout = Timeout.seconds(100);
 
   @BeforeClass
   public static void setUp(TestContext context) {
@@ -71,8 +72,7 @@ public class IsilHelperIT {
             tenantClient.postTenant(
                 null,
                 postTenantRes -> {
-                  postIsils(context);
-                  async.complete();
+                  postIsils(context).setHandler(ar -> async.complete());
                 });
           } catch (Exception e) {
             context.fail(e);
@@ -92,15 +92,16 @@ public class IsilHelperIT {
             }));
   }
 
-  private static void postIsils(TestContext context) {
+  private static Future<Void> postIsils(TestContext context) {
+    Future<Void> result = Future.future();
     String isil1Str;
     try {
       isil1Str = new String(Files.readAllBytes(Paths.get("ramls/examples/isil1.sample")));
     } catch (IOException e) {
       context.fail(e);
-      return;
+      result.fail("Cannot load isisl. " + e);
+      return result;
     }
-    Async async = context.async();
     PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
         .save(
             "isils",
@@ -108,12 +109,13 @@ public class IsilHelperIT {
             Json.decodeValue(isil1Str, Isil.class).withId(null),
             ar -> {
               if (ar.succeeded()) {
-                async.complete();
+                result.complete();
               } else {
                 context.fail(ar.cause());
+                result.fail(ar.cause());
               }
             });
-    async.await();
+    return result;
   }
 
   @Test

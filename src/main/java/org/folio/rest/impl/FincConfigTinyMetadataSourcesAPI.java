@@ -19,7 +19,7 @@ public class FincConfigTinyMetadataSourcesAPI implements FincConfigTinyMetadataS
   private final TinyMetadataSourcesHelper tinyMetadataSourcesHelper;
 
   public FincConfigTinyMetadataSourcesAPI(Vertx vertx, String tenantId) {
-    PostgresClient.getInstance(vertx).setIdField(FincConfigMetadataSourcesAPI.ID_FIELD);
+    PostgresClient.getInstance(vertx);
     tinyMetadataSourcesHelper = new TinyMetadataSourcesHelper(vertx);
   }
 

@@ -26,14 +26,13 @@ import org.folio.rest.utils.Constants;
  */
 public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
 
-  public static final String ID_FIELD = "_id";
   public static final String TABLE_NAME = "metadata_sources";
   private final Logger logger = LoggerFactory.getLogger(FincConfigMetadataSourcesAPI.class);
 
   private final ConfigMetadataSourcesHelper configMetadataSourcesHelper;
 
   public FincConfigMetadataSourcesAPI(Vertx vertx, String tenantId) {
-    PostgresClient.getInstance(vertx).setIdField(ID_FIELD);
+    PostgresClient.getInstance(vertx);
     configMetadataSourcesHelper = new ConfigMetadataSourcesHelper(vertx, tenantId);
   }
 
