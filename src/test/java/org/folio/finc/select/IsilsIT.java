@@ -29,7 +29,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class IsilHelperIT {
+public class IsilsIT {
 
   private static final String APPLICATION_JSON = "application/json";
   private static final String ISIL_1_ID = "a50a2cb5-a7d3-41fb-876f-48d6d202e31c";

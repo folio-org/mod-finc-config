@@ -9,7 +9,9 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import java.util.Map;
 import javax.ws.rs.core.Response;
-import org.folio.finc.config.ConfigMetadataSourcesHelper;
+import org.folio.cql2pgjson.exception.FieldException;
+import org.folio.finc.dao.MetadataSourcesDAO;
+import org.folio.finc.dao.MetadataSourcesDAOImpl;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
@@ -29,11 +31,11 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
   public static final String TABLE_NAME = "metadata_sources";
   private final Logger logger = LoggerFactory.getLogger(FincConfigMetadataSourcesAPI.class);
 
-  private final ConfigMetadataSourcesHelper configMetadataSourcesHelper;
+  private final MetadataSourcesDAO metadataSourcesDAO;
 
   public FincConfigMetadataSourcesAPI(Vertx vertx, String tenantId) {
     PostgresClient.getInstance(vertx);
-    configMetadataSourcesHelper = new ConfigMetadataSourcesHelper(vertx, tenantId);
+    metadataSourcesDAO = new MetadataSourcesDAOImpl();
   }
 
   @Override
@@ -48,8 +50,27 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    configMetadataSourcesHelper.getFincConfigMetadataSources(
-        query, orderBy, order, offset, limit, lang, asyncResultHandler, vertxContext);
+
+    metadataSourcesDAO
+        .getAll(query, offset, limit, vertxContext)
+        .setHandler(
+            ar -> {
+              if (ar.succeeded()) {
+                org.folio.rest.jaxrs.model.FincConfigMetadataSources result = ar.result();
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        GetFincConfigMetadataSourcesResponse.respond200WithApplicationJson(
+                            result)));
+              } else {
+                if (ar.cause() instanceof FieldException) {
+                  Future.succeededFuture(
+                    GetFincConfigMetadataSourcesResponse.respond400WithTextPlain(ar.cause()));
+                } else {
+                  Future.succeededFuture(
+                      GetFincConfigMetadataSourcesResponse.respond500WithTextPlain(ar.cause()));
+                }
+              }
+            });
   }
 
   @Override
