@@ -38,7 +38,9 @@
   },
   "required": [
     "id",
-    "label"
+    "label",
+    "file",
+    "isil"
   ],
   "additionalProperties": false
 }

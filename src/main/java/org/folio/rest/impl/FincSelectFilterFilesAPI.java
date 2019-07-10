@@ -54,7 +54,7 @@ public class FincSelectFilterFilesAPI implements FincSelectFilterFiles {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
 
-    logger.debug("Posting finc select filter file");
+    logger.debug("Getting finc select filter files");
 
     String tenantId =
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
@@ -218,8 +218,7 @@ public class FincSelectFilterFilesAPI implements FincSelectFilterFiles {
     FincSelectFilterFile file =
         entity
             .withIsil(isil)
-            .withFile(UUID.randomUUID().toString())
             .withCreated(LocalDateTime.now().toString());
-    return filterFileDAO.insert(entity, vertxContext);
+    return filterFileDAO.insert(file, vertxContext);
   }
 }

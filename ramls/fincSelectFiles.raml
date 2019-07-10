@@ -18,6 +18,20 @@ resourceTypes:
 
 /finc-select/files:
   displayName: Finc select files
+  post:
+    description: Upload/update a finc select file
+    body:
+      application/octet-stream:
+    responses:
+      200:
+        body:
+          text/plain:
+      404:
+        body:
+          text/plain:
+      500:
+        body:
+          text/plain:
   /{id}:
     get:
       description: Get file by id
@@ -27,18 +41,6 @@ resourceTypes:
             application/octet-stream:
         500:
           description: Server Error
-          body:
-            text/plain:
-    post:
-      description: Upload/update a finc select file
-      body:
-        application/octet-stream:
-      responses:
-        200:
-        404:
-          body:
-            text/plain:
-        500:
           body:
             text/plain:
     delete:

@@ -81,16 +81,25 @@ public class FileDAOImpl implements FileDAO {
 
   @Override
   public Future<Integer> deleteById(String id, String isil, Context vertxContext) {
-    return null;
+    Future<Integer> result = Future.future();
+    Criterion criterion = getCriterion(id, isil);
+    PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
+        .delete(
+            TABLE_NAME,
+            criterion,
+            reply -> {
+              if (reply.succeeded()) {
+                result.complete(reply.result().getUpdated());
+              } else {
+                result.fail(reply.cause());
+              }
+            });
+    return result;
   }
 
   private Criterion getCriterion(String id, String isil) {
     Criteria idCrit =
-        new Criteria()
-            .addField(ID_FIELD)
-            .setJSONB(false)
-            .setOperation("=")
-            .setVal(id);
+        new Criteria().addField(ID_FIELD).setJSONB(false).setOperation("=").setVal(id);
     Criterion criterion = new Criterion(idCrit);
 
     Criteria isilCrit =
