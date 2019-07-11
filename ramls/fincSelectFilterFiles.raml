@@ -1,0 +1,52 @@
+#%RAML 1.0
+title: Filters for Finc Select
+version: v1
+baseUri: http://localhost/mod-finc-config
+
+documentation:
+  - title: mod-finc-config API
+    content: This documents the API calls that can be made to query and manage filter filters
+
+types:
+  fincSelectFilterFile: !include schemas/fincSelectFilterFile.json
+  fincSelectFilterFiles: !include schemas/fincSelectFilterFiles.json
+  errors: !include ./raml-util/schemas/errors.schema
+
+traits:
+  orderable: !include ./raml-util/traits/orderable.raml
+  pageable: !include ./raml-util/traits/pageable.raml
+  searchable: !include ./raml-util/traits/searchable.raml
+  language: !include ./raml-util/traits/language.raml
+  validate: !include ./raml-util/traits/validation.raml
+
+resourceTypes:
+  collection: !include ./raml-util/rtypes/collection.raml
+  collection-item: !include ./raml-util/rtypes/item-collection.raml
+
+/finc-select/filter-files:
+  displayName: Finc select filter files
+  type:
+    collection:
+      exampleCollection: !include examples/fincSelectFilterFile_collection.sample
+      exampleItem: !include examples/fincSelectFilterFile.sample
+      schemaCollection: fincSelectFilterFiles
+      schemaItem: fincSelectFilterFile
+  get:
+    is: [
+      searchable: {description: "", example: "active=true sortBy username"},
+      orderable: {fieldsList: "field A, field B"},
+      pageable
+    ]
+    description: Get all filter files
+  post:
+    is: [validate]
+    description: Post new finc select filter file
+  /{id}:
+    type:
+      collection-item:
+        exampleItem: !include examples/fincSelectFilterFile.sample
+        schema: fincSelectFilterFile
+    get:
+      description: Get one finc select filter file identified by id
+    delete:
+      description: Delete a filter file identified by id

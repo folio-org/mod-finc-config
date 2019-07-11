@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "description": "Collection of filters in finc select",
+  "properties": {
+    "fincSelectFilters": {
+      "type": "array",
+      "id": "fincSelectFilters",
+      "description": "List of filters in finc select",
+      "items": {
+        "type": "object",
+        "$ref": "fincSelectFilter.json"
+      }
+    },
+    "totalRecords": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "fincSelectFilters",
+    "totalRecords"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "fincSelectFilterFiles": [
+    {
+      "id": "6f38da02-16e3-4cc0-b352-91f476d45175",
+      "label": "Holdings",
+      "criteria": "Column: ISSN",
+      "filter": "c79df8df-1dd8-4023-a309-77570fd2a222",
+      "filename": "filterFile.txt",
+      "created": "2019-07-03T15:59:19.660"
+    }
+  ],
+  "totalRecords": 1
+}

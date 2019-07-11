@@ -9,6 +9,11 @@
       "run": "after",
       "snippet": "CREATE OR REPLACE VIEW metadata_sources_tiny AS SELECT id AS id, jsonb_build_object('id', jsonb->>'id', 'label', jsonb->>'label') AS jsonb FROM finc_mod_finc_config.metadata_sources;",
       "fromModuleVersion": "1.0"
+    },
+    {
+      "run": "after",
+      "snippet": "CREATE OR REPLACE VIEW filters_wo_isil AS SELECT id AS id, jsonb - 'isil' AS jsonb FROM finc_mod_finc_config.filters;",
+      "fromModuleVersion": "1.0"
     }
   ],
   "tables": [
@@ -44,6 +49,21 @@
           "tOps": "ADD"
         }
       ]
+    },
+    {
+      "tableName": "filters",
+      "fromModuleVersion": "0.2",
+      "withMetadata": true
+    },
+    {
+      "tableName": "filter_files",
+      "fromModuleVersion": "0.2",
+      "withMetadata": true
+    },
+    {
+      "tableName": "files",
+      "fromModuleVersion": "0.2",
+      "withMetadata": true
     }
   ],
   "views": [

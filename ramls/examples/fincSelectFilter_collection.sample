@@ -1,0 +1,10 @@
+{
+  "fincSelectFilters": [
+    {
+      "id": "c79df8df-1dd8-4023-a309-77570fd2a222",
+      "label": "Holdings",
+      "type": "Whitelist"
+    }
+  ],
+  "totalRecords": 1
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Finc Select Filter Files Schema",
+  "description": "The filter files which can be contained in a filter",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string",
+      "description": "A unique name for this filter file"
+    },
+    "criteria": {
+      "type": "string",
+      "description": "The criteria of this filter"
+    },
+    "filter": {
+      "type": "string",
+      "description": "ID of corresponding filter"
+    },
+    "file": {
+      "type": "string",
+      "description": "Id of the filter file"
+    },
+    "isil": {
+      "type": "string",
+      "description": "Isil of the library this filter file belongs to"
+    },
+    "filename": {
+      "type": "string",
+      "description": "The file's filename"
+    },
+    "created": {
+      "type": "string",
+      "description": "The file's creation date"
+    }
+  },
+  "required": [
+    "id",
+    "label",
+    "file",
+    "isil"
+  ],
+  "additionalProperties": false
+}
