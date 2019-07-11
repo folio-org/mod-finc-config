@@ -4,23 +4,35 @@ import static io.vertx.core.Future.succeededFuture;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import java.util.Map;
 import javax.ws.rs.core.Response;
+import org.folio.cql2pgjson.exception.FieldException;
+import org.folio.finc.dao.IsilDAO;
+import org.folio.finc.dao.IsilDAOImpl;
+import org.folio.finc.dao.SelectMetadataSourcesDAO;
+import org.folio.finc.dao.SelectMetadataSourcesDAOImpl;
 import org.folio.finc.select.SelectMetadataSourcesHelper;
+import org.folio.rest.RestVerticle;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSourcesGetOrder;
 import org.folio.rest.jaxrs.model.Select;
 import org.folio.rest.jaxrs.resource.FincSelectMetadataSources;
+import org.folio.rest.tools.utils.TenantTool;
 
 public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
 
   private final SelectMetadataSourcesHelper selectMetadataSourcesHelper;
+  private final SelectMetadataSourcesDAO selectMetadataSourcesDAO;
+  private final IsilDAO isilDAO;
 
   public FincSelectMetadataSourcesAPI(Vertx vertx, String tenantId) {
     this.selectMetadataSourcesHelper = new SelectMetadataSourcesHelper(vertx, tenantId);
+    this.selectMetadataSourcesDAO = new SelectMetadataSourcesDAOImpl();
+    this.isilDAO = new IsilDAOImpl();
   }
 
   @Override
@@ -35,8 +47,30 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    this.selectMetadataSourcesHelper.getFincSelectMetadataSources(
-        query, offset, limit, lang, okapiHeaders, asyncResultHandler, vertxContext);
+
+    String tenantId =
+      TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
+    isilDAO
+        .getIsilForTenant(tenantId, vertxContext)
+        .compose(isil -> selectMetadataSourcesDAO.getAll(query, offset, limit, isil, vertxContext))
+        .setHandler(
+            ar -> {
+              if (ar.succeeded()) {
+                org.folio.rest.jaxrs.model.FincSelectMetadataSources metadataSources = ar.result();
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        GetFincSelectMetadataSourcesResponse.respond200WithApplicationJson(
+                            metadataSources)));
+              } else {
+                if (ar.cause() instanceof FieldException) {
+                  Future.succeededFuture(
+                      GetFincSelectMetadataSourcesResponse.respond400WithTextPlain(ar.cause()));
+                } else {
+                  Future.succeededFuture(
+                      GetFincSelectMetadataSourcesResponse.respond500WithTextPlain(ar.cause()));
+                }
+              }
+            });
   }
 
   @Override
@@ -63,8 +97,20 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    this.selectMetadataSourcesHelper.getFincSelectMetadataSourcesById(
-        id, lang, okapiHeaders, asyncResultHandler, vertxContext);
+
+    String tenantId =
+      TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
+    isilDAO.getIsilForTenant(tenantId, vertxContext)
+      .compose(isil -> selectMetadataSourcesDAO.getById(id, isil, vertxContext))
+      .setHandler(ar -> {
+        if (ar.succeeded()) {
+          FincSelectMetadataSource fincSelectMetadataSource = ar.result();
+          asyncResultHandler.handle(Future.succeededFuture(GetFincSelectMetadataSourcesByIdResponse.respond200WithApplicationJson(fincSelectMetadataSource)));
+        } else {
+          Future.succeededFuture(GetFincSelectMetadataSourcesByIdResponse.respond500WithTextPlain(ar.cause()));
+        }
+      });
+
   }
 
   @Override
@@ -125,7 +171,7 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    this.selectMetadataSourcesHelper.putFincSelectMetadataSourcesCollectionsSelectAllById(
+    this.selectMetadataSourcesHelper.selectAllCollectionsOfMetadataSource(
         id, entity, okapiHeaders, asyncResultHandler, vertxContext);
   }
 
