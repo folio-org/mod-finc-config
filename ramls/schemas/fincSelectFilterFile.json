@@ -21,7 +21,7 @@
     },
     "file": {
       "type": "string",
-      "description": "Id of the filter file"
+      "description": "UUID of the binary file (which is uploaded before this filter file document)"
     },
     "isil": {
       "type": "string",

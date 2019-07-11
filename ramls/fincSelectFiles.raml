@@ -19,11 +19,12 @@ resourceTypes:
 /finc-select/files:
   displayName: Finc select files
   post:
-    description: Upload/update a finc select file
+    description: Upload/update a finc select file.
     body:
       application/octet-stream:
     responses:
       200:
+        description: Uploading the file was successful. Returns uuid of uploaded file. This uuid will be referenced in 'fincSelectFilterFile' as value of the property 'file'.
         body:
           text/plain:
       404:
