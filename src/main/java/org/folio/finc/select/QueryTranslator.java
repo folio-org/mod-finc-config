@@ -40,12 +40,12 @@ public class QueryTranslator {
     if (query.contains(key)) {
       Pattern pattern =
           Pattern.compile(
-              "(AND )?" + key + "=([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])",
+              "(AND )?" + key + "=(\")?([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])(\")?",
               Pattern.CASE_INSENSITIVE);
       Matcher matcher = pattern.matcher(query);
       if (matcher.find()) {
         String andValue = matcher.group(1);
-        String value = matcher.group(2);
+        String value = matcher.group(3);
         String group = matcher.group();
         String replacedQuery = replaceQueryFunc.apply(isil);
         if ("true".equals(value)) {
