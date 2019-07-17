@@ -141,8 +141,12 @@
       }
     },
     "selected": {
-      "type": "boolean",
-      "description": "Indicator if current tenant/library has selected this metadata source"
+      "type": "string",
+      "description": "Indicator if current tenant/library has selected this metadata source",
+      "enum": [
+        "yes",
+        "no"
+      ]
     }
   },
   "required": [

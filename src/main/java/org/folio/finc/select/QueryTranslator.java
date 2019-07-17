@@ -39,16 +39,16 @@ public class QueryTranslator {
       String query, String key, String isil, Function<String, String> replaceQueryFunc) {
     if (query.contains(key)) {
       Pattern pattern =
-          Pattern.compile(
-              "(AND )?" + key + "=(\")?([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])(\")?",
-              Pattern.CASE_INSENSITIVE);
+        Pattern.compile(
+          "(AND )?" + key + "=(\")?([Yy][Ee][Ss]|[Nn][Oo])(\")?",
+          Pattern.CASE_INSENSITIVE);
       Matcher matcher = pattern.matcher(query);
       if (matcher.find()) {
         String andValue = matcher.group(1);
         String value = matcher.group(3);
         String group = matcher.group();
         String replacedQuery = replaceQueryFunc.apply(isil);
-        if ("true".equals(value)) {
+        if ("yes".equals(value)) {
           if (andValue != null) {
             query = query.replace(group, "AND " + replacedQuery);
           } else {
