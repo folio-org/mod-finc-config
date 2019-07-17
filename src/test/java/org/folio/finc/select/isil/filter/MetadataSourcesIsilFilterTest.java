@@ -1,5 +1,6 @@
 package org.folio.finc.select.isil.filter;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -9,6 +10,7 @@ import org.folio.finc.select.isil.filter.IsilFilter;
 import org.folio.finc.select.isil.filter.MetadataSourcesIsilFilter;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource;
+import org.folio.rest.jaxrs.model.FincSelectMetadataSource.Selected;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -54,10 +56,10 @@ public class MetadataSourcesIsilFilterTest {
               String label = mdSource.getLabel();
               switch (label) {
                 case SOURCE_1:
-                  assertTrue(mdSource.getSelected());
+                  assertEquals(Selected.YES, mdSource.getSelected());
                   break;
                 case SOURCE_2:
-                  assertFalse(mdSource.getSelected());
+                  assertEquals(Selected.NO, mdSource.getSelected());
                   break;
               }
             });

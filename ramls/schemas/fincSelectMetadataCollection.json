@@ -50,8 +50,12 @@
       ]
     },
     "permitted": {
-      "type": "boolean",
-      "description": "Indicates if metadata collection is permitted for current tenant/isil"
+      "type": "string",
+      "description": "Indicates if metadata collection is permitted for current tenant/isil",
+      "enum": [
+        "yes",
+        "no"
+      ]
     },
     "freeContent": {
       "type": "string",
@@ -121,8 +125,12 @@
       }
     },
     "selected": {
-      "type": "boolean",
-      "description": "Indicates if this metadata collection is selected by current tenant/isil"
+      "type": "string",
+      "description": "Indicates if this metadata collection is selected by current tenant/isil",
+      "enum": [
+        "yes",
+        "no"
+      ]
     },
     "filters": {
       "type": "array",

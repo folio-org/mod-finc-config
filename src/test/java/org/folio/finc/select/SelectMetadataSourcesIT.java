@@ -22,6 +22,7 @@ import org.folio.finc.mocks.MockOrganization;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
+import org.folio.rest.jaxrs.model.FincSelectMetadataSource.Selected;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.jaxrs.model.Organization;
 import org.folio.rest.persist.PostgresClient;
@@ -158,6 +159,6 @@ public class SelectMetadataSourcesIT {
         .body("fincSelectMetadataSources.size()", equalTo(1))
         .body("fincSelectMetadataSources[0].id", equalTo(metadatasourceSelected.getId()))
         .body("fincSelectMetadataSources[0].label", equalTo(metadatasourceSelected.getLabel()))
-        .body("fincSelectMetadataSources[0].selected", equalTo(true));
+        .body("fincSelectMetadataSources[0].selected", equalTo(Selected.YES.toString()));
   }
 }

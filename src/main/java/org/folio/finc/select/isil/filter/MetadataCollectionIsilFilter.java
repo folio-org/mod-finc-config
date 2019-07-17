@@ -4,6 +4,8 @@ import io.vertx.core.json.Json;
 import java.util.List;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollection;
+import org.folio.rest.jaxrs.model.FincSelectMetadataCollection.Permitted;
+import org.folio.rest.jaxrs.model.FincSelectMetadataCollection.Selected;
 
 public class MetadataCollectionIsilFilter
     extends IsilFilter<FincSelectMetadataCollection, FincConfigMetadataCollection> {
@@ -12,15 +14,16 @@ public class MetadataCollectionIsilFilter
   public FincSelectMetadataCollection filterForIsil(
       FincConfigMetadataCollection entry, String isil) {
     List<String> selectedBy = entry.getSelectedBy();
-    boolean selected = selectedBy.contains(isil);
+    Selected selected = selectedBy.contains(isil) ? Selected.YES : Selected.NO;
+
     entry.setSelectedBy(null);
 
     List<String> permittedFor = entry.getPermittedFor();
-    boolean permitted = permittedFor.contains(isil);
+    Permitted permitted = permittedFor.contains(isil) ? Permitted.YES : Permitted.NO;
     entry.setPermittedFor(null);
 
     FincSelectMetadataCollection result =
-      Json.mapper.convertValue(entry, FincSelectMetadataCollection.class);
+        Json.mapper.convertValue(entry, FincSelectMetadataCollection.class);
     result.setSelected(selected);
     result.setPermitted(permitted);
     return result;

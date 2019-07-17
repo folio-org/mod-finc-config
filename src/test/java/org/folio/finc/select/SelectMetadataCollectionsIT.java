@@ -19,6 +19,8 @@ import java.nio.file.Paths;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
+import org.folio.rest.jaxrs.model.FincSelectMetadataCollection.Permitted;
+import org.folio.rest.jaxrs.model.FincSelectMetadataCollection.Selected;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.jaxrs.model.Select;
 import org.folio.rest.persist.PostgresClient;
@@ -159,7 +161,7 @@ public class SelectMetadataCollectionsIT {
         .header("X-Okapi-Tenant", TENANT_UBL)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
-        .get(BASE_URI + "?query=(selected=true AND permitted=true)")
+        .get(BASE_URI + "?query=(selected=yes AND permitted=yes)")
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
@@ -168,8 +170,8 @@ public class SelectMetadataCollectionsIT {
         .body(
             "fincSelectMetadataCollections[0].label",
             equalTo(metadataCollectionPermitted.getLabel()))
-        .body("fincSelectMetadataCollections[0].selected", equalTo(true))
-        .body("fincSelectMetadataCollections[0].permitted", equalTo(true));
+        .body("fincSelectMetadataCollections[0].selected", equalTo(Selected.YES.toString()))
+        .body("fincSelectMetadataCollections[0].permitted", equalTo(Permitted.YES.toString()));
 
     // DELETE
     given()
@@ -243,8 +245,8 @@ public class SelectMetadataCollectionsIT {
         .statusCode(200)
         .body("id", equalTo(metadataCollectionPermitted.getId()))
         .body("label", equalTo(metadataCollectionPermitted.getLabel()))
-        .body("selected", equalTo(true))
-        .body("permitted", equalTo(true));
+        .body("selected", equalTo(Selected.YES.toString()))
+        .body("permitted", equalTo(Permitted.YES.toString()));
 
     // GET
     given()
@@ -257,8 +259,8 @@ public class SelectMetadataCollectionsIT {
         .statusCode(200)
         .body("id", equalTo(metadataCollectionForbidden.getId()))
         .body("label", equalTo(metadataCollectionForbidden.getLabel()))
-        .body("selected", equalTo(false))
-        .body("permitted", equalTo(false));
+        .body("selected", equalTo(Selected.NO.toString()))
+        .body("permitted", equalTo(Permitted.NO.toString()));
 
     // Unselect metadata collection
     given()
@@ -281,8 +283,8 @@ public class SelectMetadataCollectionsIT {
         .statusCode(200)
         .body("id", equalTo(metadataCollectionPermitted.getId()))
         .body("label", equalTo(metadataCollectionPermitted.getLabel()))
-        .body("selected", equalTo(false))
-        .body("permitted", equalTo(true));
+        .body("selected", equalTo(Selected.NO.toString()))
+        .body("permitted", equalTo(Permitted.YES.toString()));
 
     // Select metadata collection again
     given()
@@ -305,8 +307,8 @@ public class SelectMetadataCollectionsIT {
         .statusCode(200)
         .body("id", equalTo(metadataCollectionPermitted.getId()))
         .body("label", equalTo(metadataCollectionPermitted.getLabel()))
-        .body("selected", equalTo(true))
-        .body("permitted", equalTo(true));
+        .body("selected", equalTo(Selected.YES.toString()))
+        .body("permitted", equalTo(Permitted.YES.toString()));
 
     // Check that we cannot select forbidden metadata collection
     given()
