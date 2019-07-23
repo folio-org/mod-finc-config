@@ -4,7 +4,7 @@
   "provides": [
     {
       "id": "finc-config/metadata-sources",
-      "version": "0.1",
+      "version": "1.0",
       "handlers": [
         {
           "methods": [
@@ -61,7 +61,7 @@
     },
     {
       "id": "finc-config/metadata-collections",
-      "version": "0.1",
+      "version": "1.0",
       "handlers": [
         {
           "methods": [
@@ -112,7 +112,7 @@
     },
     {
       "id": "finc-config/isils",
-      "version": "0.1",
+      "version": "1.0",
       "handlers": [
         {
           "methods": [
@@ -148,7 +148,7 @@
     },
     {
       "id": "finc-select/metadata-collections",
-      "version": "0.1",
+      "version": "1.0",
       "handlers": [
         {
           "methods": [
@@ -172,7 +172,7 @@
     },
     {
       "id": "finc-select/metadata-sources",
-      "version": "0.1",
+      "version": "1.0",
       "handlers": [
         {
           "methods": [
@@ -196,7 +196,7 @@
     },
     {
       "id": "finc-select/filters",
-      "version": "0.1",
+      "version": "1.0",
       "handlers": [
         {
           "methods": [
