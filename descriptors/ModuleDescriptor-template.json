@@ -231,6 +231,60 @@
       ]
     },
     {
+      "id": "finc-select/filter-files",
+      "version": "1.0",
+      "handlers": [
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-select/filter-files"
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-select/filter-files/{id}"
+        },
+        {
+          "methods": [
+            "DELETE"
+          ],
+          "pathPattern": "/finc-select/filter-files/{id}"
+        },
+        {
+          "methods": [
+            "POST"
+          ],
+          "pathPattern": "/finc-select/filter-files"
+        }
+      ]
+    },
+    {
+      "id": "finc-select/files",
+      "version": "1.0",
+      "handlers": [
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-select/files/{id}"
+        },
+        {
+          "methods": [
+            "DELETE"
+          ],
+          "pathPattern": "/finc-select/files/{id}"
+        },
+        {
+          "methods": [
+            "POST"
+          ],
+          "pathPattern": "/finc-select/files"
+        }
+      ]
+    },
+    {
       "id": "_tenant",
       "version": "1.2",
       "interfaceType": "system",
