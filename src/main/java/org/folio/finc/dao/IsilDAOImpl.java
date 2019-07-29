@@ -9,6 +9,8 @@ import org.folio.rest.utils.Constants;
 
 public class IsilDAOImpl implements IsilDAO {
 
+  private static final String TABLE_NAME = "isils";
+
   @Override
   public Future<String> getIsilForTenant(String tenantId, Context context) {
     Future<String> future = Future.future();

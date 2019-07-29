@@ -16,6 +16,8 @@ import org.folio.rest.utils.Constants;
 
 public class MetadataCollectionsDAOImpl implements MetadataCollectionsDAO {
 
+  private static final String TABLE_NAME = "metadata_collections";
+
   @Override
   public Future<FincConfigMetadataCollections> getAll(String query, int offset, int limit,
     Context vertxContext) {

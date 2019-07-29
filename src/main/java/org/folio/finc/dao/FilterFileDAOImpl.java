@@ -22,6 +22,7 @@ import org.folio.cql2pgjson.exception.FieldException;
 public class FilterFileDAOImpl implements FilterFileDAO {
 
   private static final String ID_FIELD = "id";
+  private static final String TABLE_NAME = "filter_files";
   private final Logger logger = LoggerFactory.getLogger(FilterFileDAOImpl.class);
 
   @Override
