@@ -7,8 +7,8 @@ import java.util.regex.Pattern;
 /**
  * Processes query made to finc-select metadata sources. Translates selected=(yes|no) and
  * permitted=(yes|no) to selectedBy resp. permittedBy queries with corresponding isil. E.g., if
- * library with isil 'ISIL-01' looks for selected metadata collections the query 'selected="yes"' will
- * be translated to 'selectedBy="ISIL-01"'.
+ * library with isil 'ISIL-01' looks for selected metadata collections the query 'selected="yes"'
+ * will be translated to 'selectedBy="ISIL-01"'.
  */
 public class QueryTranslator {
 
@@ -75,7 +75,9 @@ public class QueryTranslator {
 
   private static String translate(
       String query, String key, String isil, Function<String, String> replaceQueryFunc) {
-    query = query.trim();
+
+    query = prepareQuery(query);
+
     if (!query.contains(key)) {
       return query;
     }
@@ -109,6 +111,19 @@ public class QueryTranslator {
       }
     }
     return "(" + query + ")";
+  }
+
+  private static String prepareQuery(String query) {
+    query = query.trim();
+    int leadingParenthesesIndex = query.indexOf("(");
+    int trialingParenthesesIndex = query.indexOf(")");
+    if (leadingParenthesesIndex == 0) {
+      query = query.substring(1);
+    }
+    if (trialingParenthesesIndex == query.length() - 1) {
+      query = query.substring(0, query.length() - 1);
+    }
+    return query;
   }
 
   private static String calculateAppendable(String query, String toAppend) {
