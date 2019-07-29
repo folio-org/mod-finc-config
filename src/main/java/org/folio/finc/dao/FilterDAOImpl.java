@@ -22,6 +22,7 @@ import org.folio.cql2pgjson.exception.FieldException;
 public class FilterDAOImpl implements FilterDAO {
 
   private static final String ID_FIELD = "id";
+  private static final String TABLE_NAME = "filters";
 
   private final Logger logger = LoggerFactory.getLogger(FilterDAOImpl.class);
 
@@ -56,14 +57,6 @@ public class FilterDAOImpl implements FilterDAO {
                 org.folio.rest.jaxrs.model.FincSelectFilters fincSelectFilters =
                     new org.folio.rest.jaxrs.model.FincSelectFilters();
                 List<FincSelectFilter> filterList = reply.result().getResults();
-                /* List<FincSelectFilter> results =
-                filterList.stream()
-                  .map(
-                    filter -> {
-                      filter.setIsil(null);
-                      return filter;
-                    })
-                  .collect(Collectors.toList());*/
                 fincSelectFilters.setFincSelectFilters(filterList);
                 fincSelectFilters.setTotalRecords(filterList.size());
                 result.complete(fincSelectFilters);

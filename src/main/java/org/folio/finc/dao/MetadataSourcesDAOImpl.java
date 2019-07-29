@@ -21,6 +21,8 @@ public class MetadataSourcesDAOImpl implements MetadataSourcesDAO {
 
   private static final Logger logger = LoggerFactory.getLogger(MetadataSourcesDAOImpl.class);
 
+  private static final String TABLE_NAME = "metadata_sources";
+
   private CQLWrapper getCQL(String query, int limit, int offset) throws FieldException {
     CQL2PgJSON cql2PgJSON =
       new CQL2PgJSON(Arrays.asList(FincConfigMetadataSourcesAPI.TABLE_NAME + ".jsonb"));

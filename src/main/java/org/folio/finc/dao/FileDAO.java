@@ -6,8 +6,6 @@ import org.folio.finc.model.File;
 
 public interface FileDAO {
 
-  String TABLE_NAME = "files";
-
   Future<File> getById(String id, String isil, Context vertxContext);
 
   Future<File> upsert(File entity, String id, Context vertxContext);

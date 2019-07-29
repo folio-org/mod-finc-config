@@ -10,6 +10,8 @@ import org.folio.rest.utils.Constants;
 
 public class MetadataSourcesTinyDAOImpl implements MetadataSourcesTinyDAO {
 
+  private static final String TABLE_NAME = "metadata_sources_tiny";
+
   @Override
   public Future<TinyMetadataSources> getAll(Context vertxContext) {
 

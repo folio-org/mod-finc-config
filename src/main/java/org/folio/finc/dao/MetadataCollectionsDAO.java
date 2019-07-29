@@ -7,8 +7,6 @@ import org.folio.rest.jaxrs.model.FincConfigMetadataCollections;
 
 public interface MetadataCollectionsDAO {
 
-  String TABLE_NAME = "metadata_collections";
-
   Future<FincConfigMetadataCollections> getAll(String query, int offset, int limit, Context vertxContext);
 
   Future<FincConfigMetadataCollection> getById(String id, Context vertxContext);

@@ -10,7 +10,6 @@ import io.vertx.core.logging.LoggerFactory;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 import org.folio.finc.dao.FilterFileDAO;
@@ -28,8 +27,6 @@ import org.folio.rest.tools.utils.TenantTool;
 
 public class FincSelectFilterFilesAPI implements FincSelectFilterFiles {
 
-  private static final String ID_FIELD = "id";
-  private static final String TABLE_NAME = "filter_files";
   private final Logger logger = LoggerFactory.getLogger(FincSelectFilterFilesAPI.class);
   private final Messages messages = Messages.getInstance();
   private final IsilHelper isilHelper;
@@ -215,10 +212,7 @@ public class FincSelectFilterFilesAPI implements FincSelectFilterFiles {
 
   private Future<FincSelectFilterFile> addMetadataAndSave(
       FincSelectFilterFile entity, String isil, Context vertxContext) {
-    FincSelectFilterFile file =
-        entity
-            .withIsil(isil)
-            .withCreated(LocalDateTime.now().toString());
+    FincSelectFilterFile file = entity.withIsil(isil).withCreated(LocalDateTime.now().toString());
     return filterFileDAO.insert(file, vertxContext);
   }
 }

@@ -7,8 +7,6 @@ import org.folio.rest.jaxrs.model.FincSelectFilters;
 
 public interface FilterDAO {
 
-  String TABLE_NAME = "filters";
-
   Future<FincSelectFilters> getAll(
       String query, int offset, int limit, String isil, Context vertxContext);
 

@@ -115,8 +115,8 @@ public class QueryTranslator {
 
   private static String prepareQuery(String query) {
     query = query.trim();
-    int leadingParenthesesIndex = query.indexOf("(");
-    int trialingParenthesesIndex = query.indexOf(")");
+    int leadingParenthesesIndex = query.indexOf('(');
+    int trialingParenthesesIndex = query.indexOf(')');
     if (leadingParenthesesIndex == 0) {
       query = query.substring(1);
     }

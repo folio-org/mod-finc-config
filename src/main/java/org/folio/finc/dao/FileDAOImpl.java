@@ -12,6 +12,8 @@ import org.folio.rest.utils.Constants;
 public class FileDAOImpl implements FileDAO {
 
   private static final String ID_FIELD = "id";
+  private static final String TABLE_NAME = "files";
+
 
   @Override
   public Future<File> getById(String id, String isil, Context vertxContext) {
@@ -27,10 +29,6 @@ public class FileDAOImpl implements FileDAO {
               if (reply.succeeded()) {
                 List<File> fileList = reply.result().getResults();
 
-                /*if (fileList.isEmpty()) {
-                  result.complete(new File());
-                  return;
-                }*/
                 if (fileList.size() > 1) {
                   result.fail(
                       "Error while getting file by id. Found "
