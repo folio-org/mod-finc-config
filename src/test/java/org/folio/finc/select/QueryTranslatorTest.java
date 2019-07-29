@@ -216,8 +216,6 @@ public class QueryTranslatorTest {
     assertEquals(expected, result);
   }
 
-  //  "usageRestricted": "no"
-
   @Test
   public void translatePermittedFalseAndTrueWithSelectedTrueAndFalseWithSource() {
     String query =
@@ -257,6 +255,24 @@ public class QueryTranslatorTest {
           + "\") OR (permittedFor any \""
           + isil
           + "\"))");
+    String result = QueryTranslator.translate(query, isil);
+    assertNotNull(result);
+    assertEquals(expected, result);
+  }
+
+  @Test
+  public void translatePermittedFalseAndTrueWithSelected() {
+    String query = "permitted=\"yes\" or \"no\" AND selected=\"yes\"";
+    String expected =
+      "(selectedBy any \""
+        + isil
+        + "\") AND "
+        + "((permittedFor any \""
+        + isil
+        + "\") OR (cql.allRecords=1 NOT permittedFor any \""
+        + isil
+        + "\"))";
+
     String result = QueryTranslator.translate(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
