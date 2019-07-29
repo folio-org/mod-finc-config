@@ -125,3 +125,11 @@ local.properties
 .worksheet
 
 /.idea/*
+
+# Build artifacts.
+/target
+
+# Project files.
+/.classpath
+/.project
+/.vscode/settings.json
