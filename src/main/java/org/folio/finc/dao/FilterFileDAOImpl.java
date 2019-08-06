@@ -82,6 +82,7 @@ public class FilterFileDAOImpl implements FilterFileDAO {
 
                 if (fileList.isEmpty()) {
                   result.complete(null);
+                  return;
                 }
                 if (fileList.size() > 1) {
                   result.fail(

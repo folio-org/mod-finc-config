@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.not;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.parsing.Parser;
+import com.jayway.restassured.response.Response;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
@@ -34,6 +35,7 @@ import org.junit.runner.RunWith;
 @RunWith(VertxUnitRunner.class)
 public class FincSelectFilterFilesIT {
   private static final String APPLICATION_JSON = "application/json";
+  private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
   private static final String BASE_URL = "/finc-select/filter-files";
   private static final String TENANT_UBL = "ubl";
   private static final String TENANT_DIKU = "diku";
@@ -134,6 +136,21 @@ public class FincSelectFilterFilesIT {
         .statusCode(201)
         .body("isil", equalTo(isilDiku.getIsil()));
 
+    // POST File
+    Response postResponse =
+        given()
+            .body("foobar".getBytes())
+            .header("X-Okapi-Tenant", TENANT_UBL)
+            .header("content-type", APPLICATION_OCTET_STREAM)
+            .post("/finc-select/files")
+            .then()
+            .statusCode(200)
+            .extract()
+            .response();
+
+    String fileId = postResponse.getBody().print();
+    filterFile.setFile(fileId);
+
     // POST
     given()
         .body(Json.encode(filterFile))
@@ -145,7 +162,9 @@ public class FincSelectFilterFilesIT {
         .statusCode(201)
         .body("id", equalTo(filterFile.getId()))
         .body("label", equalTo(filterFile.getLabel()))
-        .body("filename", equalTo(filterFile.getFilename()));
+        .body("filename", equalTo(filterFile.getFilename()))
+        .extract()
+        .response();
 
     // GET
     given()
@@ -178,6 +197,24 @@ public class FincSelectFilterFilesIT {
         .delete(BASE_URL + "/" + filterFile.getId())
         .then()
         .statusCode(204);
+
+    // GET FilterFile
+    given()
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .header("content-type", APPLICATION_JSON)
+      .header("accept", APPLICATION_JSON)
+      .get(BASE_URL + "/" + filterFile.getId())
+      .then()
+      .contentType(ContentType.TEXT)
+      .statusCode(404);
+
+    // GET File
+    given()
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .header("content-type", APPLICATION_OCTET_STREAM)
+      .get("/finc-select/files/" + fileId)
+      .then()
+      .statusCode(404);
 
     // DELETE isils
     given()
