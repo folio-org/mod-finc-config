@@ -1,6 +1,7 @@
 package org.folio.rest.impl;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 import org.folio.finc.dao.FilterFileDAO;
 import org.folio.finc.dao.FilterFileDAOImpl;
+import org.folio.finc.select.FilterHelper;
 import org.folio.finc.select.IsilHelper;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.annotations.Validate;
@@ -31,11 +33,13 @@ public class FincSelectFilterFilesAPI implements FincSelectFilterFiles {
   private final Messages messages = Messages.getInstance();
   private final IsilHelper isilHelper;
   private final FilterFileDAO filterFileDAO;
+  private final FilterHelper filterHelper;
 
   public FincSelectFilterFilesAPI(Vertx vertx, String tenantId) {
     PostgresClient.getInstance(vertx);
     this.isilHelper = new IsilHelper(vertx, tenantId);
     this.filterFileDAO = new FilterFileDAOImpl();
+    this.filterHelper = new FilterHelper();
   }
 
   @Override
@@ -172,29 +176,29 @@ public class FincSelectFilterFilesAPI implements FincSelectFilterFiles {
 
     String tenantId =
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
-    isilHelper
-        .fetchIsil(tenantId, vertxContext)
-        .compose(isil -> filterFileDAO.deleteById(id, isil, vertxContext))
-        .setHandler(
-            ar -> {
-              if (ar.succeeded()) {
-                Integer updated = ar.result();
-                if (updated == 0) {
-                  asyncResultHandler.handle(
-                      Future.succeededFuture(
-                          DeleteFincSelectFilterFilesByIdResponse.respond404WithTextPlain(
-                              messages.getMessage(lang, MessageConsts.ObjectDoesNotExist))));
-                } else {
-                  asyncResultHandler.handle(
-                      Future.succeededFuture(DeleteFincSelectFilterFilesByIdResponse.respond204()));
-                }
-              } else {
-                asyncResultHandler.handle(
-                    Future.succeededFuture(
-                        DeleteFincSelectFilterFilesByIdResponse.respond500WithTextPlain(
-                            messages.getMessage(lang, MessageConsts.InternalServerError))));
-              }
+
+    Future<String> isilFuture = isilHelper.fetchIsil(tenantId, vertxContext);
+    Future<CompositeFuture> compose =
+        isilFuture.compose(
+            isil -> {
+              Future<Integer> deleteFileFuture =
+                  filterHelper.deleteFileOfFilterFile(id, isil, vertxContext);
+              Future<Integer> deleteFilterFileFuture =
+                  filterFileDAO.deleteById(id, isil, vertxContext);
+              return CompositeFuture.all(deleteFileFuture, deleteFilterFileFuture);
             });
+    compose.setHandler(
+        ar -> {
+          if (ar.succeeded()) {
+            asyncResultHandler.handle(
+                Future.succeededFuture(DeleteFincSelectFilterFilesByIdResponse.respond204()));
+          } else {
+            asyncResultHandler.handle(
+                Future.succeededFuture(
+                    DeleteFincSelectFilterFilesByIdResponse.respond500WithTextPlain(
+                        messages.getMessage(lang, MessageConsts.InternalServerError))));
+          }
+        });
   }
 
   @Override
