@@ -17,6 +17,7 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.UUID;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.FincSelectFilterFile;
@@ -58,6 +59,7 @@ public class FincSelectFilesIT {
       String fileStr =
           new String(Files.readAllBytes(Paths.get("ramls/examples/fincSelectFilterFile.sample")));
       filterFile = Json.decodeValue(fileStr, FincSelectFilterFile.class);
+      filterFile.setId(UUID.randomUUID().toString());
 
     } catch (Exception e) {
       context.fail(e);

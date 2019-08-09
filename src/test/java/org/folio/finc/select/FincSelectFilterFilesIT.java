@@ -19,6 +19,7 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.UUID;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.FincSelectFilterFile;
@@ -27,6 +28,7 @@ import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -152,30 +154,34 @@ public class FincSelectFilterFilesIT {
     filterFile.setFile(fileId);
 
     // POST
-    given()
-        .body(Json.encode(filterFile))
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", APPLICATION_JSON)
-        .post(BASE_URL)
-        .then()
-        .statusCode(201)
-        .body("id", equalTo(filterFile.getId()))
-        .body("label", equalTo(filterFile.getLabel()))
-        .body("filename", equalTo(filterFile.getFilename()))
-        .extract()
-        .response();
+    Response postFilterFileResponse =
+        given()
+            .body(Json.encode(filterFile))
+            .header("X-Okapi-Tenant", TENANT_UBL)
+            .header("content-type", APPLICATION_JSON)
+            .header("accept", APPLICATION_JSON)
+            .post(BASE_URL)
+            .then()
+            .statusCode(201)
+            .extract()
+            .response();
+
+    FincSelectFilterFile postedFilterFile =
+        postFilterFileResponse.getBody().as(FincSelectFilterFile.class);
+    Assert.assertNotNull(postedFilterFile.getId());
+    Assert.assertEquals(filterFile.getLabel(), postedFilterFile.getLabel());
+    Assert.assertEquals(filterFile.getFilename(), postedFilterFile.getFilename());
 
     // GET
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
-        .get(BASE_URL + "/" + filterFile.getId())
+        .get(BASE_URL + "/" + postedFilterFile.getId())
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
-        .body("id", equalTo(filterFile.getId()))
+        .body("id", equalTo(postedFilterFile.getId()))
         .body("label", equalTo(filterFile.getLabel()))
         .body("filename", equalTo(filterFile.getFilename()))
         .body("$", not(hasKey("isil")));
@@ -194,27 +200,27 @@ public class FincSelectFilterFilesIT {
     // DELETE
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
-        .delete(BASE_URL + "/" + filterFile.getId())
+        .delete(BASE_URL + "/" + postedFilterFile.getId())
         .then()
         .statusCode(204);
 
     // GET FilterFile
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", APPLICATION_JSON)
-      .header("accept", APPLICATION_JSON)
-      .get(BASE_URL + "/" + filterFile.getId())
-      .then()
-      .contentType(ContentType.TEXT)
-      .statusCode(404);
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", APPLICATION_JSON)
+        .header("accept", APPLICATION_JSON)
+        .get(BASE_URL + "/" + postedFilterFile.getId())
+        .then()
+        .contentType(ContentType.TEXT)
+        .statusCode(404);
 
     // GET File
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", APPLICATION_OCTET_STREAM)
-      .get("/finc-select/files/" + fileId)
-      .then()
-      .statusCode(404);
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", APPLICATION_OCTET_STREAM)
+        .get("/finc-select/files/" + fileId)
+        .then()
+        .statusCode(404);
 
     // DELETE isils
     given()
@@ -232,6 +238,7 @@ public class FincSelectFilterFilesIT {
 
   @Test
   public void checkThatWeCanSearchForFilters() {
+    filterFile.setId(UUID.randomUUID().toString());
     // POST isils
     given()
         .body(Json.encode(isilUBL))

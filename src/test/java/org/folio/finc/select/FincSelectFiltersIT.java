@@ -8,6 +8,8 @@ import static org.hamcrest.Matchers.not;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.parsing.Parser;
+import com.jayway.restassured.response.ExtractableResponse;
+import com.jayway.restassured.response.Response;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
@@ -18,14 +20,17 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.UUID;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
+import org.folio.rest.jaxrs.model.Filter;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -142,28 +147,32 @@ public class FincSelectFiltersIT {
         .body("isil", equalTo(isilDiku.getIsil()));
 
     // POST
-    given()
-        .body(Json.encode(filter1))
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", APPLICATION_JSON)
-        .post(BASE_URL)
-        .then()
-        .statusCode(201)
-        .body("id", equalTo(filter1.getId()))
-        .body("label", equalTo(filter1.getLabel()))
-        .body("type", equalTo(filter1.getType().value()));
+    Response resp = given()
+      .body(Json.encode(filter1))
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .header("content-type", APPLICATION_JSON)
+      .header("accept", APPLICATION_JSON)
+      .post(BASE_URL)
+      .then()
+      .statusCode(201)
+      .extract()
+      .response();
+
+    FincSelectFilter postedFilter = resp.getBody().as(FincSelectFilter.class);
+    Assert.assertNotNull(postedFilter.getId());
+    Assert.assertEquals(filter1.getLabel(), postedFilter.getLabel());
+    Assert.assertEquals(filter1.getType(), postedFilter.getType());
 
     // GET
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
         .header("content-type", APPLICATION_JSON)
         .header("accept", APPLICATION_JSON)
-        .get(BASE_URL + "/" + filter1.getId())
+        .get(BASE_URL + "/" + postedFilter.getId())
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
-        .body("id", equalTo(filter1.getId()))
+        .body("id", equalTo(postedFilter.getId()))
         .body("label", equalTo(filter1.getLabel()))
         .body("type", equalTo(filter1.getType().value()))
         .body("$", not(hasKey("isil")));
@@ -174,11 +183,12 @@ public class FincSelectFiltersIT {
         .header("X-Okapi-Tenant", TENANT_UBL)
         .header("content-type", APPLICATION_JSON)
         .header("accept", "text/plain")
-        .put(BASE_URL + "/" + filter1.getId())
+        .put(BASE_URL + "/" + postedFilter.getId())
         .then()
         .statusCode(204);
 
     // GET
+    filter1Changed.setId(postedFilter.getId());
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
         .header("content-type", APPLICATION_JSON)
@@ -206,7 +216,7 @@ public class FincSelectFiltersIT {
     // DELETE
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
-        .delete(BASE_URL + "/" + filter1.getId())
+        .delete(BASE_URL + "/" + postedFilter.getId())
         .then()
         .statusCode(204);
 
@@ -226,6 +236,8 @@ public class FincSelectFiltersIT {
 
   @Test
   public void checkThatWeCanSearchForFilters() {
+    filter1.setId(UUID.randomUUID().toString());
+    filter2.setId(UUID.randomUUID().toString());
     // POST isils
     given()
         .body(Json.encode(isilUBL))
