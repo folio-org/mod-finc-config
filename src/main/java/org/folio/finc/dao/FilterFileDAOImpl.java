@@ -7,6 +7,9 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.UpdateResult;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
+import org.folio.cql2pgjson.CQL2PgJSON;
+import org.folio.cql2pgjson.exception.FieldException;
 import org.folio.rest.jaxrs.model.FincSelectFilterFile;
 import org.folio.rest.jaxrs.model.FincSelectFilterFiles;
 import org.folio.rest.persist.Criteria.Criteria;
@@ -16,8 +19,6 @@ import org.folio.rest.persist.Criteria.Offset;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.utils.Constants;
-import org.folio.cql2pgjson.CQL2PgJSON;
-import org.folio.cql2pgjson.exception.FieldException;
 
 public class FilterFileDAOImpl implements FilterFileDAO {
 
@@ -111,6 +112,9 @@ public class FilterFileDAOImpl implements FilterFileDAO {
 
   @Override
   public Future<FincSelectFilterFile> insert(FincSelectFilterFile entity, Context vertxContext) {
+    if (entity.getId() == null) {
+      entity.setId(UUID.randomUUID().toString());
+    }
     Future<FincSelectFilterFile> result = Future.future();
     PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
         .save(
@@ -168,11 +172,7 @@ public class FilterFileDAOImpl implements FilterFileDAO {
 
   private Criterion getCriterion(String id, String isil) {
     Criteria idCrit =
-        new Criteria()
-            .addField(ID_FIELD)
-            .setJSONB(false)
-            .setOperation("=")
-            .setVal(id);
+        new Criteria().addField(ID_FIELD).setJSONB(false).setOperation("=").setVal(id);
     Criterion criterion = new Criterion(idCrit);
 
     Criteria isilCrit =
