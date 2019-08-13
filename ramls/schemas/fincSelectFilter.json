@@ -19,6 +19,15 @@
         "Blacklist"
       ]
     },
+    "filterFiles": {
+      "type": "array",
+      "id": "filterFiles",
+      "description": "List of filter files associated with this filter",
+      "items": {
+        "type": "object",
+        "$ref": "fincSelectFilterFile.json"
+      }
+    },
     "isil": {
       "type": "string",
       "description": "Isil of library using this filter"

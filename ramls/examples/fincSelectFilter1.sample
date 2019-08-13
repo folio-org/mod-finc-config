@@ -1,4 +1,12 @@
 {
   "label": "Holdings 1",
-  "type": "Whitelist"
+  "type": "Whitelist",
+  "filterFiles": [
+    {
+      "label": "Holdings",
+      "criteria": "Column: ISSN",
+      "filename": "filterFile.txt",
+      "fileId": "aa9202b7-754a-414a-8bf6-378df78e5985"
+    }
+  ]
 }

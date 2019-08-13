@@ -49,7 +49,7 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
       Context vertxContext) {
 
     String tenantId =
-      TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
+        TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectMetadataSourcesDAO.getAll(query, offset, limit, isil, vertxContext))
@@ -63,11 +63,15 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
                             metadataSources)));
               } else {
                 if (ar.cause() instanceof FieldException) {
-                  Future.succeededFuture(
-                      GetFincSelectMetadataSourcesResponse.respond400WithTextPlain(ar.cause()));
+                  asyncResultHandler.handle(
+                      Future.succeededFuture(
+                          GetFincSelectMetadataSourcesResponse.respond400WithTextPlain(
+                              ar.cause())));
                 } else {
-                  Future.succeededFuture(
-                      GetFincSelectMetadataSourcesResponse.respond500WithTextPlain(ar.cause()));
+                  asyncResultHandler.handle(
+                      Future.succeededFuture(
+                          GetFincSelectMetadataSourcesResponse.respond500WithTextPlain(
+                              ar.cause())));
                 }
               }
             });
@@ -99,18 +103,25 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
       Context vertxContext) {
 
     String tenantId =
-      TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
-    isilDAO.getIsilForTenant(tenantId, vertxContext)
-      .compose(isil -> selectMetadataSourcesDAO.getById(id, isil, vertxContext))
-      .setHandler(ar -> {
-        if (ar.succeeded()) {
-          FincSelectMetadataSource fincSelectMetadataSource = ar.result();
-          asyncResultHandler.handle(Future.succeededFuture(GetFincSelectMetadataSourcesByIdResponse.respond200WithApplicationJson(fincSelectMetadataSource)));
-        } else {
-          Future.succeededFuture(GetFincSelectMetadataSourcesByIdResponse.respond500WithTextPlain(ar.cause()));
-        }
-      });
-
+        TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
+    isilDAO
+        .getIsilForTenant(tenantId, vertxContext)
+        .compose(isil -> selectMetadataSourcesDAO.getById(id, isil, vertxContext))
+        .setHandler(
+            ar -> {
+              if (ar.succeeded()) {
+                FincSelectMetadataSource fincSelectMetadataSource = ar.result();
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        GetFincSelectMetadataSourcesByIdResponse.respond200WithApplicationJson(
+                            fincSelectMetadataSource)));
+              } else {
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        GetFincSelectMetadataSourcesByIdResponse.respond500WithTextPlain(
+                            ar.cause())));
+              }
+            });
   }
 
   @Override

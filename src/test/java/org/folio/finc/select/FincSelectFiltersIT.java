@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.not;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.parsing.Parser;
-import com.jayway.restassured.response.ExtractableResponse;
 import com.jayway.restassured.response.Response;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
@@ -20,10 +19,11 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.UUID;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
-import org.folio.rest.jaxrs.model.Filter;
+import org.folio.rest.jaxrs.model.FilterFile;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.persist.PostgresClient;
@@ -42,6 +42,7 @@ public class FincSelectFiltersIT {
   private static final String BASE_URL = "/finc-select/filters";
   private static final String TENANT_UBL = "ubl";
   private static final String TENANT_DIKU = "diku";
+  private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
   private static Isil isilUBL;
   private static Isil isilDiku;
   private static FincSelectFilter filter1;
@@ -62,7 +63,6 @@ public class FincSelectFiltersIT {
       String filter1Str =
           new String(Files.readAllBytes(Paths.get("ramls/examples/fincSelectFilter1.sample")));
       filter1 = Json.decodeValue(filter1Str, FincSelectFilter.class);
-      filter1Changed = Json.decodeValue(filter1Str, FincSelectFilter.class).withLabel("CHANGED");
 
       String filter2Str =
           new String(Files.readAllBytes(Paths.get("ramls/examples/fincSelectFilter2.sample")));
@@ -146,24 +146,64 @@ public class FincSelectFiltersIT {
         .statusCode(201)
         .body("isil", equalTo(isilDiku.getIsil()));
 
-    // POST
-    Response resp = given()
-      .body(Json.encode(filter1))
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", APPLICATION_JSON)
-      .header("accept", APPLICATION_JSON)
-      .post(BASE_URL)
-      .then()
-      .statusCode(201)
-      .extract()
-      .response();
+    // POST File 1
+    Response firstPostFileResp =
+        given()
+            .body("foobar".getBytes())
+            .header("X-Okapi-Tenant", TENANT_UBL)
+            .header("content-type", APPLICATION_OCTET_STREAM)
+            .post("/finc-select/files")
+            .then()
+            .statusCode(200)
+            .extract()
+            .response();
+
+    // POST File 2
+    Response secondPostFileResp =
+        given()
+            .body("foobar2".getBytes())
+            .header("X-Okapi-Tenant", TENANT_UBL)
+            .header("content-type", APPLICATION_OCTET_STREAM)
+            .post("/finc-select/files")
+            .then()
+            .statusCode(200)
+            .extract()
+            .response();
+
+    // Add posted files to filter's filterFiles
+    String firstFileId = firstPostFileResp.getBody().print();
+    String secondFileId = secondPostFileResp.getBody().print();
+    FilterFile firstFilterFile =
+        new FilterFile()
+            .withId(UUID.randomUUID().toString())
+            .withLabel("First FilterFile")
+            .withFileId(firstFileId);
+    FilterFile secondFilterFile =
+        new FilterFile()
+            .withId(UUID.randomUUID().toString())
+            .withLabel("Second FilterFile")
+            .withFileId(secondFileId);
+    filter1.setFilterFiles(Arrays.asList(firstFilterFile, secondFilterFile));
+
+    // POST filter
+    Response resp =
+        given()
+            .body(Json.encode(filter1))
+            .header("X-Okapi-Tenant", TENANT_UBL)
+            .header("content-type", APPLICATION_JSON)
+            .header("accept", APPLICATION_JSON)
+            .post(BASE_URL)
+            .then()
+            .statusCode(201)
+            .extract()
+            .response();
 
     FincSelectFilter postedFilter = resp.getBody().as(FincSelectFilter.class);
     Assert.assertNotNull(postedFilter.getId());
     Assert.assertEquals(filter1.getLabel(), postedFilter.getLabel());
     Assert.assertEquals(filter1.getType(), postedFilter.getType());
 
-    // GET
+    // GET filter
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
         .header("content-type", APPLICATION_JSON)
@@ -177,9 +217,15 @@ public class FincSelectFiltersIT {
         .body("type", equalTo(filter1.getType().value()))
         .body("$", not(hasKey("isil")));
 
-    // PUT
+    // PUT filter and define second filter file to be deleted
+    FilterFile secondFilterFileToDelete = secondFilterFile.withDelete(true);
+    FincSelectFilter changed =
+        postedFilter
+            .withLabel("CHANGED")
+            .withFilterFiles(Arrays.asList(firstFilterFile, secondFilterFileToDelete));
+
     given()
-        .body(Json.encode(filter1Changed))
+        .body(Json.encode(changed))
         .header("X-Okapi-Tenant", TENANT_UBL)
         .header("content-type", APPLICATION_JSON)
         .header("accept", "text/plain")
@@ -187,8 +233,15 @@ public class FincSelectFiltersIT {
         .then()
         .statusCode(204);
 
-    // GET
-    filter1Changed.setId(postedFilter.getId());
+    // GET: check that second file is deleted
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", APPLICATION_OCTET_STREAM)
+        .get("/finc-select/files/" + secondFileId)
+        .then()
+        .statusCode(404);
+
+    // GET changed filter
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
         .header("content-type", APPLICATION_JSON)
@@ -198,8 +251,9 @@ public class FincSelectFiltersIT {
         .contentType(ContentType.JSON)
         .statusCode(200)
         .body("fincSelectFilters.size()", equalTo(1))
-        .body("fincSelectFilters[0].id", equalTo(filter1Changed.getId()))
-        .body("fincSelectFilters[0].label", equalTo(filter1Changed.getLabel()))
+        .body("fincSelectFilters[0].id", equalTo(changed.getId()))
+        .body("fincSelectFilters[0].label", equalTo(changed.getLabel()))
+        .body("fincSelectFilters[0].filterFiles.size()", equalTo(1))
         .body("$", not(hasKey("isil")));
 
     // GET - Different tenant
@@ -213,12 +267,20 @@ public class FincSelectFiltersIT {
         .statusCode(200)
         .body("fincSelectFilters.size()", equalTo(0));
 
-    // DELETE
+    // DELETE filter
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
         .delete(BASE_URL + "/" + postedFilter.getId())
         .then()
         .statusCode(204);
+
+    // GET first file and check that it was deleted
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", APPLICATION_OCTET_STREAM)
+        .get("/finc-select/files/" + firstFileId)
+        .then()
+        .statusCode(404);
 
     // DELETE isils
     given()

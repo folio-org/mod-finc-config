@@ -15,25 +15,17 @@
       "type": "string",
       "description": "The criteria of this filter"
     },
-    "filter": {
-      "type": "string",
-      "description": "ID of corresponding filter"
-    },
-    "file": {
+    "fileId": {
       "type": "string",
       "description": "UUID of the binary file (which is uploaded before this filter file document)"
-    },
-    "isil": {
-      "type": "string",
-      "description": "Isil of the library this filter file belongs to"
     },
     "filename": {
       "type": "string",
       "description": "The file's filename"
     },
-    "created": {
-      "type": "string",
-      "description": "The file's creation date"
+    "_delete": {
+      "type": "boolean",
+      "description": "Indicator if this filter file shall be deleted from it surrounding filter"
     }
   },
   "required": [
