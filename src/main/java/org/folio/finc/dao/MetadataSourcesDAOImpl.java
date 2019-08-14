@@ -25,15 +25,15 @@ public class MetadataSourcesDAOImpl implements MetadataSourcesDAO {
 
   private CQLWrapper getCQL(String query, int limit, int offset) throws FieldException {
     CQL2PgJSON cql2PgJSON =
-      new CQL2PgJSON(Arrays.asList(FincConfigMetadataSourcesAPI.TABLE_NAME + ".jsonb"));
+        new CQL2PgJSON(Arrays.asList(FincConfigMetadataSourcesAPI.TABLE_NAME + ".jsonb"));
     return new CQLWrapper(cql2PgJSON, query)
-      .setLimit(new Limit(limit))
-      .setOffset(new Offset(offset));
+        .setLimit(new Limit(limit))
+        .setOffset(new Offset(offset));
   }
 
   @Override
-  public Future<FincConfigMetadataSources> getAll(String query, int offset, int limit,
-    Context vertxContext) {
+  public Future<FincConfigMetadataSources> getAll(
+      String query, int offset, int limit, Context vertxContext) {
 
     Future<FincConfigMetadataSources> result = Future.future();
 
@@ -49,26 +49,25 @@ public class MetadataSourcesDAOImpl implements MetadataSourcesDAO {
     }
 
     PostgresClient.getInstance(vertxContext.owner(), tenantId)
-      .get(
-        TABLE_NAME,
-        FincConfigMetadataSource.class,
-        fieldList,
-        cql,
-        true,
-        false,
-        reply -> {
-            if (reply.succeeded()) {
-              org.folio.rest.jaxrs.model.FincConfigMetadataSources sourcesCollection =
-                new org.folio.rest.jaxrs.model.FincConfigMetadataSources();
-              List<FincConfigMetadataSource> sources = reply.result().getResults();
-              sourcesCollection.setFincConfigMetadataSources(sources);
-              sourcesCollection.setTotalRecords(
-                reply.result().getResultInfo().getTotalRecords());
-              result.complete(sourcesCollection);
-            } else {
-              result.fail("Cannot get finc config metadata sources. " + reply.cause());
-            }
-        });
+        .get(
+            TABLE_NAME,
+            FincConfigMetadataSource.class,
+            fieldList,
+            cql,
+            true,
+            false,
+            reply -> {
+              if (reply.succeeded()) {
+                org.folio.rest.jaxrs.model.FincConfigMetadataSources sourcesCollection =
+                    new org.folio.rest.jaxrs.model.FincConfigMetadataSources();
+                List<FincConfigMetadataSource> sources = reply.result().getResults();
+                sourcesCollection.setFincConfigMetadataSources(sources);
+                sourcesCollection.setTotalRecords(reply.result().getResultInfo().getTotalRecords());
+                result.complete(sourcesCollection);
+              } else {
+                result.fail("Cannot get finc config metadata sources. " + reply.cause());
+              }
+            });
     return result;
   }
 
@@ -78,19 +77,7 @@ public class MetadataSourcesDAOImpl implements MetadataSourcesDAO {
 
     String tenantId = Constants.MODULE_TENANT;
     PostgresClient.getInstance(vertxContext.owner(), tenantId)
-      .getById(
-        TABLE_NAME,
-        id,
-        FincConfigMetadataSource.class,
-        result.setHandler(ar -> {
-          if (ar.succeeded()) {
-            FincConfigMetadataSource result1 = ar.result();
-            result.complete(result1);
-          } else {
-            result.fail("Cannot find metadata source: " + id);
-          }
-        })
-      );
+        .getById(TABLE_NAME, id, FincConfigMetadataSource.class, result.completer());
     return result;
   }
 }
