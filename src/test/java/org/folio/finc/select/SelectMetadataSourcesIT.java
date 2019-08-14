@@ -192,6 +192,16 @@ public class SelectMetadataSourcesIT {
         .body("label", equalTo(metadatasourceSelected.getLabel()))
         .body("selected", equalTo(Selected.YES.toString()));
 
+    // Get a metadata source by id not found
+    given()
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .header("x-okapi-url", mockedOkapiUrl)
+      .header("content-type", ContentType.TEXT)
+      .header("accept", APPLICATION_JSON)
+      .get(BASE_URI + "/" + UUID.randomUUID().toString())
+      .then()
+      .statusCode(404);
+
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
         .delete("/finc-config/isils/" + isil1.getId())

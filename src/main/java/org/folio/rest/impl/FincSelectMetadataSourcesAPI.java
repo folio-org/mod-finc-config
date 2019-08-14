@@ -111,10 +111,17 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
             ar -> {
               if (ar.succeeded()) {
                 FincSelectMetadataSource fincSelectMetadataSource = ar.result();
-                asyncResultHandler.handle(
-                    Future.succeededFuture(
-                        GetFincSelectMetadataSourcesByIdResponse.respond200WithApplicationJson(
-                            fincSelectMetadataSource)));
+                if (fincSelectMetadataSource == null) {
+                  asyncResultHandler.handle(
+                      Future.succeededFuture(
+                          GetFincSelectMetadataSourcesByIdResponse.respond404WithTextPlain(
+                              ar.cause())));
+                } else {
+                  asyncResultHandler.handle(
+                      Future.succeededFuture(
+                          GetFincSelectMetadataSourcesByIdResponse.respond200WithApplicationJson(
+                              fincSelectMetadataSource)));
+                }
               } else {
                 asyncResultHandler.handle(
                     Future.succeededFuture(
