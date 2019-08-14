@@ -49,3 +49,15 @@ resourceTypes:
             text/plain:
     delete:
       description: Delete a file identified by id
+      responses:
+        204:
+          description: "Delete succeeded"
+        400:
+          description: "Bad request"
+          body:
+            text/plain:
+        500:
+          description: "Internal server error"
+          body:
+            text/plain:
+              example: "Internal server error, contact administrator"

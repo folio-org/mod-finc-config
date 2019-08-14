@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 import org.folio.finc.dao.FilterDAO;
 import org.folio.finc.dao.FilterDAOImpl;
+import org.folio.finc.select.FilterHelper;
 import org.folio.finc.select.IsilHelper;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.annotations.Validate;
@@ -27,12 +28,14 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
 
   private final IsilHelper isilHelper;
   private final FilterDAO filterDAO;
+  private final FilterHelper filterHelper;
   private final Messages messages = Messages.getInstance();
   private final Logger logger = LoggerFactory.getLogger(FincSelectFiltersAPI.class);
 
   public FincSelectFiltersAPI(Vertx vertx, String tenantId) {
     this.isilHelper = new IsilHelper(vertx, tenantId);
     this.filterDAO = new FilterDAOImpl();
+    this.filterHelper = new FilterHelper();
   }
 
   @Override
@@ -167,29 +170,28 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
 
     String tenantId =
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
-    isilHelper
-        .fetchIsil(tenantId, vertxContext)
-        .compose(isil -> filterDAO.deleteById(id, isil, vertxContext))
-        .setHandler(
-            ar -> {
-              if (ar.succeeded()) {
-                Integer updated = ar.result();
-                if (updated == 0) {
-                  asyncResultHandler.handle(
-                      Future.succeededFuture(
-                          DeleteFincSelectFiltersByIdResponse.respond404WithTextPlain(
-                              messages.getMessage(lang, MessageConsts.ObjectDoesNotExist))));
-                } else {
-                  asyncResultHandler.handle(
-                      Future.succeededFuture(DeleteFincSelectFiltersByIdResponse.respond204()));
-                }
-              } else {
-                asyncResultHandler.handle(
-                    Future.succeededFuture(
-                        DeleteFincSelectFiltersByIdResponse.respond500WithTextPlain(
-                            messages.getMessage(lang, MessageConsts.InternalServerError))));
-              }
-            });
+
+    Future<Integer> compose =
+        isilHelper
+            .fetchIsil(tenantId, vertxContext)
+            .compose(
+                isil ->
+                    filterHelper
+                        .deleteFilesOfFilter(id, isil, vertxContext)
+                        .compose(integer -> filterDAO.deleteById(id, isil, vertxContext)));
+
+    compose.setHandler(
+        ar -> {
+          if (ar.succeeded()) {
+            asyncResultHandler.handle(
+                Future.succeededFuture(DeleteFincSelectFiltersByIdResponse.respond204()));
+          } else {
+            asyncResultHandler.handle(
+                Future.succeededFuture(
+                    DeleteFincSelectFiltersByIdResponse.respond500WithTextPlain(
+                        messages.getMessage(lang, MessageConsts.InternalServerError))));
+          }
+        });
   }
 
   @Override
@@ -209,7 +211,13 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
 
     isilHelper
         .fetchIsil(tenantId, vertxContext)
-        .compose(isil -> filterDAO.update(entity.withIsil(isil), id, vertxContext))
+        .compose(
+            isil ->
+                filterHelper
+                    .removeFilesToDelete(entity, isil, vertxContext)
+                    .compose(
+                        fincSelectFilter ->
+                            filterDAO.update(fincSelectFilter.withIsil(isil), id, vertxContext)))
         .setHandler(
             ar -> {
               if (ar.succeeded()) {

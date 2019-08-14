@@ -1,7 +1,6 @@
 package org.folio.rest.impl;
 
 import io.vertx.core.AsyncResult;
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -16,11 +15,9 @@ import org.apache.commons.io.IOUtils;
 import org.folio.finc.dao.FileDAO;
 import org.folio.finc.dao.FileDAOImpl;
 import org.folio.finc.model.File;
-import org.folio.finc.select.FilterHelper;
 import org.folio.finc.select.IsilHelper;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.jaxrs.resource.FincSelectFiles;
-import org.folio.rest.jaxrs.resource.FincSelectFilterFiles.DeleteFincSelectFilterFilesByIdResponse;
 import org.folio.rest.tools.utils.BinaryOutStream;
 import org.folio.rest.tools.utils.TenantTool;
 
@@ -28,12 +25,10 @@ public class FincSelectFilesAPI implements FincSelectFiles {
 
   private final IsilHelper isilHelper;
   private final FileDAO fileDAO;
-  private final FilterHelper filterHelper;
 
   public FincSelectFilesAPI(Vertx vertx, String tenantId) {
     this.isilHelper = new IsilHelper(vertx, tenantId);
     this.fileDAO = new FileDAOImpl();
-    this.filterHelper = new FilterHelper();
   }
 
   @Override
@@ -128,25 +123,19 @@ public class FincSelectFilesAPI implements FincSelectFiles {
     String tenantId =
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
 
-    Future<String> isilFuture = isilHelper.fetchIsil(tenantId, vertxContext);
-    Future<CompositeFuture> compose =
-        isilFuture.compose(
-            isil -> {
-              Future<Integer> deleteFilterFileFuture =
-                  filterHelper.deleteFilterFileOfFile(id, isil, vertxContext);
-              Future<Integer> deleteFileFuture = fileDAO.deleteById(id, isil, vertxContext);
-              return CompositeFuture.all(deleteFileFuture, deleteFilterFileFuture);
+    isilHelper
+        .fetchIsil(tenantId, vertxContext)
+        .compose(isil -> fileDAO.deleteById(id, isil, vertxContext))
+        .setHandler(
+            ar -> {
+              if (ar.succeeded()) {
+                asyncResultHandler.handle(
+                    Future.succeededFuture(DeleteFincSelectFilesByIdResponse.respond204()));
+              } else {
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        DeleteFincSelectFilesByIdResponse.respond500WithTextPlain(ar.cause())));
+              }
             });
-    compose.setHandler(
-        ar -> {
-          if (ar.succeeded()) {
-            asyncResultHandler.handle(
-                Future.succeededFuture(DeleteFincSelectFilterFilesByIdResponse.respond204()));
-          } else {
-            asyncResultHandler.handle(
-                Future.succeededFuture(
-                    DeleteFincSelectFilterFilesByIdResponse.respond500WithTextPlain(ar.cause())));
-          }
-        });
   }
 }

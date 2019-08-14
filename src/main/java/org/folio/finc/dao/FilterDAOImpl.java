@@ -85,8 +85,9 @@ public class FilterDAOImpl implements FilterDAO {
 
                 if (filterList.isEmpty()) {
                   result.complete(null);
+                  return;
                 }
-                if (filterList.size() > 1) {
+                if (filterList.size() != 1) {
                   result.fail(
                       "Error while getting filter by id. Found "
                           + filterList.size()

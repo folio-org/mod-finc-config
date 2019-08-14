@@ -4,7 +4,6 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.parsing.Parser;
 import com.jayway.restassured.response.Response;
 import io.vertx.core.DeploymentOptions;
@@ -17,10 +16,8 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.UUID;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
-import org.folio.rest.jaxrs.model.FincSelectFilterFile;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
@@ -42,7 +39,6 @@ public class FincSelectFilesIT {
   private static final String TEST_CONTENT = "This is the test content!!!!";
   private static Isil isilUBL;
   private static Isil isilDiku;
-  private static FincSelectFilterFile filterFile;
   private static Vertx vertx;
 
   @Rule public Timeout timeout = Timeout.seconds(10);
@@ -55,12 +51,6 @@ public class FincSelectFilesIT {
 
       String isilDikuStr = new String(Files.readAllBytes(Paths.get("ramls/examples/isil3.sample")));
       isilDiku = Json.decodeValue(isilDikuStr, Isil.class);
-
-      String fileStr =
-          new String(Files.readAllBytes(Paths.get("ramls/examples/fincSelectFilterFile.sample")));
-      filterFile = Json.decodeValue(fileStr, FincSelectFilterFile.class);
-      filterFile.setId(UUID.randomUUID().toString());
-
     } catch (Exception e) {
       context.fail(e);
     }
@@ -150,24 +140,7 @@ public class FincSelectFilesIT {
             .statusCode(200)
             .extract()
             .response();
-
     String id = postResponse.getBody().print();
-
-    filterFile.setFile(id);
-    // POST
-    given()
-        .body(Json.encode(filterFile))
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", APPLICATION_JSON)
-        .post("/finc-select/filter-files")
-        .then()
-        .statusCode(201)
-        .body("id", equalTo(filterFile.getId()))
-        .body("label", equalTo(filterFile.getLabel()))
-        .body("filename", equalTo(filterFile.getFilename()))
-        .extract()
-        .response();
 
     // GET
     given()
@@ -181,16 +154,6 @@ public class FincSelectFilesIT {
 
     // DELETE
     given().header("X-Okapi-Tenant", TENANT_UBL).delete(BASE_URL + "/" + id).then().statusCode(204);
-
-    // GET FilterFile (should be deleted with file)
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", APPLICATION_JSON)
-      .get("/finc-select/filter-files/" + filterFile.getId())
-        .then()
-        .contentType(ContentType.TEXT)
-        .statusCode(404);
 
     // DELETE isils
     given()
