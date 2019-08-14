@@ -371,6 +371,16 @@ public class FincSelectFiltersIT {
         .contentType(ContentType.JSON)
         .statusCode(200)
         .body("fincSelectFilters.size()", equalTo(0));
+
+    // GET filter not found
+    given()
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .header("content-type", ContentType.TEXT)
+      .header("accept", APPLICATION_JSON)
+      .get(BASE_URL + "/" + UUID.randomUUID().toString())
+      .then()
+      .statusCode(404);
+
     // DELETE
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
