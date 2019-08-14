@@ -168,6 +168,16 @@ public class SelectMetadataSourcesIT {
         .body("fincSelectMetadataSources[0].label", equalTo(metadatasourceSelected.getLabel()))
         .body("fincSelectMetadataSources[0].selected", equalTo(Selected.YES.toString()));
 
+    // Get all metadata sources with failing query
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("x-okapi-url", mockedOkapiUrl)
+        .header("content-type", ContentType.TEXT)
+        .header("accept", APPLICATION_JSON)
+        .get(BASE_URI + "?query=foo(/&=bar")
+        .then()
+        .statusCode(500);
+
     // Get a metadata source by id
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
@@ -183,10 +193,10 @@ public class SelectMetadataSourcesIT {
         .body("selected", equalTo(Selected.YES.toString()));
 
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .delete("/finc-config/isils/" + isil1.getId())
-      .then()
-      .statusCode(204);
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete("/finc-config/isils/" + isil1.getId())
+        .then()
+        .statusCode(204);
   }
 
   @Test
@@ -238,172 +248,180 @@ public class SelectMetadataSourcesIT {
             .withLabel("Solr Mega Collection not restricted")
             .withUsageRestricted(UsageRestricted.NO)
             .withSolrMegaCollections(Arrays.asList("Solr Mega Collection 01"))
-          .withMdSource(mdSource);
+            .withMdSource(mdSource);
 
     // POST isils
     given()
-      .body(Json.encode(isilUBL))
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("x-okapi-url", mockedOkapiUrl)
-      .header("content-type", APPLICATION_JSON)
-      .header("accept", APPLICATION_JSON)
-      .post("/finc-config/isils")
-      .then()
-      .statusCode(201)
-      .body("isil", equalTo(isilUBL.getIsil()));
+        .body(Json.encode(isilUBL))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("x-okapi-url", mockedOkapiUrl)
+        .header("content-type", APPLICATION_JSON)
+        .header("accept", APPLICATION_JSON)
+        .post("/finc-config/isils")
+        .then()
+        .statusCode(201)
+        .body("isil", equalTo(isilUBL.getIsil()));
 
     given()
-      .body(Json.encode(isilDiku))
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("x-okapi-url", mockedOkapiUrl)
-      .header("content-type", APPLICATION_JSON)
-      .header("accept", APPLICATION_JSON)
-      .post("/finc-config/isils")
-      .then()
-      .statusCode(201)
-      .body("isil", equalTo(isilDiku.getIsil()));
+        .body(Json.encode(isilDiku))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("x-okapi-url", mockedOkapiUrl)
+        .header("content-type", APPLICATION_JSON)
+        .header("accept", APPLICATION_JSON)
+        .post("/finc-config/isils")
+        .then()
+        .statusCode(201)
+        .body("isil", equalTo(isilDiku.getIsil()));
 
     // POST metadata source
     given()
-      .body(Json.encode(metadataSource))
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("x-okapi-url", mockedOkapiUrl)
-      .header("content-type", APPLICATION_JSON)
-      .header("accept", APPLICATION_JSON)
-      .post("/finc-config/metadata-sources")
-      .then()
-      .statusCode(201)
-      .body("id", equalTo(metadataSource.getId()))
-      .body("label", equalTo(metadataSource.getLabel()))
-      .body("description", equalTo(metadataSource.getDescription()));
+        .body(Json.encode(metadataSource))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("x-okapi-url", mockedOkapiUrl)
+        .header("content-type", APPLICATION_JSON)
+        .header("accept", APPLICATION_JSON)
+        .post("/finc-config/metadata-sources")
+        .then()
+        .statusCode(201)
+        .body("id", equalTo(metadataSource.getId()))
+        .body("label", equalTo(metadataSource.getLabel()))
+        .body("description", equalTo(metadataSource.getDescription()));
 
     // POST metadata collections
     given()
-      .body(Json.encode(metadataCollectionNotRestricted))
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("x-okapi-url", mockedOkapiUrl)
-      .header("content-type", APPLICATION_JSON)
-      .header("accept", APPLICATION_JSON)
-      .post("/finc-config/metadata-collections")
-      .then()
-      .statusCode(201)
-      .body("id", equalTo(metadataCollectionNotRestricted.getId()))
-      .body("label", equalTo(metadataCollectionNotRestricted.getLabel()))
-      .body("description", equalTo(metadataCollectionNotRestricted.getDescription()));
+        .body(Json.encode(metadataCollectionNotRestricted))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("x-okapi-url", mockedOkapiUrl)
+        .header("content-type", APPLICATION_JSON)
+        .header("accept", APPLICATION_JSON)
+        .post("/finc-config/metadata-collections")
+        .then()
+        .statusCode(201)
+        .body("id", equalTo(metadataCollectionNotRestricted.getId()))
+        .body("label", equalTo(metadataCollectionNotRestricted.getLabel()))
+        .body("description", equalTo(metadataCollectionNotRestricted.getDescription()));
 
     given()
-      .body(Json.encode(metadataCollectionRestrictedNotPermitted))
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("x-okapi-url", mockedOkapiUrl)
-      .header("content-type", APPLICATION_JSON)
-      .header("accept", APPLICATION_JSON)
-      .post("/finc-config/metadata-collections")
-      .then()
-      .statusCode(201)
-      .body("id", equalTo(metadataCollectionRestrictedNotPermitted.getId()))
-      .body("label", equalTo(metadataCollectionRestrictedNotPermitted.getLabel()))
-      .body("description", equalTo(metadataCollectionRestrictedNotPermitted.getDescription()));
+        .body(Json.encode(metadataCollectionRestrictedNotPermitted))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("x-okapi-url", mockedOkapiUrl)
+        .header("content-type", APPLICATION_JSON)
+        .header("accept", APPLICATION_JSON)
+        .post("/finc-config/metadata-collections")
+        .then()
+        .statusCode(201)
+        .body("id", equalTo(metadataCollectionRestrictedNotPermitted.getId()))
+        .body("label", equalTo(metadataCollectionRestrictedNotPermitted.getLabel()))
+        .body("description", equalTo(metadataCollectionRestrictedNotPermitted.getDescription()));
 
     given()
-      .body(Json.encode(metadataCollectionRestrictedPermitted))
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("x-okapi-url", mockedOkapiUrl)
-      .header("content-type", APPLICATION_JSON)
-      .header("accept", APPLICATION_JSON)
-      .post("/finc-config/metadata-collections")
-      .then()
-      .statusCode(201)
-      .body("id", equalTo(metadataCollectionRestrictedPermitted.getId()))
-      .body("label", equalTo(metadataCollectionRestrictedPermitted.getLabel()))
-      .body("description", equalTo(metadataCollectionRestrictedPermitted.getDescription()));
+        .body(Json.encode(metadataCollectionRestrictedPermitted))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("x-okapi-url", mockedOkapiUrl)
+        .header("content-type", APPLICATION_JSON)
+        .header("accept", APPLICATION_JSON)
+        .post("/finc-config/metadata-collections")
+        .then()
+        .statusCode(201)
+        .body("id", equalTo(metadataCollectionRestrictedPermitted.getId()))
+        .body("label", equalTo(metadataCollectionRestrictedPermitted.getLabel()))
+        .body("description", equalTo(metadataCollectionRestrictedPermitted.getDescription()));
 
     // Select all collections of metadata source
     JsonObject selectJson = new JsonObject().put("select", true);
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", APPLICATION_JSON)
-      .header("accept", ContentType.TEXT)
-      .body(Json.encode(selectJson))
-      .put("/finc-select/metadata-sources/" + metadataSource.getId() + "/collections/select-all")
-      .then()
-      .statusCode(200);
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", APPLICATION_JSON)
+        .header("accept", ContentType.TEXT)
+        .body(Json.encode(selectJson))
+        .put("/finc-select/metadata-sources/" + metadataSource.getId() + "/collections/select-all")
+        .then()
+        .statusCode(200);
 
     // Wait till all metadata collections have been selected
     Thread.sleep(2000);
 
     // Check that metadata collection are selected
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", APPLICATION_JSON)
-      .header("accept", APPLICATION_JSON)
-      .get("/finc-select/metadata-collections" + "/" + metadataCollectionNotRestricted.getId())
-      .then()
-      .contentType(ContentType.JSON)
-      .statusCode(200)
-      .body("id", equalTo(metadataCollectionNotRestricted.getId()))
-      .body("label", equalTo(metadataCollectionNotRestricted.getLabel()))
-      .body("selected", equalTo(Selected.NO.toString()));
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", APPLICATION_JSON)
+        .header("accept", APPLICATION_JSON)
+        .get("/finc-select/metadata-collections" + "/" + metadataCollectionNotRestricted.getId())
+        .then()
+        .contentType(ContentType.JSON)
+        .statusCode(200)
+        .body("id", equalTo(metadataCollectionNotRestricted.getId()))
+        .body("label", equalTo(metadataCollectionNotRestricted.getLabel()))
+        .body("selected", equalTo(Selected.NO.toString()));
 
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", APPLICATION_JSON)
-      .header("accept", APPLICATION_JSON)
-      .get("/finc-select/metadata-collections" + "/" + metadataCollectionRestrictedPermitted.getId())
-      .then()
-      .contentType(ContentType.JSON)
-      .statusCode(200)
-      .body("id", equalTo(metadataCollectionRestrictedPermitted.getId()))
-      .body("label", equalTo(metadataCollectionRestrictedPermitted.getLabel()))
-      .body("selected", equalTo(Selected.YES.toString()));
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", APPLICATION_JSON)
+        .header("accept", APPLICATION_JSON)
+        .get(
+            "/finc-select/metadata-collections"
+                + "/"
+                + metadataCollectionRestrictedPermitted.getId())
+        .then()
+        .contentType(ContentType.JSON)
+        .statusCode(200)
+        .body("id", equalTo(metadataCollectionRestrictedPermitted.getId()))
+        .body("label", equalTo(metadataCollectionRestrictedPermitted.getLabel()))
+        .body("selected", equalTo(Selected.YES.toString()));
 
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", APPLICATION_JSON)
-      .header("accept", APPLICATION_JSON)
-      .get("/finc-select/metadata-collections" + "/" + metadataCollectionRestrictedNotPermitted.getId())
-      .then()
-      .contentType(ContentType.JSON)
-      .statusCode(200)
-      .body("id", equalTo(metadataCollectionRestrictedNotPermitted.getId()))
-      .body("label", equalTo(metadataCollectionRestrictedNotPermitted.getLabel()))
-      .body("selected", equalTo(Selected.NO.toString()));
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", APPLICATION_JSON)
+        .header("accept", APPLICATION_JSON)
+        .get(
+            "/finc-select/metadata-collections"
+                + "/"
+                + metadataCollectionRestrictedNotPermitted.getId())
+        .then()
+        .contentType(ContentType.JSON)
+        .statusCode(200)
+        .body("id", equalTo(metadataCollectionRestrictedNotPermitted.getId()))
+        .body("label", equalTo(metadataCollectionRestrictedNotPermitted.getLabel()))
+        .body("selected", equalTo(Selected.NO.toString()));
 
     // DELETE isil
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .delete("/finc-config/isils/" + isilUBL.getId())
-      .then()
-      .statusCode(204);
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete("/finc-config/isils/" + isilUBL.getId())
+        .then()
+        .statusCode(204);
 
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .delete("/finc-config/isils/" + isilDiku.getId())
-      .then()
-      .statusCode(204);
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete("/finc-config/isils/" + isilDiku.getId())
+        .then()
+        .statusCode(204);
 
     // DELETE metadata source
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .delete("/finc-config/metadata-sources/" + metadataSource.getId())
-      .then()
-      .statusCode(204);
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete("/finc-config/metadata-sources/" + metadataSource.getId())
+        .then()
+        .statusCode(204);
 
     // DELETE metadata collections
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .delete("/finc-config/metadata-collections/" + metadataCollectionNotRestricted.getId())
-      .then()
-      .statusCode(204);
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete("/finc-config/metadata-collections/" + metadataCollectionNotRestricted.getId())
+        .then()
+        .statusCode(204);
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .delete("/finc-config/metadata-collections/" + metadataCollectionRestrictedNotPermitted.getId())
-      .then()
-      .statusCode(204);
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete(
+            "/finc-config/metadata-collections/" + metadataCollectionRestrictedNotPermitted.getId())
+        .then()
+        .statusCode(204);
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .delete("/finc-config/metadata-collections/" + metadataCollectionRestrictedPermitted.getId())
-      .then()
-      .statusCode(204);
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete(
+            "/finc-config/metadata-collections/" + metadataCollectionRestrictedPermitted.getId())
+        .then()
+        .statusCode(204);
   }
 
   @Test

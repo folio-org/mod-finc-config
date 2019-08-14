@@ -51,17 +51,23 @@ public class SelectMetadataSourcesDAOImpl implements SelectMetadataSourcesDAO {
     Context vertxContext) {
     Future<FincSelectMetadataSource> result = Future.future();
 
-    metadataSourcesDAO.getById(id, vertxContext)
-      .setHandler(ar -> {
-        if (ar.succeeded()) {
-          FincConfigMetadataSource fincConfigMetadataSource = ar.result();
-          FincSelectMetadataSource fincSelectMetadataSource =
-            isilFilter.filterForIsil(fincConfigMetadataSource, isil);
-          result.complete(fincSelectMetadataSource);
-        } else {
-          result.fail("Cannot get finc select metadata source by id. " + ar.cause());
-        }
-      });
+    metadataSourcesDAO
+        .getById(id, vertxContext)
+        .setHandler(
+            ar -> {
+              if (ar.succeeded()) {
+                FincConfigMetadataSource fincConfigMetadataSource = ar.result();
+                if (fincConfigMetadataSource == null) {
+                  result.complete(null);
+                } else {
+                  FincSelectMetadataSource fincSelectMetadataSource =
+                      isilFilter.filterForIsil(fincConfigMetadataSource, isil);
+                  result.complete(fincSelectMetadataSource);
+                }
+              } else {
+                result.fail("Cannot get finc select metadata source by id. " + ar.cause());
+              }
+            });
 
     return result;
   }

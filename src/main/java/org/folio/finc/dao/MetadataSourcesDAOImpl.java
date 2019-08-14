@@ -82,7 +82,14 @@ public class MetadataSourcesDAOImpl implements MetadataSourcesDAO {
         TABLE_NAME,
         id,
         FincConfigMetadataSource.class,
-        result.completer()
+        result.setHandler(ar -> {
+          if (ar.succeeded()) {
+            FincConfigMetadataSource result1 = ar.result();
+            result.complete(result1);
+          } else {
+            result.fail("Cannot find metadata source: " + id);
+          }
+        })
       );
     return result;
   }
