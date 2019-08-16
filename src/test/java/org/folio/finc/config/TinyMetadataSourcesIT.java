@@ -16,11 +16,11 @@ public class TinyMetadataSourcesIT extends AbstractMetadataSourcesIT {
     MockOrganization.mockOrganizationFound(organizationUUID1235);
     given()
         .body(Json.encode(metadataSource2))
-        .header("X-Okapi-Tenant", TENANT)
+        .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("x-okapi-url", mockedOkapiUrl)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", APPLICATION_JSON)
-        .post(METADATA_SOURCES_URL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .post(FINC_CONFIG_METADATA_SOURCES_ENDPOINT)
         .then()
         .statusCode(201)
         .body("id", equalTo(metadataSource2.getId()))
@@ -29,15 +29,25 @@ public class TinyMetadataSourcesIT extends AbstractMetadataSourcesIT {
 
     // GET
     given()
-        .header("X-Okapi-Tenant", TENANT)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", APPLICATION_JSON)
-        .get(TINY_MDS_URL)
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_CONFIG_TINY_METADATA_SOURCES_ENDPOINT)
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
         .body("tinyMetadataSources.size()", equalTo(1))
         .body("tinyMetadataSources[0].id", equalTo(metadataSource2.getId()))
         .body("tinyMetadataSources[0].label", equalTo(metadataSource2.getLabel()));
+
+    // DELETE
+    given()
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .header("x-okapi-url", mockedOkapiUrl)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.TEXT)
+        .delete(FINC_CONFIG_METADATA_SOURCES_ENDPOINT + "/" + metadataSource2.getId())
+        .then()
+        .statusCode(204);
   }
 }

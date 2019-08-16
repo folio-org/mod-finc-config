@@ -1,141 +1,52 @@
 package org.folio.finc.select;
 
-import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.parsing.Parser;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Future;
-import io.vertx.core.Vertx;
-import io.vertx.core.json.Json;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
+import static com.jayway.restassured.RestAssured.given;
+import static org.junit.Assert.assertEquals;
+
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import org.folio.rest.RestVerticle;
-import org.folio.rest.client.TenantClient;
+import org.folio.finc.ApiTestBase;
 import org.folio.rest.jaxrs.model.Isil;
-import org.folio.rest.persist.PostgresClient;
-import org.folio.rest.tools.utils.NetworkUtils;
-import org.folio.rest.utils.Constants;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.folio.rest.jaxrs.model.Isils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class IsilsIT {
+public class IsilsIT extends ApiTestBase {
 
-  private static final String APPLICATION_JSON = "application/json";
-  private static final String ISIL_1_ID = "a50a2cb5-a7d3-41fb-876f-48d6d202e31c";
-  private static Vertx vertx;
+  @Rule public Timeout timeout = Timeout.seconds(10);
+  private Isil isilUBL;
 
-  @Rule public Timeout timeout = Timeout.seconds(100);
-
-  @BeforeClass
-  public static void setUp(TestContext context) {
-    vertx = Vertx.vertx();
-
-    try {
-      PostgresClient.setIsEmbedded(true);
-      PostgresClient instance = PostgresClient.getInstance(vertx);
-      instance.startEmbeddedPostgres();
-    } catch (Exception e) {
-      context.fail(e);
-      return;
-    }
-
-    Async async = context.async();
-    int port = NetworkUtils.nextFreePort();
-
-    RestAssured.reset();
-    RestAssured.baseURI = "http://localhost";
-    RestAssured.port = port;
-    RestAssured.defaultParser = Parser.JSON;
-
-    String url = "http://localhost:" + port;
-    TenantClient tenantClient =
-        new TenantClient(url, Constants.MODULE_TENANT, Constants.MODULE_TENANT);
-    DeploymentOptions options =
-        new DeploymentOptions().setConfig(new JsonObject().put("http.port", port)).setWorker(true);
-
-    vertx.deployVerticle(
-        RestVerticle.class.getName(),
-        options,
-        res -> {
-          try {
-            tenantClient.postTenant(
-                null,
-                postTenantRes -> {
-                  postIsils(context).setHandler(ar -> async.complete());
-                });
-          } catch (Exception e) {
-            context.fail(e);
-          }
-        });
+  @Before
+  public void init() {
+    isilUBL = loadIsilUbl();
   }
 
-  @AfterClass
-  public static void teardown(TestContext context) {
-    RestAssured.reset();
-    Async async = context.async();
-    vertx.close(
-        context.asyncAssertSuccess(
-            res -> {
-              PostgresClient.stopEmbeddedPostgres();
-              async.complete();
-            }));
-  }
-
-  private static Future<Void> postIsils(TestContext context) {
-    Future<Void> result = Future.future();
-    String isil1Str;
-    try {
-      isil1Str = new String(Files.readAllBytes(Paths.get("ramls/examples/isil1.sample")));
-    } catch (IOException e) {
-      context.fail(e);
-      result.fail("Cannot load isisl. " + e);
-      return result;
-    }
-    PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
-        .save(
-            "isils",
-            ISIL_1_ID,
-            Json.decodeValue(isil1Str, Isil.class).withId(null),
-            ar -> {
-              if (ar.succeeded()) {
-                result.complete();
-              } else {
-                context.fail(ar.cause());
-                result.fail(ar.cause());
-              }
-            });
-    return result;
+  @After
+  public void tearDown() {
+    deleteIsil(isilUBL.getId());
   }
 
   @Test
-  public void testGetIsilForTenant(TestContext testContext) {
-    IsilHelper cut = new IsilHelper(vertx, Constants.MODULE_TENANT);
-    Map<String, String> headers = new HashMap<>();
-    headers.put("X-Okapi-Tenant", Constants.MODULE_TENANT);
-    headers.put("content-type", APPLICATION_JSON);
-    headers.put("accept", APPLICATION_JSON);
-    Async async = testContext.async();
-    cut.getIsilForTenant("ubl", headers, vertx.getOrCreateContext())
-        .setHandler(
-            isilResult -> {
-              if (isilResult.succeeded()) {
-                String isil = isilResult.result();
-                testContext.assertEquals("DE-15", isil, "Isil not as expected");
-                async.complete();
-              } else {
-                testContext.fail("Isil request not succeeded.");
-              }
-            });
+  public void testGetIsilForTenant() {
+    Response ubl =
+        given()
+            .header("X-Okapi-Tenant", TENANT_UBL)
+            .header("content-type", ContentType.JSON)
+            .get(ISILS_API_ENDPOINT)
+            .then()
+            .contentType(ContentType.JSON.toString())
+            .statusCode(200)
+            .extract()
+            .response();
+    Isils isils = ubl.getBody().as(Isils.class);
+    assertEquals(1, isils.getIsils().size());
+    Isil ublIsil = isils.getIsils().get(0);
+    assertEquals(isilUBL.getIsil(), ublIsil.getIsil());
   }
 }

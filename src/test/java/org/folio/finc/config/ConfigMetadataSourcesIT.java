@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class MetadataSourcesIT extends AbstractMetadataSourcesIT {
+public class ConfigMetadataSourcesIT extends AbstractMetadataSourcesIT {
 
   @Test
   public void checkThatWeCanAddGetPutAndDeleteMetadataSources() {
@@ -21,11 +21,11 @@ public class MetadataSourcesIT extends AbstractMetadataSourcesIT {
     // POST
     given()
         .body(Json.encode(metadataSource2))
-        .header("X-Okapi-Tenant", TENANT)
+        .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("x-okapi-url", mockedOkapiUrl)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", APPLICATION_JSON)
-        .post(METADATA_SOURCES_URL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .post(FINC_CONFIG_METADATA_SOURCES_ENDPOINT)
         .then()
         .statusCode(201)
         .body("id", equalTo(metadataSource2.getId()))
@@ -34,11 +34,11 @@ public class MetadataSourcesIT extends AbstractMetadataSourcesIT {
 
     // GET
     given()
-        .header("X-Okapi-Tenant", TENANT)
+        .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("x-okapi-url", mockedOkapiUrl)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", APPLICATION_JSON)
-        .get(METADATA_SOURCES_URL + "/" + metadataSource2.getId())
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_CONFIG_METADATA_SOURCES_ENDPOINT + "/" + metadataSource2.getId())
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
@@ -50,21 +50,21 @@ public class MetadataSourcesIT extends AbstractMetadataSourcesIT {
     // PUT
     given()
         .body(Json.encode(metadataSource2Changed))
-        .header("X-Okapi-Tenant", TENANT)
+        .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("x-okapi-url", mockedOkapiUrl)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", "text/plain")
-        .put(METADATA_SOURCES_URL + "/" + metadataSource2.getId())
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.TEXT)
+        .put(FINC_CONFIG_METADATA_SOURCES_ENDPOINT + "/" + metadataSource2.getId())
         .then()
         .statusCode(204);
 
     // GET changed resource
     given()
-        .header("X-Okapi-Tenant", TENANT)
+        .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("x-okapi-url", mockedOkapiUrl)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", APPLICATION_JSON)
-        .get(METADATA_SOURCES_URL + "/" + metadataSource2.getId())
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_CONFIG_METADATA_SOURCES_ENDPOINT + "/" + metadataSource2.getId())
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
@@ -75,31 +75,31 @@ public class MetadataSourcesIT extends AbstractMetadataSourcesIT {
 
     // DELETE
     given()
-        .header("X-Okapi-Tenant", TENANT)
+        .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("x-okapi-url", mockedOkapiUrl)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", "text/plain")
-        .delete(METADATA_SOURCES_URL + "/" + metadataSource2.getId())
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.TEXT)
+        .delete(FINC_CONFIG_METADATA_SOURCES_ENDPOINT + "/" + metadataSource2.getId())
         .then()
         .statusCode(204);
 
     // GET again
     given()
-        .header("X-Okapi-Tenant", TENANT)
+        .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("x-okapi-url", mockedOkapiUrl)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", APPLICATION_JSON)
-        .get(METADATA_SOURCES_URL + "/" + metadataSource2.getId())
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_CONFIG_METADATA_SOURCES_ENDPOINT + "/" + metadataSource2.getId())
         .then()
         .statusCode(404);
 
     // GET all
     given()
-        .header("X-Okapi-Tenant", TENANT)
+        .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("x-okapi-url", mockedOkapiUrl)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", APPLICATION_JSON)
-        .get(METADATA_SOURCES_URL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_CONFIG_METADATA_SOURCES_ENDPOINT)
         .then()
         .statusCode(200)
         .body("totalRecords", equalTo(0));
@@ -112,22 +112,22 @@ public class MetadataSourcesIT extends AbstractMetadataSourcesIT {
     MockOrganization.mockOrganizationFound(organizationUUID1234);
     given()
         .body(Json.encode(metadataSource1))
-        .header("X-Okapi-Tenant", TENANT)
+        .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("x-okapi-url", mockedOkapiUrl)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", APPLICATION_JSON)
-        .post(METADATA_SOURCES_URL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .post(FINC_CONFIG_METADATA_SOURCES_ENDPOINT)
         .then()
         .statusCode(201)
         .body("id", equalTo(metadataSource1.getId()));
 
-    String cql = "?query=(label=\"Cambridge*\")";
+    String cql = "?query=(label=\"First Metadata Source*\")";
     given()
-        .header("X-Okapi-Tenant", TENANT)
+        .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("x-okapi-url", mockedOkapiUrl)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", APPLICATION_JSON)
-        .get(METADATA_SOURCES_URL + cql)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_CONFIG_METADATA_SOURCES_ENDPOINT + cql)
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
@@ -138,11 +138,11 @@ public class MetadataSourcesIT extends AbstractMetadataSourcesIT {
 
     String cql2 = "?query=(label=\"FOO*\")";
     given()
-        .header("X-Okapi-Tenant", TENANT)
+        .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("x-okapi-url", mockedOkapiUrl)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", APPLICATION_JSON)
-        .get(METADATA_SOURCES_URL + cql2)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_CONFIG_METADATA_SOURCES_ENDPOINT + cql2)
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
@@ -150,11 +150,11 @@ public class MetadataSourcesIT extends AbstractMetadataSourcesIT {
 
     String cqlSolrShard = "?query=(solrShard==\"UBL main\")";
     given()
-        .header("X-Okapi-Tenant", TENANT)
+        .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("x-okapi-url", mockedOkapiUrl)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", APPLICATION_JSON)
-        .get(METADATA_SOURCES_URL + cqlSolrShard)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_CONFIG_METADATA_SOURCES_ENDPOINT + cqlSolrShard)
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
@@ -168,11 +168,11 @@ public class MetadataSourcesIT extends AbstractMetadataSourcesIT {
 
     // DELETE
     given()
-        .header("X-Okapi-Tenant", TENANT)
+        .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("x-okapi-url", mockedOkapiUrl)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", "text/plain")
-        .delete(METADATA_SOURCES_URL + "/" + metadataSource1.getId())
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.TEXT)
+        .delete(FINC_CONFIG_METADATA_SOURCES_ENDPOINT + "/" + metadataSource1.getId())
         .then()
         .statusCode(204);
   }
@@ -181,14 +181,14 @@ public class MetadataSourcesIT extends AbstractMetadataSourcesIT {
   public void checkThatInvalidMetadataSourceIsNotPosted() {
     FincConfigMetadataSource metadataSourceInvalid =
         Json.decodeValue(
-                Json.encode(MetadataSourcesIT.metadataSource2), FincConfigMetadataSource.class)
+                Json.encode(metadataSource2), FincConfigMetadataSource.class)
             .withLabel(null);
     given()
         .body(Json.encode(metadataSourceInvalid))
-        .header("X-Okapi-Tenant", TENANT)
-        .header("content-type", APPLICATION_JSON)
-        .header("accept", APPLICATION_JSON)
-        .post(METADATA_SOURCES_URL)
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .post(FINC_CONFIG_METADATA_SOURCES_ENDPOINT)
         .then()
         .statusCode(422);
   }
