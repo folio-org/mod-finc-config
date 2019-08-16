@@ -465,6 +465,20 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>3.0.0-M3</version>
+        <configuration>
+           <useSystemClassLoader>false</useSystemClassLoader>
+          <excludes>
+            <exclude>**/*IT.java</exclude>
+          </excludes>
+          <includes>
+            <include>**/ApiTestSuite.java</include>
+          </includes>
+        </configuration>
+      </plugin>
 
     </plugins>
   </build>
