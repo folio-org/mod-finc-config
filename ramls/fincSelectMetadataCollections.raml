@@ -25,12 +25,14 @@ traits:
 
 resourceTypes:
   collection: !include ./raml-util/rtypes/collection.raml
+  collection-get: !include ./raml-util/rtypes/collection-get.raml
   collection-item: !include ./raml-util/rtypes/item-collection.raml
+  collection-item-get: !include ./raml-util/rtypes/item-collection-get.raml
 
 /finc-select/metadata-collections:
   displayName: Metadata Collections Select
   type:
-    collection:
+    collection-get:
       exampleCollection: !include examples/fincSelectMetadataCollection_collection.sample
       exampleItem: !include examples/fincSelectMetadataCollection.sample
       schemaCollection: fincSelectMetadataCollections
@@ -44,7 +46,7 @@ resourceTypes:
     description: Get all metadata collections
   /{id}:
     type:
-      collection-item:
+      collection-item-get:
         exampleItem: !include examples/fincSelectMetadataCollection.sample
         schema: fincSelectMetadataCollection
     get:
