@@ -20,5 +20,5 @@
     "21st Century COE Program"
   ],
   "selected": "yes",
-  "filters": []
+  "filters": [ "uuid-123", "uuid-789" ]
 }

@@ -12,6 +12,7 @@ types:
   fincSelectMetadataSources: !include schemas/fincSelectMetadataSources.json
   fincSelectMetadataCollection: !include schemas/fincSelectMetadataCollection.json
   fincSelectMetadataCollections: !include schemas/fincSelectMetadataCollections.json
+  fincSelectFiltersOfCollection: !include schemas/fincSelectFiltersOfCollection.json
   select: !include schemas/select.json
   errors: !include ./raml-util/schemas/errors.schema
 
@@ -55,3 +56,10 @@ resourceTypes:
           schema: select
       put:
         description: Put, if this metadata collection is selected resp. deselected
+    /filters:
+      type:
+        collection-item:
+          exampleItem: !include examples/fincSelectFiltersOfCollection.sample
+          schema: fincSelectFiltersOfCollection
+      put:
+        description: Put list of filters to associate with this collections

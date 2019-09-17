@@ -14,10 +14,12 @@ import org.folio.finc.dao.IsilDAO;
 import org.folio.finc.dao.IsilDAOImpl;
 import org.folio.finc.dao.SelectMetadataCollectionsDAO;
 import org.folio.finc.dao.SelectMetadataCollectionsDAOImpl;
+import org.folio.finc.select.SelectMetadataCollectionsFilterHelper;
 import org.folio.finc.select.SelectMetadataCollectionsHelper;
 import org.folio.finc.select.exception.FincSelectNotPermittedException;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.annotations.Validate;
+import org.folio.rest.jaxrs.model.FincSelectFiltersOfCollection;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollection;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollectionsGetOrder;
 import org.folio.rest.jaxrs.model.Select;
@@ -27,11 +29,14 @@ import org.folio.rest.tools.utils.TenantTool;
 public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataCollections {
 
   private final SelectMetadataCollectionsHelper selectMetadataCollectionsHelper;
+  private final SelectMetadataCollectionsFilterHelper selectMetadataCollectionsFilterHelper;
   private final SelectMetadataCollectionsDAO selectMetadataCollectionsDAO;
   private final IsilDAO isilDAO;
 
   public FincSelectMetadataCollectionsAPI(Vertx vertx, String tenantId) {
     this.selectMetadataCollectionsHelper = new SelectMetadataCollectionsHelper(vertx, tenantId);
+    this.selectMetadataCollectionsFilterHelper =
+        new SelectMetadataCollectionsFilterHelper(vertx);
     this.selectMetadataCollectionsDAO = new SelectMetadataCollectionsDAOImpl();
     this.isilDAO = new IsilDAOImpl();
   }
@@ -50,7 +55,7 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
       Context vertxContext) {
 
     String tenantId =
-      TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
+        TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
 
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
@@ -68,7 +73,7 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
               } else {
                 if (ar.cause() instanceof FieldException) {
                   Future.succeededFuture(
-                    GetFincSelectMetadataCollectionsResponse.respond400WithTextPlain(ar.cause()));
+                      GetFincSelectMetadataCollectionsResponse.respond400WithTextPlain(ar.cause()));
                 } else {
                   Future.succeededFuture(
                       GetFincSelectMetadataCollectionsResponse.respond500WithTextPlain(ar.cause()));
@@ -105,19 +110,24 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
       Context vertxContext) {
 
     String tenantId =
-      TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
+        TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
 
-    isilDAO.getIsilForTenant(tenantId, vertxContext)
-      .compose(isil -> selectMetadataCollectionsDAO.getById(id, isil, vertxContext))
-      .setHandler(ar -> {
-        if (ar.succeeded()) {
-        asyncResultHandler.handle(
-            Future.succeededFuture(GetFincSelectMetadataCollectionsByIdResponse.respond200WithApplicationJson(ar.result()))
-          );
-        } else {
-          Future.succeededFuture(GetFincSelectMetadataCollectionsByIdResponse.respond500WithTextPlain(ar.cause()));
-        }
-      });
+    isilDAO
+        .getIsilForTenant(tenantId, vertxContext)
+        .compose(isil -> selectMetadataCollectionsDAO.getById(id, isil, vertxContext))
+        .setHandler(
+            ar -> {
+              if (ar.succeeded()) {
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        GetFincSelectMetadataCollectionsByIdResponse.respond200WithApplicationJson(
+                            ar.result())));
+              } else {
+                Future.succeededFuture(
+                    GetFincSelectMetadataCollectionsByIdResponse.respond500WithTextPlain(
+                        ar.cause()));
+              }
+            });
   }
 
   @Override
@@ -182,7 +192,7 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
                 } else {
                   asyncResultHandler.handle(
                       Future.succeededFuture(
-                        PutFincSelectMetadataCollectionsSelectByIdResponse
+                          PutFincSelectMetadataCollectionsSelectByIdResponse
                               .respond500WithTextPlain(ar.cause())));
                 }
               }
@@ -220,6 +230,71 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
                 succeededFuture(
                     FincSelectMetadataCollections
                         .DeleteFincSelectMetadataCollectionsSelectByIdResponse.status(501)
+                        .build())));
+  }
+
+  @Override
+  public void putFincSelectMetadataCollectionsFiltersById(
+      String id,
+      String lang,
+      FincSelectFiltersOfCollection entity,
+      Map<String, String> okapiHeaders,
+      Handler<AsyncResult<Response>> asyncResultHandler,
+      Context vertxContext) {
+    selectMetadataCollectionsFilterHelper
+        .addFiltersToCollectionAndSave(id, entity, okapiHeaders, vertxContext)
+        .setHandler(
+            ar -> {
+              if (ar.succeeded()) {
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        PutFincSelectMetadataCollectionsFiltersByIdResponse.respond204()));
+              } else {
+                Throwable cause = ar.cause();
+                if (cause instanceof FincSelectNotPermittedException) {
+                  asyncResultHandler.handle(
+                      Future.succeededFuture(
+                          PutFincSelectMetadataCollectionsFiltersByIdResponse
+                              .respond404WithTextPlain("Not permitted")));
+                } else {
+                  asyncResultHandler.handle(
+                      Future.succeededFuture(
+                          PutFincSelectMetadataCollectionsFiltersByIdResponse
+                              .respond500WithTextPlain(ar.cause())));
+                }
+              }
+            });
+  }
+
+  @Override
+  public void getFincSelectMetadataCollectionsFiltersById(
+      String id,
+      String lang,
+      Map<String, String> okapiHeaders,
+      Handler<AsyncResult<Response>> asyncResultHandler,
+      Context vertxContext) {
+    vertxContext.runOnContext(
+        aVoid ->
+            asyncResultHandler.handle(
+                succeededFuture(
+                    FincSelectMetadataCollections
+                        .GetFincSelectMetadataCollectionsFiltersByIdResponse.status(501)
+                        .build())));
+  }
+
+  @Override
+  public void deleteFincSelectMetadataCollectionsFiltersById(
+      String id,
+      String lang,
+      Map<String, String> okapiHeaders,
+      Handler<AsyncResult<Response>> asyncResultHandler,
+      Context vertxContext) {
+    vertxContext.runOnContext(
+        aVoid ->
+            asyncResultHandler.handle(
+                succeededFuture(
+                    FincSelectMetadataCollections
+                        .DeleteFincSelectMetadataCollectionsFiltersByIdResponse.status(501)
                         .build())));
   }
 }
