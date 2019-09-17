@@ -1,3 +1,10 @@
+## 1.2.0
+* Add endpoint to add/remove filters from finc-select metadata collections (UIFC-84)
+* Add test suite to manage and structure tests
+* ID is optional in filters (UIFC-66)
+* Rename and add permissions (UIFC-16)
+* Delete filter file if filter is deleted and vice versa (UIFC-62)
+
 ## 1.1.0
 * Add finc-select/filter-files and finc-select/files to MD.json (UIFC-61)
 * Allow multiple values for selected and permitted filter (finc select) (UIFC-57)
