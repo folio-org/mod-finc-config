@@ -12,6 +12,7 @@ types:
   fincSelectMetadataSources: !include schemas/fincSelectMetadataSources.json
   fincSelectMetadataCollection: !include schemas/fincSelectMetadataCollection.json
   fincSelectMetadataCollections: !include schemas/fincSelectMetadataCollections.json
+  fincSelectFiltersOfCollection: !include schemas/fincSelectFiltersOfCollection.json
   select: !include schemas/select.json
   errors: !include ./raml-util/schemas/errors.schema
 
@@ -24,16 +25,16 @@ traits:
 
 resourceTypes:
   collection: !include ./raml-util/rtypes/collection.raml
+  collection-get: !include ./raml-util/rtypes/collection-get.raml
   collection-item: !include ./raml-util/rtypes/item-collection.raml
+  collection-item-get: !include ./raml-util/rtypes/item-collection-get.raml
 
 /finc-select/metadata-collections:
   displayName: Metadata Collections Select
   type:
-    collection:
+    collection-get:
       exampleCollection: !include examples/fincSelectMetadataCollection_collection.sample
-      exampleItem: !include examples/fincSelectMetadataCollection.sample
       schemaCollection: fincSelectMetadataCollections
-      schemaItem: fincSelectMetadataCollection
   get:
     is: [
       searchable: {description: "", example: "active=true sortBy username"},
@@ -43,7 +44,7 @@ resourceTypes:
     description: Get all metadata collections
   /{id}:
     type:
-      collection-item:
+      collection-item-get:
         exampleItem: !include examples/fincSelectMetadataCollection.sample
         schema: fincSelectMetadataCollection
     get:
@@ -55,3 +56,10 @@ resourceTypes:
           schema: select
       put:
         description: Put, if this metadata collection is selected resp. deselected
+    /filters:
+      type:
+        collection-item:
+          exampleItem: !include examples/fincSelectFiltersOfCollection.sample
+          schema: fincSelectFiltersOfCollection
+      put:
+        description: Put list of filters to associate with this collections

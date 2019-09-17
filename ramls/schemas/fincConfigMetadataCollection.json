@@ -137,7 +137,8 @@
       "description": "Filters associated to this metadata collection",
       "minItems": 0,
       "items": {
-        "type": "object"
+        "type": "object",
+        "$ref": "fincConfigFiltersOfCollection.json"
       }
     },
     "generalNotes": {

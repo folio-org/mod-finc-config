@@ -131,13 +131,13 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
 
     // DELETE
     given()
-      .header("X-Okapi-Tenant", TENANT_DIKU)
-      .header("x-okapi-url", mockedOkapiUrl)
-      .header("content-type", ContentType.JSON)
-      .header("accept", ContentType.TEXT)
-      .delete(FINC_CONFIG_METADATA_SOURCES_ENDPOINT + "/" + metadatasourceSelected.getId())
-      .then()
-      .statusCode(204);
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .header("x-okapi-url", mockedOkapiUrl)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.TEXT)
+        .delete(FINC_CONFIG_METADATA_SOURCES_ENDPOINT + "/" + metadatasourceSelected.getId())
+        .then()
+        .statusCode(204);
   }
 
   @Test

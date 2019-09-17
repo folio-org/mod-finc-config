@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Filters of a finc select metadata collection",
+  "description": "Filters associated with a finc select metadata collection",
+  "properties": {
+    "filters": {
+      "type": "array",
+      "description": "List of filters associated with this metadata collection",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "filters"
+  ]
+}
