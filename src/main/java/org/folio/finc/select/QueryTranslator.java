@@ -31,7 +31,7 @@ public class QueryTranslator {
     String permitted = "";
     String selected = "";
     String q = "";
-    String[] ands = query.split(AND);
+    String[] ands = query.split("[aA][nN][dD]");
     for (String s : ands) {
       if (s.contains(PERMITTED)) {
         permitted = processPermittedQuery(s, isil);
@@ -120,7 +120,7 @@ public class QueryTranslator {
     if (leadingParenthesesIndex == 0) {
       query = query.substring(1);
     }
-    if (trialingParenthesesIndex == query.length() - 1) {
+    if (trialingParenthesesIndex == query.length()) {
       query = query.substring(0, query.length() - 1);
     }
     return query;
