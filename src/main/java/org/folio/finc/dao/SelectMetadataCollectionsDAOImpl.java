@@ -45,6 +45,7 @@ public class SelectMetadataCollectionsDAOImpl implements SelectMetadataCollectio
           result.complete(collectionsCollection);
         } else {
           result.fail(ar.cause());
+          return;
         }
       });
     return result;
@@ -63,6 +64,7 @@ public class SelectMetadataCollectionsDAOImpl implements SelectMetadataCollectio
           result.complete(fincSelectMetadataCollection);
         } else {
           result.fail("Cannot get finc select metadata collection by id. " + ar.cause());
+          return;
         }
       });
     return result;
