@@ -1,3 +1,6 @@
+## 1.2.1
+* Bugfix: Selecting multiple filters in finc-select metadata collections
+
 ## 1.2.0
 * Add endpoint to add/remove filters from finc-select metadata collections (UIFC-84)
 * Add test suite to manage and structure tests
