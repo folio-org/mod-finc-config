@@ -16,11 +16,11 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerticle {
 
-  private static final Logger logger = LoggerFactory.getLogger(AbstractSelectMetadataSourceVerticle.class);
+  private static final Logger logger =
+      LoggerFactory.getLogger(AbstractSelectMetadataSourceVerticle.class);
 
   private static final String METADATA_COLLECTIONS_TABLE = "metadata_collections";
   private static final String ISILS_TABLE = "isils";
-  private static final String ISIL_MDC_VIEW = "isil_mdc_view";
 
   public AbstractSelectMetadataSourceVerticle(Vertx vertx, Context ctx) {
     super();
@@ -32,29 +32,32 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
     String metadataSourceId = config().getString("metadataSourceId");
     String tenantId = config().getString("tenantId");
     logger.info("Deployed AbstractSelectMetadataSourceVerticle");
-    if (!config().getBoolean("testing", false)) {
-      selectAllCollections(metadataSourceId, tenantId);
-    } else {
+    if(config().getBoolean("testing", false)) {
       logger.info("TEST ENV");
+    } else {
+      selectAllCollections(metadataSourceId, tenantId);
     }
   }
 
   public Future<CompositeFuture> selectAllCollections(String mdSourceId, String tenantId) {
-    return fetchPermittedCollections(mdSourceId, tenantId)
+
+    return fetchIsil(tenantId)
+        .compose(isil -> fetchPermittedCollections(mdSourceId, isil))
         .compose(metadataCollections -> doSelectAndSave(metadataCollections, tenantId));
   }
 
   private Future<List<FincConfigMetadataCollection>> fetchPermittedCollections(
-      String mdSourceId, String tenantId) {
+      String mdSourceId, String isil) {
 
     Future<List<FincConfigMetadataCollection>> result = Future.future();
     String where =
         String.format(
-            " WHERE (jsonb->'mdSource'->>'id' = '%s') AND (tenant = '%s')", mdSourceId, tenantId);
+            " WHERE (jsonb->>'usageRestricted'='no' OR (jsonb->>'permittedFor')::jsonb ? '%s') AND jsonb->'mdSource'->>'id'='%s'",
+            isil, mdSourceId);
 
     PostgresClient.getInstance(context.owner(), Constants.MODULE_TENANT)
         .get(
-            ISIL_MDC_VIEW,
+            METADATA_COLLECTIONS_TABLE,
             FincConfigMetadataCollection.class,
             where,
             false,
@@ -82,7 +85,8 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
             });
   }
 
-  abstract List<FincConfigMetadataCollection> select(List<FincConfigMetadataCollection> metadataCollections, String isil);
+  abstract List<FincConfigMetadataCollection> select(
+      List<FincConfigMetadataCollection> metadataCollections, String isil);
 
   private Future<String> fetchIsil(String tenantId) {
     Future<String> future = Future.future();
@@ -111,9 +115,7 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
   }
 
   private List<Future> saveCollections(List<FincConfigMetadataCollection> selected) {
-    return selected.stream()
-        .map(this::saveSingleCollection)
-        .collect(Collectors.toList());
+    return selected.stream().map(this::saveSingleCollection).collect(Collectors.toList());
   }
 
   private Future saveSingleCollection(FincConfigMetadataCollection metadataCollection) {

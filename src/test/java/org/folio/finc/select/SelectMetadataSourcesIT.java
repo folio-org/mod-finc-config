@@ -265,7 +265,7 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
         .statusCode(200)
         .body("id", equalTo(metadataCollectionNotRestricted.getId()))
         .body("label", equalTo(metadataCollectionNotRestricted.getLabel()))
-        .body("selected", equalTo(Selected.NO.toString()));
+        .body("selected", equalTo(Selected.YES.toString()));
 
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
