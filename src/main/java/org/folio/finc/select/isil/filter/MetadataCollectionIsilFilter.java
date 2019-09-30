@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.folio.rest.jaxrs.model.Filter;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
+import org.folio.rest.jaxrs.model.FincConfigMetadataCollection.UsageRestricted;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollection;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollection.Permitted;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollection.Selected;
@@ -20,8 +21,13 @@ public class MetadataCollectionIsilFilter
 
     entry.setSelectedBy(null);
 
-    List<String> permittedFor = entry.getPermittedFor();
-    Permitted permitted = permittedFor.contains(isil) ? Permitted.YES : Permitted.NO;
+    Permitted permitted;
+    if (entry.getUsageRestricted().equals(UsageRestricted.NO)) {
+      permitted = Permitted.YES;
+    } else {
+      List<String> permittedFor = entry.getPermittedFor();
+      permitted = permittedFor.contains(isil) ? Permitted.YES : Permitted.NO;
+    }
     entry.setPermittedFor(null);
 
     List<Filter> filters = entry.getFilters();

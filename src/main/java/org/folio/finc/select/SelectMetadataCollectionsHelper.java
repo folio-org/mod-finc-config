@@ -13,6 +13,7 @@ import org.folio.finc.dao.MetadataCollectionsDAOImpl;
 import org.folio.finc.select.exception.FincSelectNotPermittedException;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
+import org.folio.rest.jaxrs.model.FincConfigMetadataCollection.UsageRestricted;
 import org.folio.rest.jaxrs.model.Select;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.TenantTool;
@@ -34,7 +35,8 @@ public class SelectMetadataCollectionsHelper {
   private static FincConfigMetadataCollection setSelectStatus(
       FincConfigMetadataCollection metadataCollection, Select select, String isil) {
     List<String> permittedFor = metadataCollection.getPermittedFor();
-    boolean isPermitted = permittedFor.contains(isil);
+    UsageRestricted usageRestricted = metadataCollection.getUsageRestricted();
+    boolean isPermitted = usageRestricted.equals(UsageRestricted.NO) || permittedFor.contains(isil);
 
     if (!isPermitted) {
       throw new FincSelectNotPermittedException("Selecting this metadata collection is not permitted");
