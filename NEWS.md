@@ -1,3 +1,6 @@
+## 1.2.2
+* Bugfix: Correct handling of usageRestricted for finc-select metadata collection
+
 ## 1.2.1
 * Bugfix: Selecting multiple filters in finc-select metadata collections
 
