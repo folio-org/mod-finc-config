@@ -1,6 +1,7 @@
 package org.folio.finc.select;
 
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,11 +51,11 @@ public class QueryTranslator {
   }
 
   private static String processSelectedQuery(String query, String isil) {
-    return translate(query, SELECTED, isil, QueryTranslator::selectedBy);
+    return translate(query, SELECTED, isil, QueryTranslator::selectedBy, Function.identity());
   }
 
   private static String processPermittedQuery(String query, String isil) {
-    return translate(query, PERMITTED, isil, QueryTranslator::permittedFor);
+    return translate(query, PERMITTED, isil, QueryTranslator::permittedFor, QueryTranslator::addUsageRestrictedNoIfUsagePermitted);
   }
 
   private static String processRemainingQuery(String query) {
@@ -73,8 +74,15 @@ public class QueryTranslator {
     return String.format("permittedFor any \"%s\"", isil);
   }
 
+  private static String addUsageRestrictedNoIfUsagePermitted(String query) {
+    if (query.contains("permittedFor")) {
+      return query + " OR usageRestricted=\"no\"";
+    }
+    return query;
+  }
+
   private static String translate(
-      String query, String key, String isil, Function<String, String> replaceQueryFunc) {
+      String query, String key, String isil, UnaryOperator<String> replaceQueryFunc, Function<String, String> postProcessQueryFunc) {
 
     query = prepareQuery(query);
 
@@ -96,7 +104,8 @@ public class QueryTranslator {
       String replacedQuery = replaceQueryFunc.apply(isil);
 
       if (YES.equals(firstYesNo)) {
-        query = query.replace(group, replacedQuery);
+        String q = postProcessQueryFunc.apply(replacedQuery);
+        query = query.replace(group, q);
       } else { // selectedValue is false
         query = query.replace(group, CQL_ALL_RECORDS_1_NOT + " " + replacedQuery);
       }
@@ -104,7 +113,8 @@ public class QueryTranslator {
       if (multiValAndOr != null) {
         query = "(" + query + ")" + " " + multiValAndOr.toUpperCase();
         if (YES.equals(secondYesNo)) {
-          query = query + " (" + replacedQuery + ")";
+          String q = postProcessQueryFunc.apply(replacedQuery);
+          query = query + " (" + q + ")";
         } else {
           query = query + " (" + CQL_ALL_RECORDS_1_NOT + " " + replacedQuery + ")";
         }

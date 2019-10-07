@@ -32,6 +32,7 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
   @Rule public Timeout timeout = Timeout.seconds(10);
   private FincConfigMetadataCollection metadataCollectionPermitted;
   private FincConfigMetadataCollection metadataCollectionForbidden;
+  private FincConfigMetadataCollection metadataCollectionNotRestricted;
   private Isil isilUBL;
   private Isil isilDiku;
 
@@ -44,7 +45,7 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
         new FincConfigMetadataCollection()
             .withId(UUID.randomUUID().toString())
             .withLabel("Metadata Collection Permitted")
-            .withUsageRestricted(UsageRestricted.NO)
+            .withUsageRestricted(UsageRestricted.YES)
             .withPermittedFor(Arrays.asList(isilUBL.getIsil(), isilDiku.getIsil()))
             .withSelectedBy(Arrays.asList(isilUBL.getIsil()))
             .withSolrMegaCollections(Arrays.asList("21st Century COE Program"))
@@ -53,11 +54,19 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
         new FincConfigMetadataCollection()
             .withId(UUID.randomUUID().toString())
             .withLabel("Metadata Collection Forbidden")
-            .withUsageRestricted(UsageRestricted.NO)
+            .withUsageRestricted(UsageRestricted.YES)
             .withPermittedFor(Arrays.asList("ISIL-01"))
             .withSelectedBy(Arrays.asList("ISIL-01"))
             .withSolrMegaCollections(Arrays.asList("21st Century COE Program"))
             .withDescription("This is a test metadata collection forbidden");
+    metadataCollectionNotRestricted =
+        new FincConfigMetadataCollection()
+            .withId(UUID.randomUUID().toString())
+            .withLabel("Metadata Collection Not Restricted")
+            .withUsageRestricted(UsageRestricted.NO)
+            .withSelectedBy(Arrays.asList(isilUBL.getIsil()))
+            .withSolrMegaCollections(Arrays.asList("21st Century COE Program"))
+            .withDescription("This is a test metadata collection which usage is not restricted");
   }
 
   @After
@@ -94,6 +103,19 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
         .body("label", equalTo(metadataCollectionForbidden.getLabel()))
         .body("description", equalTo(metadataCollectionForbidden.getDescription()));
 
+    // POST
+    given()
+        .body(Json.encode(metadataCollectionNotRestricted))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .post(FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT)
+        .then()
+        .statusCode(201)
+        .body("id", equalTo(metadataCollectionNotRestricted.getId()))
+        .body("label", equalTo(metadataCollectionNotRestricted.getLabel()))
+        .body("description", equalTo(metadataCollectionNotRestricted.getDescription()));
+
     // GET
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
@@ -103,13 +125,38 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
-        .body("fincSelectMetadataCollections.size()", equalTo(1))
-        .body("fincSelectMetadataCollections[0].id", equalTo(metadataCollectionPermitted.getId()))
-        .body(
-            "fincSelectMetadataCollections[0].label",
-            equalTo(metadataCollectionPermitted.getLabel()))
-        .body("fincSelectMetadataCollections[0].selected", equalTo(Selected.YES.toString()))
-        .body("fincSelectMetadataCollections[0].permitted", equalTo(Permitted.YES.toString()));
+        .body("fincSelectMetadataCollections.size()", equalTo(2));
+
+    // GET
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT + "/" + metadataCollectionPermitted.getId())
+        .then()
+        .contentType(ContentType.JSON)
+        .statusCode(200)
+        .body("id", equalTo(metadataCollectionPermitted.getId()))
+        .body("label", equalTo(metadataCollectionPermitted.getLabel()))
+        .body("selected", equalTo(Selected.YES.toString()))
+        .body("permitted", equalTo(Permitted.YES.toString()));
+
+    // GET
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(
+            FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT
+                + "/"
+                + metadataCollectionNotRestricted.getId())
+        .then()
+        .contentType(ContentType.JSON)
+        .statusCode(200)
+        .body("id", equalTo(metadataCollectionNotRestricted.getId()))
+        .body("label", equalTo(metadataCollectionNotRestricted.getLabel()))
+        .body("selected", equalTo(Selected.YES.toString()))
+        .body("permitted", equalTo(Permitted.YES.toString()));
 
     // DELETE
     given()
@@ -126,6 +173,14 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
             FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT + "/" + metadataCollectionForbidden.getId())
         .then()
         .statusCode(204);
+
+    // DELETE
+    given()
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .delete(
+        FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT + "/" + metadataCollectionNotRestricted.getId())
+      .then()
+      .statusCode(204);
   }
 
   @Test
@@ -391,70 +446,80 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
   public void checkThatWeCanFilterForMetadataCollections() {
     // POST
     given()
-      .body(Json.encode(metadataCollectionPermitted))
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", ContentType.JSON)
-      .header("accept", ContentType.JSON)
-      .post(FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT)
-      .then()
-      .statusCode(201)
-      .body("id", equalTo(metadataCollectionPermitted.getId()))
-      .body("label", equalTo(metadataCollectionPermitted.getLabel()))
-      .body("description", equalTo(metadataCollectionPermitted.getDescription()));
+        .body(Json.encode(metadataCollectionPermitted))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .post(FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT)
+        .then()
+        .statusCode(201)
+        .body("id", equalTo(metadataCollectionPermitted.getId()))
+        .body("label", equalTo(metadataCollectionPermitted.getLabel()))
+        .body("description", equalTo(metadataCollectionPermitted.getDescription()));
 
     // POST
     given()
-      .body(Json.encode(metadataCollectionForbidden))
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", ContentType.JSON)
-      .header("accept", ContentType.JSON)
-      .post(FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT)
-      .then()
-      .statusCode(201)
-      .body("id", equalTo(metadataCollectionForbidden.getId()))
-      .body("label", equalTo(metadataCollectionForbidden.getLabel()))
-      .body("description", equalTo(metadataCollectionForbidden.getDescription()));
+        .body(Json.encode(metadataCollectionForbidden))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .post(FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT)
+        .then()
+        .statusCode(201)
+        .body("id", equalTo(metadataCollectionForbidden.getId()))
+        .body("label", equalTo(metadataCollectionForbidden.getLabel()))
+        .body("description", equalTo(metadataCollectionForbidden.getDescription()));
 
     // GET
-    String queryUBL = "query=(selectedBy any \"" + isilUBL.getIsil() +"\") AND (permittedFor any \"" + isilUBL.getIsil() + "\")";
+    String queryUBL =
+        "query=(selectedBy any \""
+            + isilUBL.getIsil()
+            + "\") AND (permittedFor any \""
+            + isilUBL.getIsil()
+            + "\")";
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", ContentType.JSON)
-      .header("accept", ContentType.JSON)
-      .get(FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT + "?" + queryUBL)
-      .then()
-      .contentType(ContentType.JSON)
-      .statusCode(200)
-      .body("fincSelectMetadataCollections.size()", equalTo(1))
-      .body("fincSelectMetadataCollections[0].id", equalTo(metadataCollectionPermitted.getId()));
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT + "?" + queryUBL)
+        .then()
+        .contentType(ContentType.JSON)
+        .statusCode(200)
+        .body("fincSelectMetadataCollections.size()", equalTo(1))
+        .body("fincSelectMetadataCollections[0].id", equalTo(metadataCollectionPermitted.getId()));
 
     // GET
-    String queryDiku = "query=(selectedBy any \"" + isilDiku.getIsil() +"\") AND (permittedFor any \"" + isilDiku.getIsil() + "\")";
+    String queryDiku =
+        "query=(selectedBy any \""
+            + isilDiku.getIsil()
+            + "\") AND (permittedFor any \""
+            + isilDiku.getIsil()
+            + "\")";
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", ContentType.JSON)
-      .header("accept", ContentType.JSON)
-      .get(FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT + "?" + queryDiku)
-      .then()
-      .contentType(ContentType.JSON)
-      .statusCode(200)
-      .body("fincSelectMetadataCollections.size()", equalTo(0));
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT + "?" + queryDiku)
+        .then()
+        .contentType(ContentType.JSON)
+        .statusCode(200)
+        .body("fincSelectMetadataCollections.size()", equalTo(0));
 
     // DELETE
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .delete(
-        FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT + "/" + metadataCollectionPermitted.getId())
-      .then()
-      .statusCode(204);
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete(
+            FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT + "/" + metadataCollectionPermitted.getId())
+        .then()
+        .statusCode(204);
 
     // DELETE
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .delete(
-        FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT + "/" + metadataCollectionForbidden.getId())
-      .then()
-      .statusCode(204);
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete(
+            FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT + "/" + metadataCollectionForbidden.getId())
+        .then()
+        .statusCode(204);
   }
 
   @Test
