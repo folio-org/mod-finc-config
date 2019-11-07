@@ -25,8 +25,10 @@ public class IsilDAOImpl implements IsilDAO {
         ar -> {
           if (ar.succeeded()) {
             List<Isil> isils = ar.result().getResults();
-            if (isils.size() != 1) {
-              future.fail("Number isils != 1");
+            if (isils.isEmpty()) {
+              future.fail("Cannot find isil for tenant " + tenantId);
+            } else if (isils.size() > 1) {
+              future.fail("Found multiple isils for tenant " + tenantId);
             } else {
               Isil isil = isils.get(0);
               future.complete(isil.getIsil());

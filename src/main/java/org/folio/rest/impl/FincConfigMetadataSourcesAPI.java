@@ -63,11 +63,15 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
                             result)));
               } else {
                 if (ar.cause() instanceof FieldException) {
-                  Future.succeededFuture(
-                    GetFincConfigMetadataSourcesResponse.respond400WithTextPlain(ar.cause()));
+                  asyncResultHandler.handle(
+                      Future.succeededFuture(
+                          GetFincConfigMetadataSourcesResponse.respond400WithTextPlain(
+                              ar.cause())));
                 } else {
-                  Future.succeededFuture(
-                      GetFincConfigMetadataSourcesResponse.respond500WithTextPlain(ar.cause()));
+                  asyncResultHandler.handle(
+                      Future.succeededFuture(
+                          GetFincConfigMetadataSourcesResponse.respond500WithTextPlain(
+                            ar.cause())));
                 }
               }
             });
