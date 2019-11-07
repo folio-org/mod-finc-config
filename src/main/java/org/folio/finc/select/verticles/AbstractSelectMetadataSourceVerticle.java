@@ -32,7 +32,7 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
     String metadataSourceId = config().getString("metadataSourceId");
     String tenantId = config().getString("tenantId");
     logger.info("Deployed AbstractSelectMetadataSourceVerticle");
-    if(config().getBoolean("testing", false)) {
+    if (Boolean.TRUE.equals(config().getBoolean("testing", false))) {
       logger.info("TEST ENV");
     } else {
       selectAllCollections(metadataSourceId, tenantId);
@@ -101,8 +101,10 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
             ar -> {
               if (ar.succeeded()) {
                 List<Isil> isils = ar.result().getResults();
-                if (isils.size() != 1) {
-                  future.fail("Number isils != 1");
+                if (isils.isEmpty()) {
+                  future.fail("Cannot find isil for tenant " + tenantId);
+                } else if (isils.size() > 1) {
+                  future.fail("Found multiple isils for tenant " + tenantId);
                 } else {
                   Isil isil = isils.get(0);
                   future.complete(isil.getIsil());

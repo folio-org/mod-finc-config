@@ -70,11 +70,15 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
                             metadataCollections)));
               } else {
                 if (ar.cause() instanceof FieldException) {
-                  Future.succeededFuture(
-                      GetFincSelectMetadataCollectionsResponse.respond400WithTextPlain(ar.cause()));
+                  asyncResultHandler.handle(
+                      Future.succeededFuture(
+                          GetFincSelectMetadataCollectionsResponse.respond400WithTextPlain(
+                              ar.cause())));
                 } else {
-                  Future.succeededFuture(
-                      GetFincSelectMetadataCollectionsResponse.respond500WithTextPlain(ar.cause()));
+                  asyncResultHandler.handle(
+                      Future.succeededFuture(
+                          GetFincSelectMetadataCollectionsResponse.respond500WithTextPlain(
+                              ar.cause())));
                 }
               }
             });
@@ -103,9 +107,10 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
                         GetFincSelectMetadataCollectionsByIdResponse.respond200WithApplicationJson(
                             ar.result())));
               } else {
-                Future.succeededFuture(
-                    GetFincSelectMetadataCollectionsByIdResponse.respond500WithTextPlain(
-                        ar.cause()));
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        GetFincSelectMetadataCollectionsByIdResponse.respond500WithTextPlain(
+                            ar.cause())));
               }
             });
   }
@@ -156,7 +161,7 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
         aVoid ->
             asyncResultHandler.handle(
                 succeededFuture(
-                    GetFincSelectMetadataCollectionsSelectByIdResponse.status(501).build())));
+                    Response.status(501).build())));
   }
 
   @Override
@@ -171,7 +176,7 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
         aVoid ->
             asyncResultHandler.handle(
                 succeededFuture(
-                    DeleteFincSelectMetadataCollectionsSelectByIdResponse.status(501).build())));
+                    Response.status(501).build())));
   }
 
   @Override
@@ -210,7 +215,7 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
         aVoid ->
             asyncResultHandler.handle(
                 succeededFuture(
-                    GetFincSelectMetadataCollectionsFiltersByIdResponse.status(501).build())));
+                    Response.status(501).build())));
   }
 
   @Override
@@ -224,6 +229,6 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
         aVoid ->
             asyncResultHandler.handle(
                 succeededFuture(
-                    DeleteFincSelectMetadataCollectionsFiltersByIdResponse.status(501).build())));
+                    Response.status(501).build())));
   }
 }
