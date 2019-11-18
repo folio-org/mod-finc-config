@@ -29,6 +29,13 @@ public class QueryTranslator {
       return query;
     }
 
+    int sortbyIndex = query.toLowerCase().indexOf("sortby");
+    String sortBy = "";
+    if (sortbyIndex != -1) {
+      sortBy = " " + query.substring(sortbyIndex);
+      query = query.substring(0, sortbyIndex);
+    }
+
     String permitted = "";
     String selected = "";
     String q = "";
@@ -47,6 +54,7 @@ public class QueryTranslator {
     String result = q;
     result += calculateAppendable(result, selected);
     result += calculateAppendable(result, permitted);
+    result += sortBy;
     return result;
   }
 

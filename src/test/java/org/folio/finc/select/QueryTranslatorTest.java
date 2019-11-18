@@ -282,6 +282,15 @@ public class QueryTranslatorTest {
   }
 
   @Test
+  public void translatePermittedFalseWithoutSourceAndSortBy() {
+    String query = "permitted=no sortby label/sort.descending";
+    String expected = "(cql.allRecords=1 NOT permittedFor any \"" + isil + "\") sortby label/sort.descending";
+    String result = QueryTranslator.translate(query, isil);
+    assertNotNull(result);
+    assertEquals(expected, result);
+  }
+
+  @Test
   public void translateNullQuery() {
     String query = null;
     String result = QueryTranslator.translate(query, isil);
