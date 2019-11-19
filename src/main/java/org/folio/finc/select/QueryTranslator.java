@@ -33,12 +33,9 @@ public class QueryTranslator {
       return query;
     }
 
-    int sortbyIndex = query.toLowerCase().indexOf("sortby");
-    String sortBy = "";
-    if (sortbyIndex != -1) {
-      sortBy = " " + query.substring(sortbyIndex);
-      query = query.substring(0, sortbyIndex);
-    }
+    String[] queryAndSortBy = splitSortBy(query);
+    query = queryAndSortBy[0];
+    String sortBy = queryAndSortBy[1];
 
     String permitted = "";
     String selected = "";
@@ -163,6 +160,19 @@ public class QueryTranslator {
     } else {
       return " " + AND + " " + toAppend;
     }
+  }
+
+  public static String[] splitSortBy(String query) {
+    if (query == null) {
+      return new String[]{"", ""};
+    }
+    int sortbyIndex = query.toLowerCase().indexOf("sortby");
+    String sortBy = "";
+    if (sortbyIndex != -1) {
+      sortBy = " " + query.substring(sortbyIndex);
+      query = query.substring(0, sortbyIndex);
+    }
+    return new String[]{query, sortBy};
   }
 
   private static String balanceBrackets(String query) {
