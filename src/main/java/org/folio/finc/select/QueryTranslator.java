@@ -1,9 +1,13 @@
 package org.folio.finc.select;
 
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.folio.finc.select.exception.FincSelectInvalidQueryException;
 
 /**
  * Processes query made to finc-select metadata sources. Translates selected=(yes|no) and
@@ -51,7 +55,7 @@ public class QueryTranslator {
       }
     }
 
-    String result = q;
+    String result = balanceBrackets(q);
     result += calculateAppendable(result, selected);
     result += calculateAppendable(result, permitted);
     result += sortBy;
@@ -63,7 +67,12 @@ public class QueryTranslator {
   }
 
   private static String processPermittedQuery(String query, String isil) {
-    return translate(query, PERMITTED, isil, QueryTranslator::permittedFor, QueryTranslator::addUsageRestrictedNoIfUsagePermitted);
+    return translate(
+        query,
+        PERMITTED,
+        isil,
+        QueryTranslator::permittedFor,
+        QueryTranslator::addUsageRestrictedNoIfUsagePermitted);
   }
 
   private static String processRemainingQuery(String query) {
@@ -90,7 +99,11 @@ public class QueryTranslator {
   }
 
   private static String translate(
-      String query, String key, String isil, UnaryOperator<String> replaceQueryFunc, Function<String, String> postProcessQueryFunc) {
+      String query,
+      String key,
+      String isil,
+      UnaryOperator<String> replaceQueryFunc,
+      Function<String, String> postProcessQueryFunc) {
 
     query = prepareQuery(query);
 
@@ -150,5 +163,36 @@ public class QueryTranslator {
     } else {
       return " " + AND + " " + toAppend;
     }
+  }
+
+  private static String balanceBrackets(String query) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(query);
+
+    Deque<SimpleEntry<Character, Integer>> stack = new ArrayDeque<>();
+    char[] chars = query.toCharArray();
+    for (int i = 0; i < chars.length; i++) {
+      char current = chars[i];
+      if (current == '(') {
+        SimpleEntry<Character, Integer> entry = new SimpleEntry<>(current, i);
+        stack.addFirst(entry);
+      }
+
+      if (current == ')') {
+        if (stack.isEmpty()) {
+          sb.deleteCharAt(i);
+        }
+        if (!stack.isEmpty()) {
+          char last = stack.peekFirst().getKey();
+          if (last == '(') {
+            stack.removeFirst();
+          } else {
+            throw new FincSelectInvalidQueryException("Invalid query");
+          }
+        }
+      }
+    }
+    stack.forEach(entry -> sb.deleteCharAt(entry.getValue()));
+    return sb.toString();
   }
 }
