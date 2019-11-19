@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 import org.folio.cql2pgjson.CQL2PgJSON;
 import org.folio.cql2pgjson.exception.FieldException;
+import org.folio.finc.select.QueryTranslator;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.jaxrs.model.FincSelectFilters;
 import org.folio.rest.persist.Criteria.Criteria;
@@ -183,10 +184,13 @@ public class FilterDAOImpl implements FilterDAO {
   }
 
   private String addIsilTo(String query, String isil) {
+    String[] queryAndSortBy = QueryTranslator.splitSortBy(query);
+    query = queryAndSortBy[0];
+    String sortBy = queryAndSortBy[1];
     if (query == null || "".equals(query)) {
       return "isil=\"" + isil + "\"";
     } else {
-      return query + "AND isil=\"" + isil + "\"";
+      return query + " AND isil=\"" + isil + "\"" + sortBy;
     }
   }
 
