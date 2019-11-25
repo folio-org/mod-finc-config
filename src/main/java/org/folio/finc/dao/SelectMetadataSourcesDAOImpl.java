@@ -1,7 +1,7 @@
 package org.folio.finc.dao;
 
 import io.vertx.core.Context;
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import java.util.List;
 import org.folio.finc.select.isil.filter.IsilFilter;
 import org.folio.finc.select.isil.filter.MetadataSourcesIsilFilter;
@@ -22,37 +22,39 @@ public class SelectMetadataSourcesDAOImpl implements SelectMetadataSourcesDAO {
   }
 
   @Override
-  public Future<FincSelectMetadataSources> getAll(String query, int offset, int limit,
-    String isil, Context vertxContext) {
-    Future<FincSelectMetadataSources> result = Future.future();
+  public Promise<FincSelectMetadataSources> getAll(
+      String query, int offset, int limit, String isil, Context vertxContext) {
+    Promise<FincSelectMetadataSources> result = Promise.promise();
 
-     metadataSourcesDAO.getAll(query, offset, limit, vertxContext)
-      .setHandler(ar -> {
-        if (ar.succeeded()){
-          FincConfigMetadataSources fincConfigMetadataSources = ar.result();
-          FincSelectMetadataSources sourcesCollection = new FincSelectMetadataSources();
-          List<FincSelectMetadataSource> transformedSources =
-            isilFilter.filterForIsil(fincConfigMetadataSources.getFincConfigMetadataSources(), isil);
-          sourcesCollection.setFincSelectMetadataSources(
-            transformedSources);
-          sourcesCollection.setTotalRecords(
-            transformedSources.size());
-          result.complete(sourcesCollection);
+    metadataSourcesDAO
+        .getAll(query, offset, limit, vertxContext)
+        .future()
+        .setHandler(
+            ar -> {
+              if (ar.succeeded()) {
+                FincConfigMetadataSources fincConfigMetadataSources = ar.result();
+                FincSelectMetadataSources sourcesCollection = new FincSelectMetadataSources();
+                List<FincSelectMetadataSource> transformedSources =
+                    isilFilter.filterForIsil(
+                        fincConfigMetadataSources.getFincConfigMetadataSources(), isil);
+                sourcesCollection.setFincSelectMetadataSources(transformedSources);
+                sourcesCollection.setTotalRecords(transformedSources.size());
+                result.complete(sourcesCollection);
 
-        } else {
-          result.fail(ar.cause());
-        }
-        });
+              } else {
+                result.fail(ar.cause());
+              }
+            });
     return result;
   }
 
   @Override
-  public Future<FincSelectMetadataSource> getById(String id, String isil,
-    Context vertxContext) {
-    Future<FincSelectMetadataSource> result = Future.future();
+  public Promise<FincSelectMetadataSource> getById(String id, String isil, Context vertxContext) {
+    Promise<FincSelectMetadataSource> result = Promise.promise();
 
     metadataSourcesDAO
         .getById(id, vertxContext)
+        .future()
         .setHandler(
             ar -> {
               if (ar.succeeded()) {

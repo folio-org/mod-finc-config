@@ -37,6 +37,7 @@ public class FincConfigTinyMetadataSourcesAPI implements FincConfigTinyMetadataS
       Context vertxContext) {
 
     metadataSourcesTinyDAO.getAll(vertxContext)
+      .future()
       .setHandler(ar -> {
         if (ar.succeeded()) {
           asyncResultHandler.handle(
@@ -76,6 +77,6 @@ public class FincConfigTinyMetadataSourcesAPI implements FincConfigTinyMetadataS
     vertxContext.runOnContext(
         aVoid ->
             asyncResultHandler.handle(
-                succeededFuture(PostFincConfigTinyMetadataSourcesResponse.status(501).build())));
+                succeededFuture(Response.status(501).build())));
   }
 }

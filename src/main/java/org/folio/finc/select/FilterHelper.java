@@ -3,6 +3,7 @@ package org.folio.finc.select;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import java.util.List;
@@ -26,22 +27,38 @@ public class FilterHelper {
     this.fileDAO = new FileDAOImpl();
   }
 
-  public Future<Void> deleteFilesOfFilter(String filterId, String isil, Context vertxContext) {
-    return filterDAO
-        .getById(filterId, isil, vertxContext)
-        .compose(fincSelectFilter -> deleteFilesOfFilter(fincSelectFilter, isil, vertxContext));
+  public Promise<Void> deleteFilesOfFilter(String filterId, String isil, Context vertxContext) {
+
+    Promise<Void> result = Promise.promise();
+
+    Promise<FincSelectFilter> byId = filterDAO.getById(filterId, isil, vertxContext);
+    byId.future()
+        .compose(
+            fincSelectFilter -> deleteFilesOfFilter(fincSelectFilter, isil, vertxContext).future())
+        .setHandler(
+            voidAsyncResult -> {
+              if (voidAsyncResult.succeeded()) {
+                result.complete();
+              } else {
+                result.fail(voidAsyncResult.cause());
+              }
+            });
+    return result;
   }
 
-  private Future<Void> deleteFilesOfFilter(FincSelectFilter filter, String isil, Context vertxContext) {
+  private Promise<Void> deleteFilesOfFilter(
+      FincSelectFilter filter, String isil, Context vertxContext) {
 
-    Future result = Future.future();
+    Promise result = Promise.promise();
     List<FilterFile> filterFiles = filter.getFilterFiles();
     if (filterFiles == null || filterFiles.isEmpty()) {
       result.complete();
     } else {
       List<Future> deleteFutures =
           filterFiles.stream()
-              .map(filterFile -> fileDAO.deleteById(filterFile.getFileId(), isil, vertxContext))
+              .map(
+                  filterFile ->
+                      fileDAO.deleteById(filterFile.getFileId(), isil, vertxContext).future())
               .collect(Collectors.toList());
 
       CompositeFuture.all(deleteFutures)
@@ -64,30 +81,32 @@ public class FilterHelper {
     return result;
   }
 
-  public Future<FincSelectFilter> removeFilesToDelete(
-    FincSelectFilter filter, String isil, Context vertxContext) {
+  public Promise<FincSelectFilter> removeFilesToDelete(
+      FincSelectFilter filter, String isil, Context vertxContext) {
 
     List<FilterFile> remainingFiles =
-      filter.getFilterFiles().stream()
-        .filter(filterFile -> filterFile.getDelete() == null || !filterFile.getDelete())
-        .collect(Collectors.toList());
+        filter.getFilterFiles().stream()
+            .filter(filterFile -> filterFile.getDelete() == null || !filterFile.getDelete())
+            .collect(Collectors.toList());
 
     List<Future> filesToDeleteFuture =
-      filter.getFilterFiles().stream()
-        .filter(filterFile -> filterFile.getDelete() != null && filterFile.getDelete())
-        .map(filterFile -> fileDAO.deleteById(filterFile.getFileId(), isil, vertxContext))
-        .collect(Collectors.toList());
+        filter.getFilterFiles().stream()
+            .filter(filterFile -> filterFile.getDelete() != null && filterFile.getDelete())
+            .map(
+                filterFile ->
+                    fileDAO.deleteById(filterFile.getFileId(), isil, vertxContext).future())
+            .collect(Collectors.toList());
 
-    Future<FincSelectFilter> result = Future.future();
+    Promise<FincSelectFilter> result = Promise.promise();
     CompositeFuture.all(filesToDeleteFuture)
-      .setHandler(
-        ar -> {
-          if (ar.succeeded()) {
-            result.complete(filter.withFilterFiles(remainingFiles));
-          } else {
-            result.fail(ar.cause());
-          }
-        });
+        .setHandler(
+            ar -> {
+              if (ar.succeeded()) {
+                result.complete(filter.withFilterFiles(remainingFiles));
+              } else {
+                result.fail(ar.cause());
+              }
+            });
     return result;
   }
 }

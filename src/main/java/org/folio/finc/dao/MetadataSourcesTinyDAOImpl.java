@@ -1,7 +1,7 @@
 package org.folio.finc.dao;
 
 import io.vertx.core.Context;
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import java.util.List;
 import org.folio.rest.jaxrs.model.TinyMetadataSource;
 import org.folio.rest.jaxrs.model.TinyMetadataSources;
@@ -13,9 +13,9 @@ public class MetadataSourcesTinyDAOImpl implements MetadataSourcesTinyDAO {
   private static final String TABLE_NAME = "metadata_sources_tiny";
 
   @Override
-  public Future<TinyMetadataSources> getAll(Context vertxContext) {
+  public Promise<TinyMetadataSources> getAll(Context vertxContext) {
 
-    Future<TinyMetadataSources> result = Future.future();
+    Promise<TinyMetadataSources> result = Promise.promise();
 
     String tenantId = Constants.MODULE_TENANT;
     PostgresClient.getInstance(vertxContext.owner(), tenantId)

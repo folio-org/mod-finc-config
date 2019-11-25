@@ -1,6 +1,6 @@
 package org.folio.finc.select;
 
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
@@ -76,9 +76,9 @@ public abstract class AbstractSelectMetadataSourceVerticleTest {
     }
   }
 
-  static Future<Void> writeDataToDB(TestContext context, Vertx vertx) {
+  static Promise<Void> writeDataToDB(TestContext context, Vertx vertx) {
     Async async = context.async(3);
-    Future<Void> result = Future.future();
+    Promise<Void> result = Promise.promise();
 
     vertx.executeBlocking(
         future -> {

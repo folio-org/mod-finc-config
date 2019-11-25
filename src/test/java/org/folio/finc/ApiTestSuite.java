@@ -5,11 +5,16 @@ import com.jayway.restassured.parsing.Parser;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.folio.finc.config.ConfigMetadataCollectionsIT;
 import org.folio.finc.config.ConfigMetadataSourcesIT;
 import org.folio.finc.config.TinyMetadataSourcesIT;
@@ -20,6 +25,7 @@ import org.folio.finc.select.SelectMetadataCollectionsIT;
 import org.folio.finc.select.SelectMetadataSourcesIT;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
+import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
@@ -132,14 +138,25 @@ public class ApiTestSuite {
           new TenantClient(url, Constants.MODULE_TENANT, Constants.MODULE_TENANT);
       TenantClient tenantClientDiku = new TenantClient(url, TENANT_DIKU, TENANT_DIKU);
       TenantClient tenantClientUbl = new TenantClient(url, TENANT_UBL, TENANT_UBL);
-      tenantClientFinc.postTenant(null, postTenantRes -> fincFuture.complete(postTenantRes));
-      tenantClientDiku.postTenant(null, postTenantRes -> dikuFuture.complete(postTenantRes));
-      tenantClientUbl.postTenant(null, postTenantRes -> ublFuture.complete(postTenantRes));
+      tenantClientFinc.postTenant(
+          new TenantAttributes().withModuleTo(getModuleVersion()),
+          postTenantRes -> fincFuture.complete(postTenantRes));
+      tenantClientDiku.postTenant(
+          new TenantAttributes().withModuleTo(getModuleVersion()),
+          postTenantRes -> dikuFuture.complete(postTenantRes));
+      tenantClientUbl.postTenant(
+          new TenantAttributes().withModuleTo(getModuleVersion()),
+          postTenantRes -> ublFuture.complete(postTenantRes));
       fincFuture.get(30, TimeUnit.SECONDS);
       dikuFuture.get(30, TimeUnit.SECONDS);
       ublFuture.get(30, TimeUnit.SECONDS);
     } catch (Exception e) {
       assert false;
     }
+  }
+
+  public static String getModuleVersion() throws IOException, XmlPullParserException {
+    Model pom = new MavenXpp3Reader().read(new FileReader("pom.xml"));
+    return String.format("%s-%s", pom.getArtifactId(), pom.getVersion());
   }
 }

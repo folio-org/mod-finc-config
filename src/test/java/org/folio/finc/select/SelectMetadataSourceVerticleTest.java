@@ -10,10 +10,12 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.folio.finc.ApiTestSuite;
 import org.folio.finc.select.verticles.SelectMetadataSourceVerticle;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
+import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
@@ -65,11 +67,13 @@ public class SelectMetadataSourceVerticleTest extends AbstractSelectMetadataSour
         options,
         res -> {
           try {
-            tenantClientFinc.postTenant(null, postTenantRes -> async.countDown());
+            tenantClientFinc.postTenant(
+                new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
+                postTenantRes -> async.countDown());
             tenantClientUBL.postTenant(
-                null,
+                new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
                 postTenantRes -> {
-                  Future<Void> future = writeDataToDB(context, vertx);
+                  Future<Void> future = writeDataToDB(context, vertx).future();
                   future.setHandler(
                       ar -> {
                         if (ar.succeeded()) async.countDown();

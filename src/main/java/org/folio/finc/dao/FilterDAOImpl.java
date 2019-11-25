@@ -1,7 +1,7 @@
 package org.folio.finc.dao;
 
 import io.vertx.core.Context;
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.UpdateResult;
@@ -29,10 +29,10 @@ public class FilterDAOImpl implements FilterDAO {
   private final Logger logger = LoggerFactory.getLogger(FilterDAOImpl.class);
 
   @Override
-  public Future<FincSelectFilters> getAll(
+  public Promise<FincSelectFilters> getAll(
       String query, int offset, int limit, String isil, Context vertxContext) {
 
-    Future<FincSelectFilters> result = Future.future();
+    Promise<FincSelectFilters> result = Promise.promise();
 
     String field = "*";
     String[] fieldList = {field};
@@ -70,8 +70,8 @@ public class FilterDAOImpl implements FilterDAO {
   }
 
   @Override
-  public Future<FincSelectFilter> getById(String id, String isil, Context vertxContext) {
-    Future<FincSelectFilter> result = Future.future();
+  public Promise<FincSelectFilter> getById(String id, String isil, Context vertxContext) {
+    Promise<FincSelectFilter> result = Promise.promise();
     Criterion criterion = getCriterion(id, isil);
     PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
         .get(
@@ -114,11 +114,11 @@ public class FilterDAOImpl implements FilterDAO {
   }
 
   @Override
-  public Future<FincSelectFilter> insert(FincSelectFilter entity, Context vertxContext) {
+  public Promise<FincSelectFilter> insert(FincSelectFilter entity, Context vertxContext) {
     if (entity.getId() == null) {
       entity.setId(UUID.randomUUID().toString());
     }
-    Future<FincSelectFilter> result = Future.future();
+    Promise<FincSelectFilter> result = Promise.promise();
     PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
         .save(
             TABLE_NAME,
@@ -135,8 +135,9 @@ public class FilterDAOImpl implements FilterDAO {
   }
 
   @Override
-  public Future<FincSelectFilter> update(FincSelectFilter entity, String id, Context vertxContext) {
-    Future<FincSelectFilter> result = Future.future();
+  public Promise<FincSelectFilter> update(
+      FincSelectFilter entity, String id, Context vertxContext) {
+    Promise<FincSelectFilter> result = Promise.promise();
     PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
         .update(
             TABLE_NAME,
@@ -153,8 +154,8 @@ public class FilterDAOImpl implements FilterDAO {
   }
 
   @Override
-  public Future<Integer> deleteById(String id, String isil, Context vertxContext) {
-    Future<Integer> result = Future.future();
+  public Promise<Integer> deleteById(String id, String isil, Context vertxContext) {
+    Promise<Integer> result = Promise.promise();
     Criterion criterion = getCriterion(id, isil);
 
     PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)

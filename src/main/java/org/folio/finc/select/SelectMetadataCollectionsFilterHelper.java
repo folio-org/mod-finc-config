@@ -3,6 +3,7 @@ package org.folio.finc.select;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class SelectMetadataCollectionsFilterHelper {
     this.metadataCollectionsDAO = new MetadataCollectionsDAOImpl();
   }
 
-  public Future<Boolean> addFiltersToCollectionAndSave(
+  public Promise<Boolean> addFiltersToCollectionAndSave(
       String mdCollectionId,
       FincSelectFiltersOfCollection filters,
       Map<String, String> okapiHeaders,
@@ -37,12 +38,14 @@ public class SelectMetadataCollectionsFilterHelper {
     String tenantId =
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
 
-    Future<Boolean> result = Future.future();
+    Promise<Boolean> result = Promise.promise();
     updateFiltersOfCollection(filters, mdCollectionId, tenantId, vertxContext)
+        .future()
         .compose(
             metadataCollection ->
-                this.metadataCollectionsDAO.update(
-                    metadataCollection, mdCollectionId, vertxContext))
+                this.metadataCollectionsDAO
+                    .update(metadataCollection, mdCollectionId, vertxContext)
+                    .future())
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -54,16 +57,16 @@ public class SelectMetadataCollectionsFilterHelper {
     return result;
   }
 
-  private Future<FincConfigMetadataCollection> updateFiltersOfCollection(
+  private Promise<FincConfigMetadataCollection> updateFiltersOfCollection(
       FincSelectFiltersOfCollection filters,
       String mdCollectionId,
       String tenantId,
       Context vertxContext) {
-    Future<String> isilFuture = isilDAO.getIsilForTenant(tenantId, vertxContext);
+    Future<String> isilFuture = isilDAO.getIsilForTenant(tenantId, vertxContext).future();
     Future<FincConfigMetadataCollection> metadataCollectionFuture =
-        metadataCollectionsDAO.getById(mdCollectionId, vertxContext);
+        metadataCollectionsDAO.getById(mdCollectionId, vertxContext).future();
 
-    Future<FincConfigMetadataCollection> result = Future.future();
+    Promise<FincConfigMetadataCollection> result = Promise.promise();
     CompositeFuture.all(isilFuture, metadataCollectionFuture)
         .setHandler(
             ar -> {
