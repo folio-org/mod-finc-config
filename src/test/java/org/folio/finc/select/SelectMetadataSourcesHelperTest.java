@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class SelectMetadataSourcesHelperTest extends AbstractSelectMetadataSourceVerticleTest {
+public class SelectMetadataSourcesHelperTest {
 
   private static final String TENANT_UBL = "ubl";
   private static Vertx vertx;
@@ -36,7 +36,8 @@ public class SelectMetadataSourcesHelperTest extends AbstractSelectMetadataSourc
 
   @BeforeClass
   public static void setUp(TestContext context) {
-    readData(context);
+    SelectMetadataSourceVerticleTestHelper selectMetadataSourceVerticleTestHelper = new SelectMetadataSourceVerticleTestHelper();
+    selectMetadataSourceVerticleTestHelper.readData(context);
     vertx = Vertx.vertx();
     try {
       PostgresClient.setIsEmbedded(true);
@@ -73,7 +74,8 @@ public class SelectMetadataSourcesHelperTest extends AbstractSelectMetadataSourc
             tenantClientUBL.postTenant(
                 new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
                 postTenantRes -> {
-                  Future<Void> future = writeDataToDB(context, vertx).future();
+                  Future<Void> future = selectMetadataSourceVerticleTestHelper
+                    .writeDataToDB(context, vertx).future();
                   future.setHandler(
                       ar -> {
                         if (ar.succeeded()) async.countDown();
@@ -110,7 +112,7 @@ public class SelectMetadataSourcesHelperTest extends AbstractSelectMetadataSourc
 
     Async async = context.async();
     cut.selectAllCollectionsOfMetadataSource(
-        metadataSource2.getId(),
+        SelectMetadataSourceVerticleTestHelper.getMetadataSource2().getId(),
         select,
         header,
         ar -> {

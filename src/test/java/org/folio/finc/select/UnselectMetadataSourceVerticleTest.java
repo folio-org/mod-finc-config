@@ -9,6 +9,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.finc.ApiTestSuite;
 import org.folio.finc.select.verticles.UnselectMetadataSourceVerticle;
 import org.folio.rest.RestVerticle;
@@ -23,8 +24,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-public class UnselectMetadataSourceVerticleTest extends AbstractSelectMetadataSourceVerticleTest {
+@RunWith(VertxUnitRunner.class)
+public class UnselectMetadataSourceVerticleTest {
 
   private static final String TENANT_UBL = "ubl";
   private static Vertx vertx;
@@ -33,7 +36,9 @@ public class UnselectMetadataSourceVerticleTest extends AbstractSelectMetadataSo
 
   @BeforeClass
   public static void setUp(TestContext context) {
-    readData(context);
+    SelectMetadataSourceVerticleTestHelper selectMetadataSourceVerticleTestHelper =
+        new SelectMetadataSourceVerticleTestHelper();
+    selectMetadataSourceVerticleTestHelper.readData(context);
     vertx = Vertx.vertx();
     try {
       PostgresClient.setIsEmbedded(true);
@@ -70,7 +75,10 @@ public class UnselectMetadataSourceVerticleTest extends AbstractSelectMetadataSo
             tenantClientUBL.postTenant(
                 new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
                 postTenantRes -> {
-                  Future<Void> future = writeDataToDB(context, vertx).future();
+                  Future<Void> future =
+                      selectMetadataSourceVerticleTestHelper
+                          .writeDataToDB(context, vertx)
+                          .future();
                   future.setHandler(
                       ar -> {
                         if (ar.succeeded()) async.countDown();
@@ -101,7 +109,8 @@ public class UnselectMetadataSourceVerticleTest extends AbstractSelectMetadataSo
     vertx = Vertx.vertx();
     JsonObject cfg2 = vertx.getOrCreateContext().config();
     cfg2.put("tenantId", TENANT_UBL);
-    cfg2.put("metadataSourceId", metadataSource2.getId());
+    cfg2.put(
+        "metadataSourceId", SelectMetadataSourceVerticleTestHelper.getMetadataSource2().getId());
     cfg2.put("testing", true);
     vertx.deployVerticle(
         cut,
@@ -115,14 +124,17 @@ public class UnselectMetadataSourceVerticleTest extends AbstractSelectMetadataSo
   @Test
   public void testSuccessfulUnSelect(TestContext context) {
     Async async = context.async();
-    cut.selectAllCollections(metadataSource1.getId(), TENANT_UBL)
+    cut.selectAllCollections(
+            SelectMetadataSourceVerticleTestHelper.getMetadataSource1().getId(), TENANT_UBL)
         .setHandler(
             aVoid -> {
               if (aVoid.succeeded()) {
                 try {
                   String where =
                       String.format(
-                          " WHERE (jsonb->>'label' = '%s')", metadataCollection1.getLabel());
+                          " WHERE (jsonb->>'label' = '%s')",
+                          SelectMetadataSourceVerticleTestHelper.getMetadataCollection1()
+                              .getLabel());
                   PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
                       .get(
                           "metadata_collections",

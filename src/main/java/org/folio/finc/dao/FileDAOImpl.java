@@ -7,6 +7,7 @@ import org.folio.finc.model.File;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.utils.Constants;
 
 public class FileDAOImpl implements FileDAO {
@@ -18,11 +19,12 @@ public class FileDAOImpl implements FileDAO {
   public Promise<File> getById(String id, String isil, Context vertxContext) {
     Promise<File> result = Promise.promise();
     Criterion criterion = getCriterion(id, isil);
+    CQLWrapper cql = new CQLWrapper(criterion);
     PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
         .get(
             TABLE_NAME,
             File.class,
-            criterion,
+            cql,
             false,
             reply -> {
               if (reply.succeeded()) {
