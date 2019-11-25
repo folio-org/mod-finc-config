@@ -1,7 +1,7 @@
 package org.folio.finc.dao;
 
 import io.vertx.core.Context;
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import java.util.List;
 import org.folio.finc.select.QueryTranslator;
 import org.folio.finc.select.isil.filter.IsilFilter;
@@ -22,52 +22,57 @@ public class SelectMetadataCollectionsDAOImpl implements SelectMetadataCollectio
   }
 
   @Override
-  public Future<FincSelectMetadataCollections> getAll(String query, int offset, int limit,
-    String isil, Context vertxContext) {
+  public Promise<FincSelectMetadataCollections> getAll(
+      String query, int offset, int limit, String isil, Context vertxContext) {
 
-    Future<FincSelectMetadataCollections> result = Future.future();
+    Promise<FincSelectMetadataCollections> result = Promise.promise();
     query = QueryTranslator.translate(query, isil);
-    metadataCollectionsDAO.getAll(query, offset, limit, vertxContext)
-      .setHandler(ar -> {
-        if (ar.succeeded()) {
+    metadataCollectionsDAO
+        .getAll(query, offset, limit, vertxContext)
+        .future()
+        .setHandler(
+            ar -> {
+              if (ar.succeeded()) {
 
-          FincSelectMetadataCollections collectionsCollection = new FincSelectMetadataCollections();
+                FincSelectMetadataCollections collectionsCollection =
+                    new FincSelectMetadataCollections();
 
-          List<FincConfigMetadataCollection> fincConfigMetadataCollections = ar.result().getFincConfigMetadataCollections();
+                List<FincConfigMetadataCollection> fincConfigMetadataCollections =
+                    ar.result().getFincConfigMetadataCollections();
 
-          List<FincSelectMetadataCollection> transformedCollections =
-            isilFilter.filterForIsil(fincConfigMetadataCollections, isil);
+                List<FincSelectMetadataCollection> transformedCollections =
+                    isilFilter.filterForIsil(fincConfigMetadataCollections, isil);
 
-          collectionsCollection.setFincSelectMetadataCollections(
-            transformedCollections);
-          collectionsCollection.setTotalRecords(
-            transformedCollections.size());
-          result.complete(collectionsCollection);
-        } else {
-          result.fail(ar.cause());
-          return;
-        }
-      });
+                collectionsCollection.setFincSelectMetadataCollections(transformedCollections);
+                collectionsCollection.setTotalRecords(transformedCollections.size());
+                result.complete(collectionsCollection);
+              } else {
+                result.fail(ar.cause());
+                return;
+              }
+            });
     return result;
   }
 
   @Override
-  public Future<FincSelectMetadataCollection> getById(String id, String isil,
-    Context vertxContext) {
-    Future<FincSelectMetadataCollection> result = Future.future();
+  public Promise<FincSelectMetadataCollection> getById(
+      String id, String isil, Context vertxContext) {
+    Promise<FincSelectMetadataCollection> result = Promise.promise();
 
-    metadataCollectionsDAO.getById(id, vertxContext)
-      .setHandler(ar -> {
-        if (ar.succeeded()) {
-          FincSelectMetadataCollection fincSelectMetadataCollection = isilFilter.filterForIsil(
-            ar.result(), isil);
-          result.complete(fincSelectMetadataCollection);
-        } else {
-          result.fail("Cannot get finc select metadata collection by id. " + ar.cause());
-          return;
-        }
-      });
+    metadataCollectionsDAO
+        .getById(id, vertxContext)
+        .future()
+        .setHandler(
+            ar -> {
+              if (ar.succeeded()) {
+                FincSelectMetadataCollection fincSelectMetadataCollection =
+                    isilFilter.filterForIsil(ar.result(), isil);
+                result.complete(fincSelectMetadataCollection);
+              } else {
+                result.fail("Cannot get finc select metadata collection by id. " + ar.cause());
+                return;
+              }
+            });
     return result;
   }
-
 }

@@ -44,7 +44,8 @@ public class SelectMetadataSourcesHelper {
                     "Will (un)select metadata collections of metadata source %s for tenant %s.",
                     metadataSourceID, tenantId);
             logger.info(msg);
-            deploySelectSourceVerticle(vertxContext.owner(), metadataSourceID, tenantId, selectEntity);
+            deploySelectSourceVerticle(
+                vertxContext.owner(), metadataSourceID, tenantId, selectEntity);
             String result = new JsonObject().put("message", msg).toString();
             asyncResultHandler.handle(
                 Future.succeededFuture(
@@ -68,18 +69,16 @@ public class SelectMetadataSourcesHelper {
     JsonObject cfg = vertx.getOrCreateContext().config();
     cfg.put("tenantId", tenantId);
     cfg.put("metadataSourceId", metadataSourceId);
-    Future<String> deploy = Future.future();
     vertx.deployVerticle(
-        verticle, new DeploymentOptions().setConfig(cfg).setWorker(true), deploy.completer());
-
-    deploy.setHandler(
-        ar -> {
-          if (ar.failed()) {
+        verticle,
+        new DeploymentOptions().setConfig(cfg).setWorker(true),
+        stringAsyncResult -> {
+          if (stringAsyncResult.failed()) {
             logger.error(
                 String.format(
                     "Failed to deploy SelectVerticle for metadata source %s and for tenant %s: %s",
-                    metadataSourceId, tenantId, ar.cause().getMessage()),
-                ar.cause());
+                    metadataSourceId, tenantId, stringAsyncResult.cause().getMessage()),
+                stringAsyncResult.cause());
           }
         });
   }

@@ -52,7 +52,10 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
-        .compose(isil -> selectMetadataSourcesDAO.getAll(query, offset, limit, isil, vertxContext))
+        .future()
+        .compose(
+            isil ->
+                selectMetadataSourcesDAO.getAll(query, offset, limit, isil, vertxContext).future())
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -86,11 +89,7 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     vertxContext.runOnContext(
-        aVoid ->
-            asyncResultHandler.handle(
-                succeededFuture(
-                    FincSelectMetadataSources.PostFincSelectMetadataSourcesResponse.status(501)
-                        .build())));
+        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
   }
 
   @Override
@@ -106,7 +105,8 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
-        .compose(isil -> selectMetadataSourcesDAO.getById(id, isil, vertxContext))
+        .future()
+        .compose(isil -> selectMetadataSourcesDAO.getById(id, isil, vertxContext).future())
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -140,12 +140,7 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     vertxContext.runOnContext(
-        aVoid ->
-            asyncResultHandler.handle(
-                succeededFuture(
-                    FincSelectMetadataSources.DeleteFincSelectMetadataSourcesByIdResponse.status(
-                            501)
-                        .build())));
+        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
   }
 
   @Override
@@ -158,11 +153,7 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     vertxContext.runOnContext(
-        aVoid ->
-            asyncResultHandler.handle(
-                succeededFuture(
-                    FincSelectMetadataSources.PutFincSelectMetadataSourcesByIdResponse.status(501)
-                        .build())));
+        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
   }
 
   @Override
@@ -173,11 +164,7 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     vertxContext.runOnContext(
-        aVoid ->
-            asyncResultHandler.handle(
-                succeededFuture(
-                    FincSelectMetadataSources.GetFincSelectMetadataSourcesResponse.status(501)
-                        .build())));
+        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
   }
 
   @Override
@@ -202,12 +189,7 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     vertxContext.runOnContext(
-        aVoid ->
-            asyncResultHandler.handle(
-                succeededFuture(
-                    FincSelectMetadataSources
-                        .GetFincSelectMetadataSourcesCollectionsSelectAllByIdResponse.status(501)
-                        .build())));
+        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
   }
 
   @Override
@@ -219,11 +201,6 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     vertxContext.runOnContext(
-        aVoid ->
-            asyncResultHandler.handle(
-                succeededFuture(
-                    FincSelectMetadataSources
-                        .DeleteFincSelectMetadataSourcesCollectionsSelectAllByIdResponse.status(501)
-                        .build())));
+        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
   }
 }

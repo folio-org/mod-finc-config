@@ -1,12 +1,13 @@
 package org.folio.finc.dao;
 
 import io.vertx.core.Context;
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import java.util.List;
 import org.folio.finc.model.File;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.utils.Constants;
 
 public class FileDAOImpl implements FileDAO {
@@ -14,16 +15,16 @@ public class FileDAOImpl implements FileDAO {
   private static final String ID_FIELD = "id";
   private static final String TABLE_NAME = "files";
 
-
   @Override
-  public Future<File> getById(String id, String isil, Context vertxContext) {
-    Future<File> result = Future.future();
+  public Promise<File> getById(String id, String isil, Context vertxContext) {
+    Promise<File> result = Promise.promise();
     Criterion criterion = getCriterion(id, isil);
+    CQLWrapper cql = new CQLWrapper(criterion);
     PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
         .get(
             TABLE_NAME,
             File.class,
-            criterion,
+            cql,
             false,
             reply -> {
               if (reply.succeeded()) {
@@ -60,8 +61,8 @@ public class FileDAOImpl implements FileDAO {
   }
 
   @Override
-  public Future<File> upsert(File entity, String id, Context vertxContext) {
-    Future<File> result = Future.future();
+  public Promise<File> upsert(File entity, String id, Context vertxContext) {
+    Promise<File> result = Promise.promise();
     PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
         .upsert(
             TABLE_NAME,
@@ -78,8 +79,8 @@ public class FileDAOImpl implements FileDAO {
   }
 
   @Override
-  public Future<Integer> deleteById(String id, String isil, Context vertxContext) {
-    Future<Integer> result = Future.future();
+  public Promise<Integer> deleteById(String id, String isil, Context vertxContext) {
+    Promise<Integer> result = Promise.promise();
     Criterion criterion = getCriterion(id, isil);
     PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
         .delete(

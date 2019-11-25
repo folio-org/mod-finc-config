@@ -176,11 +176,13 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
 
     // DELETE
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .delete(
-        FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT + "/" + metadataCollectionNotRestricted.getId())
-      .then()
-      .statusCode(204);
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete(
+            FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT
+                + "/"
+                + metadataCollectionNotRestricted.getId())
+        .then()
+        .statusCode(204);
   }
 
   @Test
@@ -472,9 +474,9 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
 
     // GET
     String queryUBL =
-        "query=(selectedBy any \""
+        "query=(selectedBy adj \""
             + isilUBL.getIsil()
-            + "\") AND (permittedFor any \""
+            + "\") AND (permittedFor adj \""
             + isilUBL.getIsil()
             + "\")";
     given()
@@ -490,11 +492,11 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
 
     // GET
     String queryDiku =
-        "query=(selectedBy any \""
+        "query=selectedBy adj "
             + isilDiku.getIsil()
-            + "\") AND (permittedFor any \""
-            + isilDiku.getIsil()
-            + "\")";
+            + " AND permittedFor adj "
+            + isilDiku.getIsil();
+
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
         .header("content-type", ContentType.JSON)

@@ -1,6 +1,6 @@
 package org.folio.finc.select;
 
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
@@ -8,7 +8,6 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -21,10 +20,8 @@ import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.jaxrs.model.Isils;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.utils.Constants;
-import org.junit.runner.RunWith;
 
-@RunWith(VertxUnitRunner.class)
-public abstract class AbstractSelectMetadataSourceVerticleTest {
+public class SelectMetadataSourceVerticleTestHelper {
 
   private static final Logger logger =
       LoggerFactory.getLogger(SelectMetadataSourceVerticleTest.class);
@@ -39,7 +36,27 @@ public abstract class AbstractSelectMetadataSourceVerticleTest {
 
   private static Vertx vertx = Vertx.vertx();
 
-  static void readData(TestContext context) {
+  public static FincConfigMetadataSource getMetadataSource1() {
+    return metadataSource1;
+  }
+
+  public static FincConfigMetadataSource getMetadataSource2() {
+    return metadataSource2;
+  }
+
+  public static FincConfigMetadataCollection getMetadataCollection1() {
+    return metadataCollection1;
+  }
+
+  public static FincConfigMetadataCollection getMetadataCollection2() {
+    return metadataCollection2;
+  }
+
+  public static FincConfigMetadataCollection getMetadataCollection3() {
+    return metadataCollection3;
+  }
+
+  public void readData(TestContext context) {
     try {
       String metadataSourceStr1 =
           new String(
@@ -76,9 +93,9 @@ public abstract class AbstractSelectMetadataSourceVerticleTest {
     }
   }
 
-  static Future<Void> writeDataToDB(TestContext context, Vertx vertx) {
+  public Promise<Void> writeDataToDB(TestContext context, Vertx vertx) {
     Async async = context.async(3);
-    Future<Void> result = Future.future();
+    Promise<Void> result = Promise.promise();
 
     vertx.executeBlocking(
         future -> {

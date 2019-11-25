@@ -1,7 +1,7 @@
 package org.folio.finc.select;
 
 import io.vertx.core.Context;
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +9,6 @@ import javax.ws.rs.core.Response;
 import org.folio.rest.impl.IsilsAPI;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.jaxrs.model.Isils;
-import org.folio.rest.persist.Criteria.Criteria;
-import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.utils.Constants;
 
@@ -23,9 +21,9 @@ public class IsilHelper {
     isilsAPI = new IsilsAPI(vertx, tenantId);
   }
 
-  public Future<String> getIsilForTenant(
+  public Promise<String> getIsilForTenant(
       String tenantId, Map<String, String> okapiHeaders, Context vertxContext) {
-    Future<String> isilFuture = Future.future();
+    Promise<String> isilFuture = Promise.promise();
     String query = String.format("query=(tenant=%s)", tenantId);
     isilsAPI.getFincConfigIsils(
         query,
@@ -57,22 +55,15 @@ public class IsilHelper {
     return isilFuture;
   }
 
-  public Future<String> fetchIsil(String tenantId, Context context) {
-    Future<String> future = Future.future();
-//    String where = String.format(" WHERE (jsonb->>'tenant' = '%s')", tenantId);
-    Criteria tenantCrit =
-      new Criteria()
-        .addField("'tenant'")
-        .setJSONB(true)
-        .setOperation("=")
-        .setVal(tenantId);
-    Criterion criterion = new Criterion(tenantCrit);
+  public Promise<String> fetchIsil(String tenantId, Context context) {
+    Promise<String> future = Promise.promise();
+    Isil queryIsil = new Isil().withTenant(tenantId);
     PostgresClient.getInstance(context.owner(), Constants.MODULE_TENANT)
         .get(
             TABLE_NAME,
-            Isil.class,
-            criterion,
-          false,
+            queryIsil,
+            true,
+            false,
             ar -> {
               if (ar.succeeded()) {
                 List<Isil> isils = ar.result().getResults();

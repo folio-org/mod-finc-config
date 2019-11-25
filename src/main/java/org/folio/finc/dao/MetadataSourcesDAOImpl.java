@@ -1,7 +1,7 @@
 package org.folio.finc.dao;
 
 import io.vertx.core.Context;
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import java.util.Arrays;
@@ -32,10 +32,10 @@ public class MetadataSourcesDAOImpl implements MetadataSourcesDAO {
   }
 
   @Override
-  public Future<FincConfigMetadataSources> getAll(
+  public Promise<FincConfigMetadataSources> getAll(
       String query, int offset, int limit, Context vertxContext) {
 
-    Future<FincConfigMetadataSources> result = Future.future();
+    Promise<FincConfigMetadataSources> result = Promise.promise();
 
     String tenantId = Constants.MODULE_TENANT;
     String field = "*";
@@ -72,12 +72,23 @@ public class MetadataSourcesDAOImpl implements MetadataSourcesDAO {
   }
 
   @Override
-  public Future<FincConfigMetadataSource> getById(String id, Context vertxContext) {
-    Future<FincConfigMetadataSource> result = Future.future();
+  public Promise<FincConfigMetadataSource> getById(String id, Context vertxContext) {
+    Promise<FincConfigMetadataSource> result = Promise.promise();
 
     String tenantId = Constants.MODULE_TENANT;
     PostgresClient.getInstance(vertxContext.owner(), tenantId)
-        .getById(TABLE_NAME, id, FincConfigMetadataSource.class, result.completer());
+        .getById(
+            TABLE_NAME,
+            id,
+            FincConfigMetadataSource.class,
+            reply -> {
+              if (reply.succeeded()) {
+                result.complete(reply.result());
+              } else {
+                result.fail("Cannot get finc config metadatasource by id. " + reply.cause());
+              }
+            });
+
     return result;
   }
 }

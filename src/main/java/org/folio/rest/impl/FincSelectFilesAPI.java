@@ -14,6 +14,8 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.io.IOUtils;
 import org.folio.finc.dao.FileDAO;
 import org.folio.finc.dao.FileDAOImpl;
+import org.folio.finc.dao.IsilDAO;
+import org.folio.finc.dao.IsilDAOImpl;
 import org.folio.finc.model.File;
 import org.folio.finc.select.IsilHelper;
 import org.folio.rest.RestVerticle;
@@ -24,11 +26,13 @@ import org.folio.rest.tools.utils.TenantTool;
 public class FincSelectFilesAPI implements FincSelectFiles {
 
   private final IsilHelper isilHelper;
+  private final IsilDAO isilDAO;
   private final FileDAO fileDAO;
 
   public FincSelectFilesAPI(Vertx vertx, String tenantId) {
     this.isilHelper = new IsilHelper(vertx, tenantId);
     this.fileDAO = new FileDAOImpl();
+    this.isilDAO = new IsilDAOImpl();
   }
 
   @Override
@@ -40,10 +44,10 @@ public class FincSelectFilesAPI implements FincSelectFiles {
 
     String tenantId =
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
-
-    isilHelper
-        .fetchIsil(tenantId, vertxContext)
-        .compose(isil -> fileDAO.getById(id, isil, vertxContext))
+    isilDAO
+        .getIsilForTenant(tenantId, vertxContext)
+        .future()
+        .compose(isil -> fileDAO.getById(id, isil, vertxContext).future())
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -91,12 +95,15 @@ public class FincSelectFilesAPI implements FincSelectFiles {
     String base64Data = Base64.getEncoder().encodeToString(bytes);
     String uuid = UUID.randomUUID().toString();
 
-    isilHelper
-        .fetchIsil(tenantId, vertxContext)
+    isilHelper.fetchIsil(tenantId, vertxContext).future();
+
+    isilDAO
+        .getIsilForTenant(tenantId, vertxContext)
+      .future()
         .compose(
             isil -> {
               File file = new File().withData(base64Data).withId(uuid).withIsil(isil);
-              return fileDAO.upsert(file, uuid, vertxContext);
+              return fileDAO.upsert(file, uuid, vertxContext).future();
             })
         .setHandler(
             ar -> {
@@ -123,9 +130,9 @@ public class FincSelectFilesAPI implements FincSelectFiles {
     String tenantId =
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
 
-    isilHelper
-        .fetchIsil(tenantId, vertxContext)
-        .compose(isil -> fileDAO.deleteById(id, isil, vertxContext))
+    isilDAO.getIsilForTenant(tenantId, vertxContext)
+        .future()
+        .compose(isil -> fileDAO.deleteById(id, isil, vertxContext).future())
         .setHandler(
             ar -> {
               if (ar.succeeded()) {

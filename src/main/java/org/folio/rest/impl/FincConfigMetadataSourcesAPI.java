@@ -53,6 +53,7 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
 
     metadataSourcesDAO
         .getAll(query, offset, limit, vertxContext)
+      .future()
         .setHandler(
             ar -> {
               if (ar.succeeded()) {

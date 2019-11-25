@@ -19,10 +19,9 @@ import org.junit.runner.RunWith;
 public class FincSelectFilesIT extends ApiTestBase {
 
   private static final String TEST_CONTENT = "This is the test content!!!!";
+  @Rule public Timeout timeout = Timeout.seconds(10);
   private Isil isilUBL;
   private Isil isilDiku;
-
-  @Rule public Timeout timeout = Timeout.seconds(10);
 
   @Before
   public void init() {
