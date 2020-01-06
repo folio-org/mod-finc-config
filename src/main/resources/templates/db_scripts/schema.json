@@ -16,10 +16,12 @@
       "tableName": "metadata_sources",
       "fromModuleVersion": "1.0",
       "withMetadata": true,
-      "uniqueIndex": [
+      "index": [
         {
           "fieldName": "label",
-          "tOps": "ADD"
+          "tOps": "ADD",
+          "caseSensitive": false,
+          "removeAccents": true
         }
       ]
     },
@@ -27,10 +29,12 @@
       "tableName": "metadata_collections",
       "fromModuleVersion": "1.0",
       "withMetadata": true,
-      "uniqueIndex": [
+      "index": [
         {
           "fieldName": "label",
-          "tOps": "ADD"
+          "tOps": "ADD",
+          "caseSensitive": false,
+          "removeAccents": true
         }
       ]
     },
