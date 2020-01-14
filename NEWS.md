@@ -1,3 +1,12 @@
+## 1.3.0
+* Replace uniqueIndex for labels (UIFC-104)
+* Update to RMB 29 (UIFC-100)
+* Bugfix: Sortby does not work in filters (UIFC-99)
+* Bugfix: Sorting in finc select throws error (UIFC-97)
+* Bugfix: No response if isil is not found when fetching finc-select metadata-source (UIFC-69)
+* Consider usageRestricted for finc-select metadata collection (UIFC-71)
+* Bugfix: Combination of selected and permitted filter in finc-select (UIFC-81)
+
 ## 1.2.0
 * Add endpoint to add/remove filters from finc-select metadata collections (UIFC-84)
 * Add test suite to manage and structure tests
