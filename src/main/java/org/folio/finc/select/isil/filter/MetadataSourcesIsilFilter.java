@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource.Selected;
-import org.folio.rest.jaxrs.model.Select;
 import org.folio.rest.jaxrs.model.SelectedBy;
 
 public class MetadataSourcesIsilFilter
@@ -14,10 +13,9 @@ public class MetadataSourcesIsilFilter
 
   @Override
   public FincSelectMetadataSource filterForIsil(FincConfigMetadataSource entry, String isil) {
-    //    List<String> selectedBy = entry.getSelectedBy();
     List<SelectedBy> selectedBy = entry.getSelectedBy();
     List<SelectedBy> selectedByIsil =
-        selectedBy.stream().filter(sb -> sb.getIsisl().equals(isil)).collect(Collectors.toList());
+        selectedBy.stream().filter(sb -> sb.getIsil().equals(isil)).collect(Collectors.toList());
     Selected selected;
     if (selectedByIsil.size() == 0) {
       selected = Selected.NONE;

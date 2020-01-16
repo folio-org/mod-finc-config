@@ -147,7 +147,7 @@
       "items": {
         "type": "object",
         "properties": {
-          "isisl": {
+          "isil": {
             "type": "string"
           },
           "selected": {

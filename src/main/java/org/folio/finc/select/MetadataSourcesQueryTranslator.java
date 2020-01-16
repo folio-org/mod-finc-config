@@ -11,10 +11,7 @@ import org.folio.finc.select.exception.FincSelectInvalidQueryException;
 
 public class MetadataSourcesQueryTranslator {
 
-  private static final String PERMITTED = "permitted";
   private static final String SELECTED = "selected";
-  private static final String YES = "yes";
-  private static final String CQL_ALL_RECORDS_1_NOT = "cql.allRecords=1 NOT";
   private static final String AND = "AND";
 
   public static String translate(String query, String isil) {
@@ -75,26 +72,25 @@ public class MetadataSourcesQueryTranslator {
       return query;
     }
 
-//    Pattern pattern =
-//        Pattern.compile(
-//            key
-//                + "=\\(?(\")?(?<first>all|some|none)(\")?(\\s?(?<second>[Aa][Nn][Dd]|[Oo][Rr])\\s?(\")?(?<third>all|some|none)(\")?)?(\\s?(?<fourth>[Aa][Nn][Dd]|[Oo][Rr])\\s?(\")?(?<fifth>all|some|none)(\")?)?\\)?",
-//            Pattern.CASE_INSENSITIVE);
     Pattern pattern =
-      Pattern.compile(
-        key
-          + "=\\(?(\")?(?<first>all|some|none)(\")?(\\s?(?<second>[Aa][Nn][Dd]|[Oo][Rr])\\s?(\")?(?<third>all|some|none)(\")?)?\\)?",
-        Pattern.CASE_INSENSITIVE);
+        Pattern.compile(
+            key
+                + "=\\(?(\")?(?<first>all|some|none)(\")?(\\s?(?<second>[Aa][Nn][Dd]|[Oo][Rr])\\s?(\")?(?<third>all|some|none)(\")?)?(\\s?(?<fourth>[Aa][Nn][Dd]|[Oo][Rr])\\s?(\")?(?<fifth>all|some|none)(\")?)?\\)?",
+            Pattern.CASE_INSENSITIVE);
+//    Pattern pattern =
+//      Pattern.compile(
+//        key
+//          + "=\\(?(\")?(?<first>all|some|none)(\")?(\\s?(?<second>[Aa][Nn][Dd]|[Oo][Rr])\\s?(\")?(?<third>all|some|none)(\")?)?\\)?",
+//        Pattern.CASE_INSENSITIVE);
     Matcher matcher = pattern.matcher(query);
     if (matcher.find()) {
       String firstAllSomeNone = matcher.group("first");
       String firstMultiValAndOr = matcher.group("second");
       String secondAllSomeNone = matcher.group("third");
-      /*String secondMultiValAndOr = matcher.group("fourth");
-      String thirdAllSomeNone = matcher.group("fifth");*/
+      String secondMultiValAndOr = matcher.group("fourth");
+      String thirdAllSomeNone = matcher.group("fifth");
 
       String group = matcher.group();
-      // String replacedQuery = replaceQueryFunc.apply(isil);
 
       if (firstAllSomeNone != null) {
         String q = String.format("selectedBy == \"*\\\"isil\\\": \\\"%s\\\", \\\"selected\\\": \\\"%s\\\"*\"", isil, firstAllSomeNone);
@@ -107,13 +103,13 @@ public class MetadataSourcesQueryTranslator {
           query = query + " (" + q + ")";
         }
       }
-      /*if (secondMultiValAndOr != null) {
-        query = "(" + query + ")" + " " + secondMultiValAndOr.toUpperCase();
+      if (secondMultiValAndOr != null) {
+        query = query + " " + secondMultiValAndOr.toUpperCase();
         if (thirdAllSomeNone != null) {
           String q = String.format("selectedBy == \"*\\\"isil\\\": \\\"%s\\\", \\\"selected\\\": \\\"%s\\\"*\"", isil, thirdAllSomeNone);
           query = query + " (" + q + ")";
         }
-      }*/
+      }
     }
     return "(" + query + ")";
   }
@@ -122,7 +118,6 @@ public class MetadataSourcesQueryTranslator {
     query = query.trim();
     int queryLength = query.length();
     int leadingParenthesesIndex = query.indexOf('(');
-//    int trialingParenthesesIndex = query.indexOf(')');
     int trialingParenthesesIndex = query.lastIndexOf((')'));
     if (leadingParenthesesIndex == 0) {
       query = query.substring(1);

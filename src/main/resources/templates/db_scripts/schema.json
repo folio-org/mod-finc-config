@@ -35,6 +35,12 @@
           "tOps": "ADD",
           "caseSensitive": false,
           "removeAccents": true
+        },
+        {
+          "fieldName": "selectedBy",
+          "tOps": "ADD",
+          "arraySubfield": "value",
+          "arrayModifiers": ["selected", "isil"]
         }
       ]
     },

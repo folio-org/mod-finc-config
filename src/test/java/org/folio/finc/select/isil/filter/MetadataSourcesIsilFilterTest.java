@@ -34,24 +34,19 @@ public class MetadataSourcesIsilFilterTest {
     FincConfigMetadataSource source1 = new FincConfigMetadataSource();
     source1.setLabel(SOURCE_1);
     source1.setId("uuid-1234");
-    /*List<String> selectedBy1 = new ArrayList<>();
-    selectedBy1.add(DE_15);
-    selectedBy1.add(DE_14);*/
 
     List<SelectedBy> selectedBy1 = new ArrayList<>();
-    selectedBy1.add(new SelectedBy().withIsisl(DE_15).withSelected(Selected.ALL.value()));
-    selectedBy1.add(new SelectedBy().withIsisl(DE_14).withSelected(Selected.ALL.value()));
+    selectedBy1.add(new SelectedBy().withIsil(DE_15).withSelected(Selected.ALL.value()));
+    selectedBy1.add(new SelectedBy().withIsil(DE_14).withSelected(Selected.ALL.value()));
 
     source1.setSelectedBy(selectedBy1);
 
     FincConfigMetadataSource source2 = new FincConfigMetadataSource();
     source2.setLabel(SOURCE_2);
     source2.setId("uuid-6789");
-    /*List<String> selectedBy2 = new ArrayList<>();
-    selectedBy2.add(DE_14);*/
     List<SelectedBy> selectedBy2 = new ArrayList<>();
-    selectedBy1.add(new SelectedBy().withIsisl(DE_15).withSelected(Selected.NONE.value()));
-    selectedBy1.add(new SelectedBy().withIsisl(DE_14).withSelected(Selected.ALL.value()));
+    selectedBy1.add(new SelectedBy().withIsil(DE_15).withSelected(Selected.NONE.value()));
+    selectedBy1.add(new SelectedBy().withIsil(DE_14).withSelected(Selected.ALL.value()));
     source2.setSelectedBy(selectedBy2);
 
     List<FincConfigMetadataSource> sources = new ArrayList<>();

@@ -56,7 +56,7 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
             .withSourceId(1)
             .withSelectedBy(
                 Arrays.asList(
-                    new SelectedBy().withIsisl("DE-15").withSelected(Selected.ALL.value())));
+                    new SelectedBy().withIsil("DE-15").withSelected(Selected.ALL.value())));
   }
 
   @After
