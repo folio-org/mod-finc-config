@@ -43,5 +43,14 @@
     "json"
   ],
   "updateRhythm": "monthly",
-  "selectedBy": [ "DE-14" ]
+  "selectedBy": [
+        {
+          "selected": "all",
+          "isil": "DE-14"
+        },
+        {
+          "selected": "none",
+          "isil": "DE-15"
+        }
+      ]
 }

@@ -11,6 +11,7 @@ import org.folio.finc.select.isil.filter.MetadataSourcesIsilFilter;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource.Selected;
+import org.folio.rest.jaxrs.model.SelectedBy;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,16 +34,24 @@ public class MetadataSourcesIsilFilterTest {
     FincConfigMetadataSource source1 = new FincConfigMetadataSource();
     source1.setLabel(SOURCE_1);
     source1.setId("uuid-1234");
-    List<String> selectedBy1 = new ArrayList<>();
+    /*List<String> selectedBy1 = new ArrayList<>();
     selectedBy1.add(DE_15);
-    selectedBy1.add(DE_14);
+    selectedBy1.add(DE_14);*/
+
+    List<SelectedBy> selectedBy1 = new ArrayList<>();
+    selectedBy1.add(new SelectedBy().withIsisl(DE_15).withSelected(Selected.ALL.value()));
+    selectedBy1.add(new SelectedBy().withIsisl(DE_14).withSelected(Selected.ALL.value()));
+
     source1.setSelectedBy(selectedBy1);
 
     FincConfigMetadataSource source2 = new FincConfigMetadataSource();
     source2.setLabel(SOURCE_2);
     source2.setId("uuid-6789");
-    List<String> selectedBy2 = new ArrayList<>();
-    selectedBy2.add(DE_14);
+    /*List<String> selectedBy2 = new ArrayList<>();
+    selectedBy2.add(DE_14);*/
+    List<SelectedBy> selectedBy2 = new ArrayList<>();
+    selectedBy1.add(new SelectedBy().withIsisl(DE_15).withSelected(Selected.NONE.value()));
+    selectedBy1.add(new SelectedBy().withIsisl(DE_14).withSelected(Selected.ALL.value()));
     source2.setSelectedBy(selectedBy2);
 
     List<FincConfigMetadataSource> sources = new ArrayList<>();
@@ -56,10 +65,10 @@ public class MetadataSourcesIsilFilterTest {
               String label = mdSource.getLabel();
               switch (label) {
                 case SOURCE_1:
-                  assertEquals(Selected.YES, mdSource.getSelected());
+                  assertEquals(Selected.ALL, mdSource.getSelected());
                   break;
                 case SOURCE_2:
-                  assertEquals(Selected.NO, mdSource.getSelected());
+                  assertEquals(Selected.NONE, mdSource.getSelected());
                   break;
               }
             });

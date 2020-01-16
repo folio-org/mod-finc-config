@@ -3,6 +3,7 @@ package org.folio.finc.dao;
 import io.vertx.core.Context;
 import io.vertx.core.Promise;
 import java.util.List;
+import org.folio.finc.select.MetadataSourcesQueryTranslator;
 import org.folio.finc.select.isil.filter.IsilFilter;
 import org.folio.finc.select.isil.filter.MetadataSourcesIsilFilter;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
@@ -25,7 +26,7 @@ public class SelectMetadataSourcesDAOImpl implements SelectMetadataSourcesDAO {
   public Promise<FincSelectMetadataSources> getAll(
       String query, int offset, int limit, String isil, Context vertxContext) {
     Promise<FincSelectMetadataSources> result = Promise.promise();
-
+    query = MetadataSourcesQueryTranslator.translate(query, isil);
     metadataSourcesDAO
         .getAll(query, offset, limit, vertxContext)
         .future()

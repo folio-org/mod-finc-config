@@ -17,12 +17,14 @@ import org.folio.finc.mocks.MockOrganization;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection.UsageRestricted;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
+import org.folio.rest.jaxrs.model.FincSelectMetadataCollection;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource.Selected;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource.Status;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.jaxrs.model.MdSource;
 import org.folio.rest.jaxrs.model.Organization;
+import org.folio.rest.jaxrs.model.SelectedBy;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -52,7 +54,9 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
             .withDescription("This is a metadata source for tests")
             .withStatus(FincConfigMetadataSource.Status.ACTIVE)
             .withSourceId(1)
-            .withSelectedBy(Arrays.asList(isilUBL.getIsil()));
+            .withSelectedBy(
+                Arrays.asList(
+                    new SelectedBy().withIsisl("DE-15").withSelected(Selected.ALL.value())));
   }
 
   @After
@@ -93,7 +97,7 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
         .body("fincSelectMetadataSources.size()", equalTo(1))
         .body("fincSelectMetadataSources[0].id", equalTo(metadatasourceSelected.getId()))
         .body("fincSelectMetadataSources[0].label", equalTo(metadatasourceSelected.getLabel()))
-        .body("fincSelectMetadataSources[0].selected", equalTo(Selected.YES.toString()));
+        .body("fincSelectMetadataSources[0].selected", equalTo(Selected.ALL.toString()));
 
     // Get all metadata sources with failing query
     given()
@@ -117,7 +121,7 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
         .statusCode(200)
         .body("id", equalTo(metadatasourceSelected.getId()))
         .body("label", equalTo(metadatasourceSelected.getLabel()))
-        .body("selected", equalTo(Selected.YES.toString()));
+        .body("selected", equalTo(Selected.ALL.toString()));
 
     // Get a metadata source by id not found
     given()
@@ -265,7 +269,7 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
         .statusCode(200)
         .body("id", equalTo(metadataCollectionNotRestricted.getId()))
         .body("label", equalTo(metadataCollectionNotRestricted.getLabel()))
-        .body("selected", equalTo(Selected.YES.toString()));
+        .body("selected", equalTo(FincSelectMetadataCollection.Selected.YES.value()));
 
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
@@ -280,7 +284,7 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
         .statusCode(200)
         .body("id", equalTo(metadataCollectionRestrictedPermitted.getId()))
         .body("label", equalTo(metadataCollectionRestrictedPermitted.getLabel()))
-        .body("selected", equalTo(Selected.YES.toString()));
+        .body("selected", equalTo(FincSelectMetadataCollection.Selected.YES.value()));
 
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
@@ -295,7 +299,7 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
         .statusCode(200)
         .body("id", equalTo(metadataCollectionRestrictedNotPermitted.getId()))
         .body("label", equalTo(metadataCollectionRestrictedNotPermitted.getLabel()))
-        .body("selected", equalTo(Selected.NO.toString()));
+        .body("selected", equalTo(FincSelectMetadataCollection.Selected.NO.value()));
 
     // DELETE metadata source
     given()

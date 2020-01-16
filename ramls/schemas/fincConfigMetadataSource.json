@@ -145,7 +145,15 @@
       "description": "List of tenants/libraries which selected this metadata source",
       "minItems": 0,
       "items": {
-        "type": "string"
+        "type": "object",
+        "properties": {
+          "isisl": {
+            "type": "string"
+          },
+          "selected": {
+            "type": "string"
+          }
+        }
       }
     }
   },
