@@ -77,7 +77,7 @@ $BODY$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION update_sources_selected_by_on_delete() RETURNS TRIGGER AS
 $BODY$
-DECLARE selected json;
+DECLARE selected jsonb;
 BEGIN
   SELECT calc_selected_state_as_json(OLD.jsonb->'mdSource'->>'id') INTO selected;
   UPDATE metadata_sources SET jsonb = jsonb_set(jsonb, '{selectedBy}', selected, TRUE) WHERE jsonb->>'id' = OLD.jsonb->'mdSource'->>'id';
