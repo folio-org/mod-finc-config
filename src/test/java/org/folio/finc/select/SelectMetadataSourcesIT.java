@@ -301,6 +301,19 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
         .body("label", equalTo(metadataCollectionRestrictedNotPermitted.getLabel()))
         .body("selected", equalTo(FincSelectMetadataCollection.Selected.NO.value()));
 
+    // Check that selected=all in MetadataSource
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_SELECT_METADATA_SOURCES_ENDPOINT + "/" + metadataSource.getId())
+        .andReturn()
+        .then()
+        .statusCode(200)
+        .body("id", equalTo(metadataSource.getId()))
+        .body("label", equalTo(metadataSource.getLabel()))
+        .body("selected", equalTo(FincSelectMetadataSource.Selected.SOME.value()));
+
     // DELETE metadata source
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
