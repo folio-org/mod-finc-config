@@ -49,6 +49,7 @@ $$
   SELECT  sub.isil,
           CASE WHEN sub.diff = 0 THEN 'all'
           WHEN sub.diff = sub.count THEN 'none'
+          WHEN sub.count = 0 THEN 'none'
           ELSE 'some'
           END AS selected
   FROM calc_diff_to_counted_selected_collections($1) AS sub;
@@ -59,7 +60,6 @@ CREATE OR REPLACE FUNCTION calc_selected_state_as_json(
  mdSourceId TEXT
  ) RETURNS TABLE(selected jsonb) AS
 $$
-  -- SELECT  array_to_json(array_agg(sub))
   SELECT  to_jsonb(array_agg(sub))
   FROM    calc_selected_state($1) AS sub;
 $$
@@ -70,7 +70,9 @@ $BODY$
 DECLARE selected jsonb;
 BEGIN
   SELECT calc_selected_state_as_json(NEW.jsonb->'mdSource'->>'id') INTO selected;
-  UPDATE metadata_sources SET jsonb = jsonb_set(jsonb, '{selectedBy}', selected, TRUE) WHERE jsonb->>'id' = NEW.jsonb->'mdSource'->>'id';
+  IF selected IS NOT NULL THEN
+    UPDATE metadata_sources SET jsonb = jsonb_set(jsonb, '{selectedBy}', selected, TRUE) WHERE jsonb->>'id' = NEW.jsonb->'mdSource'->>'id';
+  END IF;
   RETURN NEW;
 END;
 $BODY$ LANGUAGE plpgsql;
