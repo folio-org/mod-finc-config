@@ -2,11 +2,21 @@ package org.folio.finc.select;
 
 import static org.junit.Assert.assertEquals;
 
+import org.folio.finc.select.query.MetadataSourcesQueryTranslator;
+import org.folio.finc.select.query.QueryTranslator;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class MetadataSourceQueryTranslatorTest {
 
   private static final String ISIL = "ISIL-01";
+
+  private static QueryTranslator cut;
+
+  @BeforeClass
+  public static void setUp() {
+    cut = new MetadataSourcesQueryTranslator();
+  }
 
   @Test
   public void translateSelectedAll() {
@@ -15,7 +25,7 @@ public class MetadataSourceQueryTranslatorTest {
         "(sourceId=\"1*\") AND (selectedBy == \"*\\\"isil\\\": \\\""
             + ISIL
             + "\\\", \\\"selected\\\": \\\"all\\\"*\")";
-    String result = MetadataSourcesQueryTranslator.translate(query, ISIL);
+    String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
 
@@ -26,7 +36,7 @@ public class MetadataSourceQueryTranslatorTest {
         "(sourceId=\"1*\") AND (selectedBy == \"*\\\"isil\\\": \\\""
             + ISIL
             + "\\\", \\\"selected\\\": \\\"some\\\"*\")";
-    String result = MetadataSourcesQueryTranslator.translate(query, ISIL);
+    String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
 
@@ -37,7 +47,7 @@ public class MetadataSourceQueryTranslatorTest {
         "(sourceId=\"1*\") AND (selectedBy == \"*\\\"isil\\\": \\\""
             + ISIL
             + "\\\", \\\"selected\\\": \\\"none\\\"*\")";
-    String result = MetadataSourcesQueryTranslator.translate(query, ISIL);
+    String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
 
@@ -48,7 +58,7 @@ public class MetadataSourceQueryTranslatorTest {
         "(sourceId=\"1*\") AND (selectedBy == \"*\\\"isil\\\": \\\""
             + ISIL
             + "\\\", \\\"selected\\\": \\\"all\\\"*\") sortby label";
-    String result = MetadataSourcesQueryTranslator.translate(query, ISIL);
+    String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
 
@@ -59,7 +69,7 @@ public class MetadataSourceQueryTranslatorTest {
         "(sourceId=\"1*\") AND (selectedBy == \"*\\\"isil\\\": \\\""
             + ISIL
             + "\\\", \\\"selected\\\": \\\"all\\\"*\") sortby label";
-    String result = MetadataSourcesQueryTranslator.translate(query, ISIL);
+    String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
 
@@ -70,7 +80,7 @@ public class MetadataSourceQueryTranslatorTest {
         "(sourceId=\"1*\") AND (status=(\"active\")) AND (selectedBy == \"*\\\"isil\\\": \\\""
             + ISIL
             + "\\\", \\\"selected\\\": \\\"all\\\"*\")";
-    String result = MetadataSourcesQueryTranslator.translate(query, ISIL);
+    String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
 
@@ -81,7 +91,7 @@ public class MetadataSourceQueryTranslatorTest {
         "(sourceId=\"1*\") AND (status=(\"active\")) AND (selectedBy == \"*\\\"isil\\\": \\\""
             + ISIL
             + "\\\", \\\"selected\\\": \\\"all\\\"*\") sortby label";
-    String result = MetadataSourcesQueryTranslator.translate(query, ISIL);
+    String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
 
@@ -94,7 +104,7 @@ public class MetadataSourceQueryTranslatorTest {
             + "\\\", \\\"selected\\\": \\\"none\\\"*\") OR (selectedBy == \"*\\\"isil\\\": \\\""
             + ISIL
             + "\\\", \\\"selected\\\": \\\"some\\\"*\"))";
-    String result = MetadataSourcesQueryTranslator.translate(query, ISIL);
+    String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
 
@@ -107,7 +117,7 @@ public class MetadataSourceQueryTranslatorTest {
             + "\\\", \\\"selected\\\": \\\"none\\\"*\") OR (selectedBy == \"*\\\"isil\\\": \\\""
             + ISIL
             + "\\\", \\\"selected\\\": \\\"some\\\"*\")) sortby label";
-    String result = MetadataSourcesQueryTranslator.translate(query, ISIL);
+    String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
 
@@ -122,7 +132,7 @@ public class MetadataSourceQueryTranslatorTest {
             + "\\\", \\\"selected\\\": \\\"some\\\"*\") OR (selectedBy == \"*\\\"isil\\\": \\\""
             + ISIL
             + "\\\", \\\"selected\\\": \\\"all\\\"*\"))";
-    String result = MetadataSourcesQueryTranslator.translate(query, ISIL);
+    String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
 
@@ -137,7 +147,7 @@ public class MetadataSourceQueryTranslatorTest {
             + "\\\", \\\"selected\\\": \\\"some\\\"*\") OR (selectedBy == \"*\\\"isil\\\": \\\""
             + ISIL
             + "\\\", \\\"selected\\\": \\\"all\\\"*\")) sortby label";
-    String result = MetadataSourcesQueryTranslator.translate(query, ISIL);
+    String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
 
@@ -153,7 +163,7 @@ public class MetadataSourceQueryTranslatorTest {
             + "\\\", \\\"selected\\\": \\\"some\\\"*\") OR (selectedBy == \"*\\\"isil\\\": \\\""
             + ISIL
             + "\\\", \\\"selected\\\": \\\"all\\\"*\")) sortby label";
-    String result = MetadataSourcesQueryTranslator.translate(query, ISIL);
+    String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
 }

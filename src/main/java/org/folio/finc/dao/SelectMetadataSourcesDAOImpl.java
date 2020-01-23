@@ -3,9 +3,10 @@ package org.folio.finc.dao;
 import io.vertx.core.Context;
 import io.vertx.core.Promise;
 import java.util.List;
-import org.folio.finc.select.MetadataSourcesQueryTranslator;
+import org.folio.finc.select.query.MetadataSourcesQueryTranslator;
 import org.folio.finc.select.isil.filter.IsilFilter;
 import org.folio.finc.select.isil.filter.MetadataSourcesIsilFilter;
+import org.folio.finc.select.query.QueryTranslator;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSources;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource;
@@ -15,18 +16,20 @@ public class SelectMetadataSourcesDAOImpl implements SelectMetadataSourcesDAO {
 
   private final MetadataSourcesDAO metadataSourcesDAO;
   private final IsilFilter<FincSelectMetadataSource, FincConfigMetadataSource> isilFilter;
+  private final QueryTranslator queryTranslator;
 
   public SelectMetadataSourcesDAOImpl() {
     super();
     this.metadataSourcesDAO = new MetadataSourcesDAOImpl();
     this.isilFilter = new MetadataSourcesIsilFilter();
+    this.queryTranslator = new MetadataSourcesQueryTranslator();
   }
 
   @Override
   public Promise<FincSelectMetadataSources> getAll(
       String query, int offset, int limit, String isil, Context vertxContext) {
     Promise<FincSelectMetadataSources> result = Promise.promise();
-    query = MetadataSourcesQueryTranslator.translate(query, isil);
+    query = queryTranslator.translateQuery(query, isil);
     metadataSourcesDAO
         .getAll(query, offset, limit, vertxContext)
         .future()
