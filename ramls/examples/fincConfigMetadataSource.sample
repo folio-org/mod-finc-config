@@ -61,5 +61,14 @@
     "uuid-789",
     "uuid-123"
   ],
-  "selectedBy": [ "DE-15", "DE-14" ]
+  "selectedBy": [
+      {
+        "selected": "all",
+        "isil": "DE-14"
+      },
+      {
+        "selected": "all",
+        "isil": "DE-15"
+      }
+    ]
 }

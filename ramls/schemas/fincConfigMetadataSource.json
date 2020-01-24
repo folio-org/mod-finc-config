@@ -145,7 +145,21 @@
       "description": "List of tenants/libraries which selected this metadata source",
       "minItems": 0,
       "items": {
-        "type": "string"
+        "type": "object",
+        "properties": {
+          "isil": {
+            "type": "string",
+            "description": "Isil of library/tenant which selected this metadata source"
+          },
+          "selected": {
+            "description": "Indicator if the tenant/library has selected this metadata source",
+            "enum": [
+              "all",
+              "some",
+              "none"
+            ]
+          }
+        }
       }
     }
   },

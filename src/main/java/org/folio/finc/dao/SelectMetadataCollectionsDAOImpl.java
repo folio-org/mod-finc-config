@@ -3,7 +3,7 @@ package org.folio.finc.dao;
 import io.vertx.core.Context;
 import io.vertx.core.Promise;
 import java.util.List;
-import org.folio.finc.select.QueryTranslator;
+import org.folio.finc.select.query.MetadataCollectionsQueryTranslator;
 import org.folio.finc.select.isil.filter.IsilFilter;
 import org.folio.finc.select.isil.filter.MetadataCollectionIsilFilter;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
@@ -14,11 +14,13 @@ public class SelectMetadataCollectionsDAOImpl implements SelectMetadataCollectio
 
   private final IsilFilter<FincSelectMetadataCollection, FincConfigMetadataCollection> isilFilter;
   private MetadataCollectionsDAO metadataCollectionsDAO;
+  private MetadataCollectionsQueryTranslator queryTranslator;
 
   public SelectMetadataCollectionsDAOImpl() {
     super();
     this.isilFilter = new MetadataCollectionIsilFilter();
     this.metadataCollectionsDAO = new MetadataCollectionsDAOImpl();
+    this.queryTranslator = new MetadataCollectionsQueryTranslator();
   }
 
   @Override
@@ -26,7 +28,7 @@ public class SelectMetadataCollectionsDAOImpl implements SelectMetadataCollectio
       String query, int offset, int limit, String isil, Context vertxContext) {
 
     Promise<FincSelectMetadataCollections> result = Promise.promise();
-    query = QueryTranslator.translate(query, isil);
+    query = queryTranslator.translateQuery(query, isil);
     metadataCollectionsDAO
         .getAll(query, offset, limit, vertxContext)
         .future()

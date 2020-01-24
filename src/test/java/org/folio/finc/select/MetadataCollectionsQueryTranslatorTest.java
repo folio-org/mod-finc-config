@@ -4,18 +4,28 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import org.folio.finc.select.query.MetadataCollectionsQueryTranslator;
+import org.folio.finc.select.query.QueryTranslator;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class QueryTranslatorTest {
+public class MetadataCollectionsQueryTranslatorTest {
 
   private static final String isil = "ISIL-01";
+
+  private static QueryTranslator cut;
+
+  @BeforeClass
+  public static void setUp() {
+    cut = new MetadataCollectionsQueryTranslator();
+  }
 
   @Test
   public void translatePermittedFalse() {
     String query = "mdSource.id=\"uuid-1234\" AND permitted=no";
     String expected =
         "(mdSource.id=\"uuid-1234\") AND (cql.allRecords=1 NOT permittedFor any \"" + isil + "\")";
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -27,7 +37,7 @@ public class QueryTranslatorTest {
         "(mdSource.id=\"uuid-1234\") AND (permittedFor any \""
             + isil
             + "\" OR usageRestricted=\"no\")";
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -36,7 +46,7 @@ public class QueryTranslatorTest {
   public void translatePermittedFalseWithoutSource() {
     String query = "permitted=no";
     String expected = "(cql.allRecords=1 NOT permittedFor any \"" + isil + "\")";
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -45,7 +55,7 @@ public class QueryTranslatorTest {
   public void translatePermittedTrueWithoutSource() {
     String query = "permitted=yes";
     String expected = "(permittedFor any \"" + isil + "\" OR usageRestricted=\"no\")";
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -55,7 +65,7 @@ public class QueryTranslatorTest {
     String query = "mdSource.id=\"uuid-1234\" AND selected=\"no\"";
     String expected =
         "(mdSource.id=\"uuid-1234\") AND (cql.allRecords=1 NOT selectedBy any \"" + isil + "\")";
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -64,7 +74,7 @@ public class QueryTranslatorTest {
   public void translateSelectedTrue() {
     String query = "mdSource.id=\"uuid-1234\" AND selected=\"yes\"";
     String expected = "(mdSource.id=\"uuid-1234\") AND (selectedBy any \"" + isil + "\")";
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -73,7 +83,7 @@ public class QueryTranslatorTest {
   public void translateSelectedFalseWithoutSource() {
     String query = "selected=no";
     String expected = "(cql.allRecords=1 NOT selectedBy any \"" + isil + "\")";
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -82,7 +92,7 @@ public class QueryTranslatorTest {
   public void translateSelectedTrueWithoutSource() {
     String query = "selected=yes";
     String expected = "(selectedBy any \"" + isil + "\")";
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -94,7 +104,7 @@ public class QueryTranslatorTest {
         String.format(
             "(mdSource.id=\"uuid-1234\") AND (cql.allRecords=1 NOT selectedBy any \"%s\") AND (cql.allRecords=1 NOT permittedFor any \"%s\")",
             isil, isil);
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -106,7 +116,7 @@ public class QueryTranslatorTest {
         String.format(
             "(mdSource.id=\"uuid-1234\") AND (selectedBy any \"%s\") AND (permittedFor any \"%s\" OR usageRestricted=\"no\")",
             isil, isil);
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -118,7 +128,7 @@ public class QueryTranslatorTest {
         String.format(
             "(cql.allRecords=1 NOT selectedBy any \"%s\") AND (cql.allRecords=1 NOT permittedFor any \"%s\")",
             isil, isil);
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -130,7 +140,7 @@ public class QueryTranslatorTest {
         String.format(
             "(selectedBy any \"%s\") AND (permittedFor any \"%s\" OR usageRestricted=\"no\")",
             isil, isil);
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -142,7 +152,7 @@ public class QueryTranslatorTest {
         String.format(
             "(mdSource.id=\"uuid-1234\") AND (cql.allRecords=1 NOT selectedBy any \"%s\") AND (permittedFor any \"%s\" OR usageRestricted=\"no\")",
             isil, isil);
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -154,7 +164,7 @@ public class QueryTranslatorTest {
         String.format(
             "(cql.allRecords=1 NOT selectedBy any \"%s\") AND (permittedFor any \"%s\" OR usageRestricted=\"no\")",
             isil, isil);
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -168,7 +178,7 @@ public class QueryTranslatorTest {
             + "\") OR (cql.allRecords=1 NOT selectedBy any \""
             + isil
             + "\"))";
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -182,7 +192,7 @@ public class QueryTranslatorTest {
             + "\" OR usageRestricted=\"no\") OR (cql.allRecords=1 NOT permittedFor any \""
             + isil
             + "\"))";
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -196,7 +206,7 @@ public class QueryTranslatorTest {
             + "\") OR (permittedFor any \""
             + isil
             + "\" OR usageRestricted=\"no\"))";
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -216,7 +226,7 @@ public class QueryTranslatorTest {
             + isil
             + "\" OR usageRestricted=\"no\"))";
 
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -237,7 +247,7 @@ public class QueryTranslatorTest {
             + "\") OR (permittedFor any \""
             + isil
             + "\" OR usageRestricted=\"no\"))";
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -258,7 +268,7 @@ public class QueryTranslatorTest {
             + "\") OR (permittedFor any \""
             + isil
             + "\" OR usageRestricted=\"no\"))";
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -276,7 +286,7 @@ public class QueryTranslatorTest {
             + isil
             + "\"))";
 
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -286,7 +296,7 @@ public class QueryTranslatorTest {
     String query = "permitted=no sortby label/sort.descending";
     String expected =
         "(cql.allRecords=1 NOT permittedFor any \"" + isil + "\") sortby label/sort.descending";
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -294,9 +304,10 @@ public class QueryTranslatorTest {
   @Test
   public void translateBalancing1() {
     String query =
-      "(selected=\"no\" and permitted=\"no\" and freeContent=(\"yes\" or \"undetermined\"))";
-    String expected = "(freeContent=(\"yes\" or \"undetermined\")) AND (cql.allRecords=1 NOT selectedBy any \"ISIL-01\") AND (cql.allRecords=1 NOT permittedFor any \"ISIL-01\")";
-    String result = QueryTranslator.translate(query, isil);
+        "(selected=\"no\" and permitted=\"no\" and freeContent=(\"yes\" or \"undetermined\"))";
+    String expected =
+        "(freeContent=(\"yes\" or \"undetermined\")) AND (cql.allRecords=1 NOT selectedBy any \"ISIL-01\") AND (cql.allRecords=1 NOT permittedFor any \"ISIL-01\")";
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -305,8 +316,9 @@ public class QueryTranslatorTest {
   public void translateBalancing2() {
     String query =
         "(freeContent=(\"yes\" or \"undetermined\") and selected=\"no\" and permitted=\"no\")";
-    String expected = "(freeContent=(\"yes\" or \"undetermined\")) AND (cql.allRecords=1 NOT selectedBy any \"ISIL-01\") AND (cql.allRecords=1 NOT permittedFor any \"ISIL-01\")";
-    String result = QueryTranslator.translate(query, isil);
+    String expected =
+        "(freeContent=(\"yes\" or \"undetermined\")) AND (cql.allRecords=1 NOT selectedBy any \"ISIL-01\") AND (cql.allRecords=1 NOT permittedFor any \"ISIL-01\")";
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -315,8 +327,9 @@ public class QueryTranslatorTest {
   public void translateBalancing3() {
     String query =
         "(selected=\"no\" and freeContent=(\"yes\" or \"undetermined\") and permitted=\"no\")";
-    String expected = "(freeContent=(\"yes\" or \"undetermined\")) AND (cql.allRecords=1 NOT selectedBy any \"ISIL-01\") AND (cql.allRecords=1 NOT permittedFor any \"ISIL-01\")";
-    String result = QueryTranslator.translate(query, isil);
+    String expected =
+        "(freeContent=(\"yes\" or \"undetermined\")) AND (cql.allRecords=1 NOT selectedBy any \"ISIL-01\") AND (cql.allRecords=1 NOT permittedFor any \"ISIL-01\")";
+    String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
   }
@@ -324,7 +337,7 @@ public class QueryTranslatorTest {
   @Test
   public void translateNullQuery() {
     String query = null;
-    String result = QueryTranslator.translate(query, isil);
+    String result = cut.translateQuery(query, isil);
     assertNull(result);
   }
 }
