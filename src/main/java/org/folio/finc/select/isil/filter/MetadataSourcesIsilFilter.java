@@ -20,11 +20,11 @@ public class MetadataSourcesIsilFilter
     if (selectedByIsil.size() == 0) {
       selected = Selected.NONE;
     } else {
-      String currentSelected = selectedByIsil.get(0).getSelected();
+      SelectedBy.Selected currentSelected = selectedByIsil.get(0).getSelected();
 
-      if (Selected.ALL.value().equals(currentSelected)) {
+      if (Selected.ALL.value().equals(currentSelected.value())) {
         selected = Selected.ALL;
-      } else if (Selected.SOME.value().equals(currentSelected)) {
+      } else if (Selected.SOME.value().equals(currentSelected.value())) {
         selected = Selected.SOME;
       } else {
         selected = Selected.NONE;

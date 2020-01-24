@@ -1,13 +1,9 @@
 package org.folio.finc.select.isil.filter;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.folio.finc.select.isil.filter.IsilFilter;
-import org.folio.finc.select.isil.filter.MetadataSourcesIsilFilter;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource.Selected;
@@ -36,8 +32,8 @@ public class MetadataSourcesIsilFilterTest {
     source1.setId("uuid-1234");
 
     List<SelectedBy> selectedBy1 = new ArrayList<>();
-    selectedBy1.add(new SelectedBy().withIsil(DE_15).withSelected(Selected.ALL.value()));
-    selectedBy1.add(new SelectedBy().withIsil(DE_14).withSelected(Selected.ALL.value()));
+    selectedBy1.add(new SelectedBy().withIsil(DE_15).withSelected(SelectedBy.Selected.ALL));
+    selectedBy1.add(new SelectedBy().withIsil(DE_14).withSelected(SelectedBy.Selected.ALL));
 
     source1.setSelectedBy(selectedBy1);
 
@@ -45,8 +41,8 @@ public class MetadataSourcesIsilFilterTest {
     source2.setLabel(SOURCE_2);
     source2.setId("uuid-6789");
     List<SelectedBy> selectedBy2 = new ArrayList<>();
-    selectedBy1.add(new SelectedBy().withIsil(DE_15).withSelected(Selected.NONE.value()));
-    selectedBy1.add(new SelectedBy().withIsil(DE_14).withSelected(Selected.ALL.value()));
+    selectedBy1.add(new SelectedBy().withIsil(DE_15).withSelected(SelectedBy.Selected.NONE));
+    selectedBy1.add(new SelectedBy().withIsil(DE_14).withSelected(SelectedBy.Selected.ALL));
     source2.setSelectedBy(selectedBy2);
 
     List<FincConfigMetadataSource> sources = new ArrayList<>();
