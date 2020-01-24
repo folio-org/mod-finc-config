@@ -13,19 +13,6 @@
   ],
   "tables": [
     {
-      "tableName": "metadata_sources",
-      "fromModuleVersion": "1.0",
-      "withMetadata": true,
-      "index": [
-        {
-          "fieldName": "label",
-          "tOps": "ADD",
-          "caseSensitive": false,
-          "removeAccents": true
-        }
-      ]
-    },
-    {
       "tableName": "metadata_collections",
       "fromModuleVersion": "1.0",
       "withMetadata": true,
@@ -52,6 +39,20 @@
         {
           "fieldName": "isil",
           "tOps": "ADD"
+        }
+      ]
+    },
+    {
+      "tableName": "metadata_sources",
+      "fromModuleVersion": "mod-finc-config-1.4.0",
+      "customSnippetPath": "migration/metadata_sources.sql",
+      "withMetadata": true,
+      "index": [
+        {
+          "fieldName": "label",
+          "tOps": "ADD",
+          "caseSensitive": false,
+          "removeAccents": true
         }
       ]
     },
