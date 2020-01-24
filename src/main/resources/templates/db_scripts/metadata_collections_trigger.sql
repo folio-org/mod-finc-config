@@ -48,7 +48,6 @@ CREATE OR REPLACE FUNCTION calc_selected_state(
 $$
   SELECT  sub.isil,
           CASE WHEN sub.diff = 0 THEN 'all'
-          WHEN sub.diff = sub.count THEN 'none'
           WHEN sub.count = 0 THEN 'none'
           ELSE 'some'
           END AS selected
