@@ -67,7 +67,7 @@ public class FilterDAOImpl implements FilterDAO {
                     new org.folio.rest.jaxrs.model.FincSelectFilters();
                 List<FincSelectFilter> filterList = reply.result().getResults();
                 fincSelectFilters.setFincSelectFilters(filterList);
-                fincSelectFilters.setTotalRecords(filterList.size());
+                fincSelectFilters.setTotalRecords(reply.result().getResultInfo().getTotalRecords());
                 result.complete(fincSelectFilters);
               } else {
                 result.fail("Cannot get filter files: " + reply.cause());
