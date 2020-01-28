@@ -3,9 +3,9 @@ package org.folio.finc.dao;
 import io.vertx.core.Context;
 import io.vertx.core.Promise;
 import java.util.List;
-import org.folio.finc.select.query.MetadataSourcesQueryTranslator;
 import org.folio.finc.select.isil.filter.IsilFilter;
 import org.folio.finc.select.isil.filter.MetadataSourcesIsilFilter;
+import org.folio.finc.select.query.MetadataSourcesQueryTranslator;
 import org.folio.finc.select.query.QueryTranslator;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSources;
@@ -42,7 +42,7 @@ public class SelectMetadataSourcesDAOImpl implements SelectMetadataSourcesDAO {
                     isilFilter.filterForIsil(
                         fincConfigMetadataSources.getFincConfigMetadataSources(), isil);
                 sourcesCollection.setFincSelectMetadataSources(transformedSources);
-                sourcesCollection.setTotalRecords(transformedSources.size());
+                sourcesCollection.setTotalRecords(fincConfigMetadataSources.getTotalRecords());
                 result.complete(sourcesCollection);
 
               } else {
