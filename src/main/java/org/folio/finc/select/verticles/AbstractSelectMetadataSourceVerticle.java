@@ -4,6 +4,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,11 +40,12 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
     }
   }
 
-  public Future<CompositeFuture> selectAllCollections(String mdSourceId, String tenantId) {
+  public Future<Void> selectAllCollections(String mdSourceId, String tenantId) {
 
     return fetchIsil(tenantId)
         .compose(isil -> fetchPermittedCollections(mdSourceId, isil))
-        .compose(metadataCollections -> doSelectAndSave(metadataCollections, tenantId));
+        .compose(metadataCollections -> doSelectAndSave(metadataCollections, tenantId))
+        .compose(compositeFuture -> updateSelectedBy(mdSourceId, tenantId));
   }
 
   private Future<List<FincConfigMetadataCollection>> fetchPermittedCollections(
@@ -135,5 +137,21 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
               }
             });
     return future;
+  }
+
+  public Future<Void> updateSelectedBy(String mdSourceId, String tenantId) {
+    Promise<Void> result = Promise.promise();
+    String query = String.format("SELECT * FROM update_selected_state('%s')", mdSourceId);
+    PostgresClient.getInstance(context.owner(), tenantId)
+        .select(
+            query,
+            ar -> {
+              if (ar.succeeded()) {
+                result.complete();
+              } else {
+                result.fail("Cannot update selectedBy. " + ar.cause());
+              }
+            });
+    return result.future();
   }
 }

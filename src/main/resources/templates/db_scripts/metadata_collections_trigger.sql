@@ -64,6 +64,21 @@ $$
 $$
 LANGUAGE SQL;
 
+CREATE OR REPLACE FUNCTION update_selected_state(
+  mdSourceId TEXT
+ ) RETURNS boolean AS
+$BODY$
+DECLARE selected jsonb;
+BEGIN
+  SELECT calc_selected_state_as_json($1) INTO selected;
+  IF selected IS NOT NULL THEN
+    UPDATE metadata_sources SET jsonb = jsonb_set(jsonb, '{selectedBy}', selected, TRUE) WHERE jsonb->>'id' = $1;
+  END IF;
+  RETURN true;
+END;
+$BODY$
+LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION update_sources_selected_by_on_update() RETURNS TRIGGER AS
 $BODY$
 DECLARE selected jsonb;
