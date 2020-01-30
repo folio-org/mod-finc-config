@@ -30,7 +30,7 @@ public class FincSelectFilesAPI implements FincSelectFiles {
   private final FileDAO fileDAO;
 
   public FincSelectFilesAPI(Vertx vertx, String tenantId) {
-    this.isilHelper = new IsilHelper(vertx, tenantId);
+    this.isilHelper = new IsilHelper();
     this.fileDAO = new FileDAOImpl();
     this.isilDAO = new IsilDAOImpl();
   }
@@ -46,8 +46,7 @@ public class FincSelectFilesAPI implements FincSelectFiles {
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
-        .future()
-        .compose(isil -> fileDAO.getById(id, isil, vertxContext).future())
+        .compose(isil -> fileDAO.getById(id, isil, vertxContext))
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -95,15 +94,14 @@ public class FincSelectFilesAPI implements FincSelectFiles {
     String base64Data = Base64.getEncoder().encodeToString(bytes);
     String uuid = UUID.randomUUID().toString();
 
-    isilHelper.fetchIsil(tenantId, vertxContext).future();
+    isilHelper.fetchIsil(tenantId, vertxContext);
 
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
-      .future()
         .compose(
             isil -> {
               File file = new File().withData(base64Data).withId(uuid).withIsil(isil);
-              return fileDAO.upsert(file, uuid, vertxContext).future();
+              return fileDAO.upsert(file, uuid, vertxContext);
             })
         .setHandler(
             ar -> {
@@ -130,9 +128,9 @@ public class FincSelectFilesAPI implements FincSelectFiles {
     String tenantId =
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
 
-    isilDAO.getIsilForTenant(tenantId, vertxContext)
-        .future()
-        .compose(isil -> fileDAO.deleteById(id, isil, vertxContext).future())
+    isilDAO
+        .getIsilForTenant(tenantId, vertxContext)
+        .compose(isil -> fileDAO.deleteById(id, isil, vertxContext))
         .setHandler(
             ar -> {
               if (ar.succeeded()) {

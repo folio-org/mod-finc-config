@@ -20,7 +20,10 @@ import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.TenantAttributes;
+import org.folio.rest.persist.Criteria.Criteria;
+import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
 import org.junit.AfterClass;
@@ -102,7 +105,7 @@ public class SelectMetadataSourceVerticleTest {
           new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
           postTenantRes -> {
             Future<Void> future =
-                selectMetadataSourceVerticleTestHelper.writeDataToDB(context, vertx).future();
+                selectMetadataSourceVerticleTestHelper.writeDataToDB(context, vertx);
             future.setHandler(
                 ar -> {
                   ublFuture.complete(postTenantRes);
@@ -133,7 +136,6 @@ public class SelectMetadataSourceVerticleTest {
 
   @Before
   public void before() throws InterruptedException, ExecutionException, TimeoutException {
-    // Async async = context.async();
     vertx = Vertx.vertx();
     JsonObject cfg2 = vertx.getOrCreateContext().config();
     cfg2.put("tenantId", TENANT_UBL);
@@ -164,16 +166,21 @@ public class SelectMetadataSourceVerticleTest {
             aVoid -> {
               if (aVoid.succeeded()) {
                 try {
-                  String where =
-                      String.format(
-                          " WHERE (jsonb->>'label' = '%s')",
-                          SelectMetadataSourceVerticleTestHelper.getMetadataCollection3()
-                              .getLabel());
+                  Criteria labelCrit =
+                      new Criteria()
+                          .addField("'label'")
+                          .setJSONB(true)
+                          .setOperation("=")
+                          .setVal(
+                              SelectMetadataSourceVerticleTestHelper.getMetadataCollection3()
+                                  .getLabel());
+                  Criterion criterion = new Criterion(labelCrit);
+                  CQLWrapper cql = new CQLWrapper(criterion);
                   PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
                       .get(
                           "metadata_collections",
                           FincConfigMetadataCollection.class,
-                          where,
+                          cql,
                           true,
                           true,
                           ar -> {
@@ -208,16 +215,21 @@ public class SelectMetadataSourceVerticleTest {
             aVoid -> {
               if (aVoid.succeeded()) {
                 try {
-                  String where =
-                      String.format(
-                          " WHERE (jsonb->>'label' = '%s')",
-                          SelectMetadataSourceVerticleTestHelper.getMetadataCollection2()
-                              .getLabel());
+                  Criteria labelCrit =
+                      new Criteria()
+                          .addField("'label'")
+                          .setJSONB(true)
+                          .setOperation("=")
+                          .setVal(
+                              SelectMetadataSourceVerticleTestHelper.getMetadataCollection2()
+                                  .getLabel());
+                  Criterion criterion = new Criterion(labelCrit);
+                  CQLWrapper cql = new CQLWrapper(criterion);
                   PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
                       .get(
                           "metadata_collections",
                           FincConfigMetadataCollection.class,
-                          where,
+                          cql,
                           true,
                           true,
                           ar -> {

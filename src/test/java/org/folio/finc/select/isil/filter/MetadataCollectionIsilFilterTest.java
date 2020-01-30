@@ -1,14 +1,10 @@
 package org.folio.finc.select.isil.filter;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.folio.finc.select.isil.filter.IsilFilter;
-import org.folio.finc.select.isil.filter.MetadataCollectionIsilFilter;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection.UsageRestricted;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollection;

@@ -1,14 +1,14 @@
 package org.folio.finc.dao;
 
 import io.vertx.core.Context;
-import io.vertx.core.Promise;
+import io.vertx.core.Future;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSources;
 
 public interface MetadataSourcesDAO {
 
-  Promise<FincConfigMetadataSources> getAll(
+  Future<FincConfigMetadataSources> getAll(
       String query, int offset, int limit, Context vertxContext);
 
-  Promise<FincConfigMetadataSource> getById(String id, Context vertxContext);
+  Future<FincConfigMetadataSource> getById(String id, Context vertxContext);
 }

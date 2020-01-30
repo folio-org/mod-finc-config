@@ -1,6 +1,7 @@
 package org.folio.finc.dao;
 
 import io.vertx.core.Context;
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -32,7 +33,7 @@ public class MetadataSourcesDAOImpl implements MetadataSourcesDAO {
   }
 
   @Override
-  public Promise<FincConfigMetadataSources> getAll(
+  public Future<FincConfigMetadataSources> getAll(
       String query, int offset, int limit, Context vertxContext) {
 
     Promise<FincConfigMetadataSources> result = Promise.promise();
@@ -68,11 +69,11 @@ public class MetadataSourcesDAOImpl implements MetadataSourcesDAO {
                 result.fail("Cannot get finc config metadata sources. " + reply.cause());
               }
             });
-    return result;
+    return result.future();
   }
 
   @Override
-  public Promise<FincConfigMetadataSource> getById(String id, Context vertxContext) {
+  public Future<FincConfigMetadataSource> getById(String id, Context vertxContext) {
     Promise<FincConfigMetadataSource> result = Promise.promise();
 
     String tenantId = Constants.MODULE_TENANT;
@@ -89,6 +90,6 @@ public class MetadataSourcesDAOImpl implements MetadataSourcesDAO {
               }
             });
 
-    return result;
+    return result.future();
   }
 }

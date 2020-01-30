@@ -1,6 +1,7 @@
 package org.folio.finc.dao;
 
 import io.vertx.core.Context;
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import java.util.List;
 import org.folio.finc.model.File;
@@ -16,7 +17,7 @@ public class FileDAOImpl implements FileDAO {
   private static final String TABLE_NAME = "files";
 
   @Override
-  public Promise<File> getById(String id, String isil, Context vertxContext) {
+  public Future<File> getById(String id, String isil, Context vertxContext) {
     Promise<File> result = Promise.promise();
     Criterion criterion = getCriterion(id, isil);
     CQLWrapper cql = new CQLWrapper(criterion);
@@ -57,11 +58,11 @@ public class FileDAOImpl implements FileDAO {
                 result.fail("Cannot get file by id " + reply.cause());
               }
             });
-    return result;
+    return result.future();
   }
 
   @Override
-  public Promise<File> upsert(File entity, String id, Context vertxContext) {
+  public Future<File> upsert(File entity, String id, Context vertxContext) {
     Promise<File> result = Promise.promise();
     PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
         .upsert(
@@ -75,11 +76,11 @@ public class FileDAOImpl implements FileDAO {
                 result.fail("Cannot upsert file: " + asyncResult.cause());
               }
             });
-    return result;
+    return result.future();
   }
 
   @Override
-  public Promise<Integer> deleteById(String id, String isil, Context vertxContext) {
+  public Future<Integer> deleteById(String id, String isil, Context vertxContext) {
     Promise<Integer> result = Promise.promise();
     Criterion criterion = getCriterion(id, isil);
     PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
@@ -93,7 +94,7 @@ public class FileDAOImpl implements FileDAO {
                 result.fail(reply.cause());
               }
             });
-    return result;
+    return result.future();
   }
 
   private Criterion getCriterion(String id, String isil) {

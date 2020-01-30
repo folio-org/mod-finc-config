@@ -9,7 +9,7 @@ import org.folio.rest.jaxrs.model.FincSelectMetadataSource.Selected;
 import org.folio.rest.jaxrs.model.SelectedBy;
 
 public class MetadataSourcesIsilFilter
-    extends IsilFilter<FincSelectMetadataSource, FincConfigMetadataSource> {
+    implements IsilFilter<FincSelectMetadataSource, FincConfigMetadataSource> {
 
   @Override
   public FincSelectMetadataSource filterForIsil(FincConfigMetadataSource entry, String isil) {
@@ -17,7 +17,7 @@ public class MetadataSourcesIsilFilter
     List<SelectedBy> selectedByIsil =
         selectedBy.stream().filter(sb -> sb.getIsil().equals(isil)).collect(Collectors.toList());
     Selected selected;
-    if (selectedByIsil.size() == 0) {
+    if (selectedByIsil.isEmpty()) {
       selected = Selected.NONE;
     } else {
       SelectedBy.Selected currentSelected = selectedByIsil.get(0).getSelected();

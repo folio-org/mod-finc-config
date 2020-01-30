@@ -1,6 +1,7 @@
 package org.folio.finc.dao;
 
 import io.vertx.core.Context;
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import java.util.List;
 import org.folio.finc.select.isil.filter.IsilFilter;
@@ -13,8 +14,8 @@ import org.folio.rest.jaxrs.model.FincSelectMetadataCollections;
 public class SelectMetadataCollectionsDAOImpl implements SelectMetadataCollectionsDAO {
 
   private final IsilFilter<FincSelectMetadataCollection, FincConfigMetadataCollection> isilFilter;
-  private MetadataCollectionsDAO metadataCollectionsDAO;
-  private MetadataCollectionsQueryTranslator queryTranslator;
+  private final MetadataCollectionsDAO metadataCollectionsDAO;
+  private final MetadataCollectionsQueryTranslator queryTranslator;
 
   public SelectMetadataCollectionsDAOImpl() {
     super();
@@ -24,14 +25,13 @@ public class SelectMetadataCollectionsDAOImpl implements SelectMetadataCollectio
   }
 
   @Override
-  public Promise<FincSelectMetadataCollections> getAll(
+  public Future<FincSelectMetadataCollections> getAll(
       String query, int offset, int limit, String isil, Context vertxContext) {
 
     Promise<FincSelectMetadataCollections> result = Promise.promise();
     query = queryTranslator.translateQuery(query, isil);
     metadataCollectionsDAO
         .getAll(query, offset, limit, vertxContext)
-        .future()
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -53,17 +53,16 @@ public class SelectMetadataCollectionsDAOImpl implements SelectMetadataCollectio
                 return;
               }
             });
-    return result;
+    return result.future();
   }
 
   @Override
-  public Promise<FincSelectMetadataCollection> getById(
+  public Future<FincSelectMetadataCollection> getById(
       String id, String isil, Context vertxContext) {
     Promise<FincSelectMetadataCollection> result = Promise.promise();
 
     metadataCollectionsDAO
         .getById(id, vertxContext)
-        .future()
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -75,6 +74,6 @@ public class SelectMetadataCollectionsDAOImpl implements SelectMetadataCollectio
                 return;
               }
             });
-    return result;
+    return result.future();
   }
 }

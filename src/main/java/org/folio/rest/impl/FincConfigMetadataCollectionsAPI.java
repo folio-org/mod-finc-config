@@ -33,7 +33,6 @@ import org.folio.cql2pgjson.exception.FieldException;
  */
 public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataCollections {
 
-  private static final String ID_FIELD = "id";
   private static final String TABLE_NAME = "metadata_collections";
   private final Messages messages = Messages.getInstance();
   private final Logger logger = LoggerFactory.getLogger(FincConfigMetadataCollectionsAPI.class);

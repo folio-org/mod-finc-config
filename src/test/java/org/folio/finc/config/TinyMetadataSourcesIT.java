@@ -34,7 +34,6 @@ public class TinyMetadataSourcesIT extends AbstractMetadataSourcesIT {
         .header("accept", ContentType.JSON)
         .get(FINC_CONFIG_TINY_METADATA_SOURCES_ENDPOINT)
         .then()
-        .contentType(ContentType.JSON)
         .statusCode(200)
         .body("tinyMetadataSources.size()", equalTo(1))
         .body("tinyMetadataSources[0].id", equalTo(metadataSource2.getId()))

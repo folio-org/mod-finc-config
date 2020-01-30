@@ -16,7 +16,10 @@ import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.TenantAttributes;
+import org.folio.rest.persist.Criteria.Criteria;
+import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
 import org.junit.AfterClass;
@@ -32,7 +35,7 @@ public class UnselectMetadataSourceVerticleTest {
   private static final String TENANT_UBL = "ubl";
   private static Vertx vertx;
   private static UnselectMetadataSourceVerticle cut;
-  @Rule public Timeout timeout = Timeout.seconds(1000);
+  @Rule public Timeout timeout = Timeout.seconds(10);
 
   @BeforeClass
   public static void setUp(TestContext context) {
@@ -76,9 +79,7 @@ public class UnselectMetadataSourceVerticleTest {
                 new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
                 postTenantRes -> {
                   Future<Void> future =
-                      selectMetadataSourceVerticleTestHelper
-                          .writeDataToDB(context, vertx)
-                          .future();
+                      selectMetadataSourceVerticleTestHelper.writeDataToDB(context, vertx);
                   future.setHandler(
                       ar -> {
                         if (ar.succeeded()) async.countDown();
@@ -130,16 +131,21 @@ public class UnselectMetadataSourceVerticleTest {
             aVoid -> {
               if (aVoid.succeeded()) {
                 try {
-                  String where =
-                      String.format(
-                          " WHERE (jsonb->>'label' = '%s')",
-                          SelectMetadataSourceVerticleTestHelper.getMetadataCollection1()
-                              .getLabel());
+                  Criteria labelCrit =
+                      new Criteria()
+                          .addField("'label'")
+                          .setJSONB(true)
+                          .setOperation("=")
+                          .setVal(
+                              SelectMetadataSourceVerticleTestHelper.getMetadataCollection1()
+                                  .getLabel());
+                  Criterion criterion = new Criterion(labelCrit);
+                  CQLWrapper cql = new CQLWrapper(criterion);
                   PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
                       .get(
                           "metadata_collections",
                           FincConfigMetadataCollection.class,
-                          where,
+                          cql,
                           true,
                           true,
                           ar -> {
@@ -147,7 +153,11 @@ public class UnselectMetadataSourceVerticleTest {
                               if (ar.result() != null) {
                                 FincConfigMetadataCollection collection =
                                     ar.result().getResults().get(0);
-                                context.assertFalse(collection.getSelectedBy().contains("DE-15"));
+                                if (collection == null) {
+                                  context.fail("No results found.");
+                                } else {
+                                  context.assertFalse(collection.getSelectedBy().contains("DE-15"));
+                                }
                               } else {
                                 context.fail("No results found.");
                               }
