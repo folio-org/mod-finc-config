@@ -12,7 +12,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.folio.finc.config.ConfigMetadataCollectionsIT;
@@ -50,9 +49,7 @@ public class ApiTestSuite {
   public static final String TENANT_UBL = "ubl";
   public static final String TENANT_DIKU = "diku";
 
-  private static final int okapiPort = NetworkUtils.nextFreePort();
   private static Vertx vertx;
-  private static int port;
   private static boolean initialised = false;
 
   @BeforeClass
@@ -69,7 +66,7 @@ public class ApiTestSuite {
     client.startEmbeddedPostgres();
 
     initialised = true;
-    port = NetworkUtils.nextFreePort();
+    int port = NetworkUtils.nextFreePort();
 
     RestAssured.reset();
     RestAssured.baseURI = "http://localhost";

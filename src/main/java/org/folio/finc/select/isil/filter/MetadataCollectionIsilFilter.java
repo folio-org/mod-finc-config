@@ -11,7 +11,7 @@ import org.folio.rest.jaxrs.model.FincSelectMetadataCollection.Permitted;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollection.Selected;
 
 public class MetadataCollectionIsilFilter
-    extends IsilFilter<FincSelectMetadataCollection, FincConfigMetadataCollection> {
+    implements IsilFilter<FincSelectMetadataCollection, FincConfigMetadataCollection> {
 
   @Override
   public FincSelectMetadataCollection filterForIsil(

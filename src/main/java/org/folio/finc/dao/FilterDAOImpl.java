@@ -1,6 +1,7 @@
 package org.folio.finc.dao;
 
 import io.vertx.core.Context;
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -29,14 +30,14 @@ public class FilterDAOImpl implements FilterDAO {
 
   private final Logger logger = LoggerFactory.getLogger(FilterDAOImpl.class);
 
-  private QueryTranslator queryTranslator;
+  private final QueryTranslator queryTranslator;
 
   public FilterDAOImpl() {
     queryTranslator = new MetadataCollectionsQueryTranslator();
   }
 
   @Override
-  public Promise<FincSelectFilters> getAll(
+  public Future<FincSelectFilters> getAll(
       String query, int offset, int limit, String isil, Context vertxContext) {
 
     Promise<FincSelectFilters> result = Promise.promise();
@@ -73,11 +74,11 @@ public class FilterDAOImpl implements FilterDAO {
                 result.fail("Cannot get filter files: " + reply.cause());
               }
             });
-    return result;
+    return result.future();
   }
 
   @Override
-  public Promise<FincSelectFilter> getById(String id, String isil, Context vertxContext) {
+  public Future<FincSelectFilter> getById(String id, String isil, Context vertxContext) {
     Promise<FincSelectFilter> result = Promise.promise();
     Criterion criterion = getCriterion(id, isil);
     PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
@@ -117,11 +118,11 @@ public class FilterDAOImpl implements FilterDAO {
                 result.fail("Cannot get filter by id " + reply.cause());
               }
             });
-    return result;
+    return result.future();
   }
 
   @Override
-  public Promise<FincSelectFilter> insert(FincSelectFilter entity, Context vertxContext) {
+  public Future<FincSelectFilter> insert(FincSelectFilter entity, Context vertxContext) {
     if (entity.getId() == null) {
       entity.setId(UUID.randomUUID().toString());
     }
@@ -138,11 +139,11 @@ public class FilterDAOImpl implements FilterDAO {
                 result.fail("Cannot insert filter: " + asyncResult.cause());
               }
             });
-    return result;
+    return result.future();
   }
 
   @Override
-  public Promise<FincSelectFilter> update(
+  public Future<FincSelectFilter> update(
       FincSelectFilter entity, String id, Context vertxContext) {
     Promise<FincSelectFilter> result = Promise.promise();
     PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
@@ -157,11 +158,11 @@ public class FilterDAOImpl implements FilterDAO {
                 result.fail("Cannot update filter: " + asyncResult.cause());
               }
             });
-    return result;
+    return result.future();
   }
 
   @Override
-  public Promise<Integer> deleteById(String id, String isil, Context vertxContext) {
+  public Future<Integer> deleteById(String id, String isil, Context vertxContext) {
     Promise<Integer> result = Promise.promise();
     Criterion criterion = getCriterion(id, isil);
 
@@ -177,7 +178,7 @@ public class FilterDAOImpl implements FilterDAO {
                 result.fail("Error while deleting finc select filter. " + reply.cause());
               }
             });
-    return result;
+    return result.future();
   }
 
   private CQLWrapper getCQL(String query, int limit, int offset, String isil)

@@ -1,9 +1,9 @@
 package org.folio.finc.dao;
 
 import io.vertx.core.Context;
-import io.vertx.core.Promise;
+import io.vertx.core.Future;
 
 public interface IsilDAO {
 
-  Promise<String> getIsilForTenant(String tenantId, Context context);
+  Future<String> getIsilForTenant(String tenantId, Context context);
 }

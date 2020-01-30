@@ -19,22 +19,20 @@ public class FilterHelper {
 
   private static final Logger logger = LoggerFactory.getLogger(FilterHelper.class);
 
-  private FilterDAO filterDAO;
-  private FileDAO fileDAO;
+  private final FilterDAO filterDAO;
+  private final FileDAO fileDAO;
 
   public FilterHelper() {
     this.filterDAO = new FilterDAOImpl();
     this.fileDAO = new FileDAOImpl();
   }
 
-  public Promise<Void> deleteFilesOfFilter(String filterId, String isil, Context vertxContext) {
+  public Future<Void> deleteFilesOfFilter(String filterId, String isil, Context vertxContext) {
 
     Promise<Void> result = Promise.promise();
 
-    Promise<FincSelectFilter> byId = filterDAO.getById(filterId, isil, vertxContext);
-    byId.future()
-        .compose(
-            fincSelectFilter -> deleteFilesOfFilter(fincSelectFilter, isil, vertxContext).future())
+    Future<FincSelectFilter> byId = filterDAO.getById(filterId, isil, vertxContext);
+    byId.compose(fincSelectFilter -> deleteFilesOfFilter(fincSelectFilter, isil, vertxContext))
         .setHandler(
             voidAsyncResult -> {
               if (voidAsyncResult.succeeded()) {
@@ -43,22 +41,20 @@ public class FilterHelper {
                 result.fail(voidAsyncResult.cause());
               }
             });
-    return result;
+    return result.future();
   }
 
-  private Promise<Void> deleteFilesOfFilter(
+  private Future<Void> deleteFilesOfFilter(
       FincSelectFilter filter, String isil, Context vertxContext) {
 
-    Promise result = Promise.promise();
+    Promise<Void> result = Promise.promise();
     List<FilterFile> filterFiles = filter.getFilterFiles();
     if (filterFiles == null || filterFiles.isEmpty()) {
       result.complete();
     } else {
       List<Future> deleteFutures =
           filterFiles.stream()
-              .map(
-                  filterFile ->
-                      fileDAO.deleteById(filterFile.getFileId(), isil, vertxContext).future())
+              .map(filterFile -> fileDAO.deleteById(filterFile.getFileId(), isil, vertxContext))
               .collect(Collectors.toList());
 
       CompositeFuture.all(deleteFutures)
@@ -78,10 +74,10 @@ public class FilterHelper {
                 }
               });
     }
-    return result;
+    return result.future();
   }
 
-  public Promise<FincSelectFilter> removeFilesToDelete(
+  public Future<FincSelectFilter> removeFilesToDelete(
       FincSelectFilter filter, String isil, Context vertxContext) {
 
     List<FilterFile> remainingFiles =
@@ -92,9 +88,7 @@ public class FilterHelper {
     List<Future> filesToDeleteFuture =
         filter.getFilterFiles().stream()
             .filter(filterFile -> filterFile.getDelete() != null && filterFile.getDelete())
-            .map(
-                filterFile ->
-                    fileDAO.deleteById(filterFile.getFileId(), isil, vertxContext).future())
+            .map(filterFile -> fileDAO.deleteById(filterFile.getFileId(), isil, vertxContext))
             .collect(Collectors.toList());
 
     Promise<FincSelectFilter> result = Promise.promise();
@@ -107,6 +101,6 @@ public class FilterHelper {
                 result.fail(ar.cause());
               }
             });
-    return result;
+    return result.future();
   }
 }

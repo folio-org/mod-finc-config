@@ -36,34 +36,41 @@ public class FincConfigTinyMetadataSourcesAPI implements FincConfigTinyMetadataS
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
 
-    metadataSourcesTinyDAO.getAll(vertxContext)
-      .future()
-      .setHandler(ar -> {
-        if (ar.succeeded()) {
-          asyncResultHandler.handle(
-            Future.succeededFuture(
-              GetFincConfigTinyMetadataSourcesResponse
-                .respond200WithApplicationJson(ar.result())));
-        } else {
-          Throwable cause = ar.cause();
-          if (cause instanceof IllegalStateException) {
-            asyncResultHandler.handle(
-              Future.succeededFuture(
-                GetFincConfigTinyMetadataSourcesResponse.respond400WithTextPlain(
-                  "CQL Illegal State Error for '" + "" + "': " + cause.getLocalizedMessage())));
-          } else if (cause.getClass().getSimpleName().contains("CQLParseException")) {
-              asyncResultHandler.handle(
-                Future.succeededFuture(
-                  GetFincConfigTinyMetadataSourcesResponse.respond400WithTextPlain(
-                    "CQL Parsing Error for '" + "" + "': " + cause.getLocalizedMessage())));
-            } else {
-            asyncResultHandler.handle(
-              io.vertx.core.Future.succeededFuture(
-                GetFincConfigTinyMetadataSourcesResponse.respond500WithTextPlain(
-                  messages.getMessage(lang, MessageConsts.InternalServerError))));
-          }
-        }
-      });
+    metadataSourcesTinyDAO
+        .getAll(vertxContext)
+        .setHandler(
+            ar -> {
+              if (ar.succeeded()) {
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        GetFincConfigTinyMetadataSourcesResponse.respond200WithApplicationJson(
+                            ar.result())));
+              } else {
+                Throwable cause = ar.cause();
+                if (cause instanceof IllegalStateException) {
+                  asyncResultHandler.handle(
+                      Future.succeededFuture(
+                          GetFincConfigTinyMetadataSourcesResponse.respond400WithTextPlain(
+                              "CQL Illegal State Error for '"
+                                  + ""
+                                  + "': "
+                                  + cause.getLocalizedMessage())));
+                } else if (cause.getClass().getSimpleName().contains("CQLParseException")) {
+                  asyncResultHandler.handle(
+                      Future.succeededFuture(
+                          GetFincConfigTinyMetadataSourcesResponse.respond400WithTextPlain(
+                              "CQL Parsing Error for '"
+                                  + ""
+                                  + "': "
+                                  + cause.getLocalizedMessage())));
+                } else {
+                  asyncResultHandler.handle(
+                      io.vertx.core.Future.succeededFuture(
+                          GetFincConfigTinyMetadataSourcesResponse.respond500WithTextPlain(
+                              messages.getMessage(lang, MessageConsts.InternalServerError))));
+                }
+              }
+            });
   }
 
   @Override
@@ -75,8 +82,6 @@ public class FincConfigTinyMetadataSourcesAPI implements FincConfigTinyMetadataS
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     vertxContext.runOnContext(
-        aVoid ->
-            asyncResultHandler.handle(
-                succeededFuture(Response.status(501).build())));
+        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
   }
 }

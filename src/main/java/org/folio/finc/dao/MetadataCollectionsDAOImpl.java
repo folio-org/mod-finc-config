@@ -1,6 +1,7 @@
 package org.folio.finc.dao;
 
 import io.vertx.core.Context;
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +20,7 @@ public class MetadataCollectionsDAOImpl implements MetadataCollectionsDAO {
   private static final String TABLE_NAME = "metadata_collections";
 
   @Override
-  public Promise<FincConfigMetadataCollections> getAll(
+  public Future<FincConfigMetadataCollections> getAll(
       String query, int offset, int limit, Context vertxContext) {
     Promise<FincConfigMetadataCollections> result = Promise.promise();
     String tenantId = Constants.MODULE_TENANT;
@@ -56,11 +57,11 @@ public class MetadataCollectionsDAOImpl implements MetadataCollectionsDAO {
               }
             });
 
-    return result;
+    return result.future();
   }
 
   @Override
-  public Promise<FincConfigMetadataCollection> getById(String id, Context vertxContext) {
+  public Future<FincConfigMetadataCollection> getById(String id, Context vertxContext) {
     Promise<FincConfigMetadataCollection> result = Promise.promise();
 
     String tenantId = Constants.MODULE_TENANT;
@@ -77,11 +78,11 @@ public class MetadataCollectionsDAOImpl implements MetadataCollectionsDAO {
                 result.fail("Cannot get metadata collection by id. " + reply.cause());
               }
             });
-    return result;
+    return result.future();
   }
 
   @Override
-  public Promise<FincConfigMetadataCollection> update(
+  public Future<FincConfigMetadataCollection> update(
       FincConfigMetadataCollection entity, String id, Context vertxContext) {
     Promise<FincConfigMetadataCollection> result = Promise.promise();
     String tenantId = Constants.MODULE_TENANT;
@@ -97,7 +98,7 @@ public class MetadataCollectionsDAOImpl implements MetadataCollectionsDAO {
                 result.fail("Cannot update metadata collection: " + ar.cause());
               }
             });
-    return result;
+    return result.future();
   }
 
   private CQLWrapper getCQL(String query, int limit, int offset) throws FieldException {

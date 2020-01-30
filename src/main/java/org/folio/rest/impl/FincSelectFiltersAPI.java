@@ -57,8 +57,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
 
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
-        .future()
-        .compose(isil -> filterDAO.getAll(query, offset, limit, isil, vertxContext).future())
+        .compose(isil -> filterDAO.getAll(query, offset, limit, isil, vertxContext))
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -100,8 +99,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
 
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
-        .future()
-        .compose(isil -> filterDAO.insert(entity.withIsil(isil), vertxContext).future())
+        .compose(isil -> filterDAO.insert(entity.withIsil(isil), vertxContext))
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -135,8 +133,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
-        .future()
-        .compose(isil -> filterDAO.getById(id, isil, vertxContext).future())
+        .compose(isil -> filterDAO.getById(id, isil, vertxContext))
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -177,13 +174,11 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
     Future<Integer> compose =
         isilDAO
             .getIsilForTenant(tenantId, vertxContext)
-            .future()
             .compose(
                 isil ->
                     filterHelper
                         .deleteFilesOfFilter(id, isil, vertxContext)
-                        .future()
-                        .compose(integer -> filterDAO.deleteById(id, isil, vertxContext).future()));
+                        .compose(integer -> filterDAO.deleteById(id, isil, vertxContext)));
 
     compose.setHandler(
         ar -> {
@@ -216,17 +211,13 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
 
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
-        .future()
         .compose(
             isil ->
                 filterHelper
                     .removeFilesToDelete(entity, isil, vertxContext)
-                    .future()
                     .compose(
                         fincSelectFilter ->
-                            filterDAO
-                                .update(fincSelectFilter.withIsil(isil), id, vertxContext)
-                                .future()))
+                            filterDAO.update(fincSelectFilter.withIsil(isil), id, vertxContext)))
         .setHandler(
             ar -> {
               if (ar.succeeded()) {

@@ -1,5 +1,6 @@
 package org.folio.finc.select;
 
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
@@ -33,8 +34,6 @@ public class SelectMetadataSourceVerticleTestHelper {
   static FincConfigMetadataCollection metadataCollection3;
   static Isil isil1;
   static Isil isil2;
-
-  private static Vertx vertx = Vertx.vertx();
 
   public static FincConfigMetadataSource getMetadataSource1() {
     return metadataSource1;
@@ -93,7 +92,7 @@ public class SelectMetadataSourceVerticleTestHelper {
     }
   }
 
-  public Promise<Void> writeDataToDB(TestContext context, Vertx vertx) {
+  public Future<Void> writeDataToDB(TestContext context, Vertx vertx) {
     Async async = context.async(3);
     Promise<Void> result = Promise.promise();
 
@@ -169,6 +168,6 @@ public class SelectMetadataSourceVerticleTestHelper {
             result.fail("Cannot load testdata");
           }
         });
-    return result;
+    return result.future();
   }
 }

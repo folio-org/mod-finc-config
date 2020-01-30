@@ -25,7 +25,7 @@ import org.folio.rest.tools.utils.TenantTool;
  */
 public class SelectMetadataCollectionsHelper {
   private final IsilDAO isilDAO;
-  private MetadataCollectionsDAO metadataCollectionsDAO;
+  private final MetadataCollectionsDAO metadataCollectionsDAO;
 
   public SelectMetadataCollectionsHelper(Vertx vertx, String tenantId) {
     PostgresClient.getInstance(vertx);
@@ -54,7 +54,7 @@ public class SelectMetadataCollectionsHelper {
     return metadataCollection.withSelectedBy(selectedBy);
   }
 
-  public Promise<Boolean> selectMetadataCollection(
+  public Future<Boolean> selectMetadataCollection(
       String mdCollectionId,
       Select selectEntity,
       Map<String, String> okapiHeaders,
@@ -65,12 +65,10 @@ public class SelectMetadataCollectionsHelper {
 
     Promise<Boolean> result = Promise.promise();
     doSelect(selectEntity, mdCollectionId, tenantId, vertxContext)
-        .future()
         .compose(
             metadataCollection ->
-                this.metadataCollectionsDAO
-                    .update(metadataCollection, mdCollectionId, vertxContext)
-                    .future())
+                this.metadataCollectionsDAO.update(
+                    metadataCollection, mdCollectionId, vertxContext))
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -79,14 +77,14 @@ public class SelectMetadataCollectionsHelper {
                 result.fail(ar.cause());
               }
             });
-    return result;
+    return result.future();
   }
 
-  private Promise<FincConfigMetadataCollection> doSelect(
+  private Future<FincConfigMetadataCollection> doSelect(
       Select selectEntity, String id, String tenantId, Context vertxContext) {
-    Future<String> isilFuture = isilDAO.getIsilForTenant(tenantId, vertxContext).future();
+    Future<String> isilFuture = isilDAO.getIsilForTenant(tenantId, vertxContext);
     Future<FincConfigMetadataCollection> metadataCollectionFuture =
-        metadataCollectionsDAO.getById(id, vertxContext).future();
+        metadataCollectionsDAO.getById(id, vertxContext);
 
     Promise<FincConfigMetadataCollection> result = Promise.promise();
     CompositeFuture.all(isilFuture, metadataCollectionFuture)
@@ -110,6 +108,6 @@ public class SelectMetadataCollectionsHelper {
                 result.fail("Cannot (un)select metadata collection. " + ar.cause());
               }
             });
-    return result;
+    return result.future();
   }
 }

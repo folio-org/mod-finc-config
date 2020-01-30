@@ -2,6 +2,7 @@ package org.folio.rest.utils.nameresolver;
 
 import io.vertx.core.Context;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -24,7 +25,7 @@ public class OrgaizationNameResolver {
 
   public static Future<String> resolveName(
       String organizationId, Map<String, String> okapiHeaders, Context vertxContext) {
-    Future<String> future = Future.future();
+    Promise<String> result = Promise.promise();
 
     if (organizationId == null) {
       return Future.succeededFuture();
@@ -48,19 +49,19 @@ public class OrgaizationNameResolver {
               JsonObject orgaJson = ar.result().bodyAsJsonObject();
               String orgaName = orgaJson.getString("name");
               logger.info("Found organization name " + orgaName + " for id " + organizationId);
-              future.complete(orgaName);
+              result.complete(orgaName);
             } else {
               logger.warn(
                   "Failure while looking for organization name for id "
                       + organizationId
                       + ". Will proceed without setting orga name.",
                   ar.cause());
-              future.complete();
+              result.complete();
             }
           } else {
-            future.fail(ar.cause());
+            result.fail(ar.cause());
           }
         });
-    return future;
+    return result.future();
   }
 }

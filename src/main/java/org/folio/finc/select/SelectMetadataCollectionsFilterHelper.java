@@ -22,7 +22,7 @@ import org.folio.rest.tools.utils.TenantTool;
 public class SelectMetadataCollectionsFilterHelper {
 
   private final IsilDAO isilDAO;
-  private MetadataCollectionsDAO metadataCollectionsDAO;
+  private final MetadataCollectionsDAO metadataCollectionsDAO;
 
   public SelectMetadataCollectionsFilterHelper(Vertx vertx) {
     PostgresClient.getInstance(vertx);
@@ -30,7 +30,7 @@ public class SelectMetadataCollectionsFilterHelper {
     this.metadataCollectionsDAO = new MetadataCollectionsDAOImpl();
   }
 
-  public Promise<Boolean> addFiltersToCollectionAndSave(
+  public Future<Boolean> addFiltersToCollectionAndSave(
       String mdCollectionId,
       FincSelectFiltersOfCollection filters,
       Map<String, String> okapiHeaders,
@@ -40,12 +40,10 @@ public class SelectMetadataCollectionsFilterHelper {
 
     Promise<Boolean> result = Promise.promise();
     updateFiltersOfCollection(filters, mdCollectionId, tenantId, vertxContext)
-        .future()
         .compose(
             metadataCollection ->
-                this.metadataCollectionsDAO
-                    .update(metadataCollection, mdCollectionId, vertxContext)
-                    .future())
+                this.metadataCollectionsDAO.update(
+                    metadataCollection, mdCollectionId, vertxContext))
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -54,17 +52,17 @@ public class SelectMetadataCollectionsFilterHelper {
                 result.fail(ar.cause());
               }
             });
-    return result;
+    return result.future();
   }
 
-  private Promise<FincConfigMetadataCollection> updateFiltersOfCollection(
+  private Future<FincConfigMetadataCollection> updateFiltersOfCollection(
       FincSelectFiltersOfCollection filters,
       String mdCollectionId,
       String tenantId,
       Context vertxContext) {
-    Future<String> isilFuture = isilDAO.getIsilForTenant(tenantId, vertxContext).future();
+    Future<String> isilFuture = isilDAO.getIsilForTenant(tenantId, vertxContext);
     Future<FincConfigMetadataCollection> metadataCollectionFuture =
-        metadataCollectionsDAO.getById(mdCollectionId, vertxContext).future();
+        metadataCollectionsDAO.getById(mdCollectionId, vertxContext);
 
     Promise<FincConfigMetadataCollection> result = Promise.promise();
     CompositeFuture.all(isilFuture, metadataCollectionFuture)
@@ -81,7 +79,7 @@ public class SelectMetadataCollectionsFilterHelper {
                 result.fail("Cannot update filters of metadata collection. " + ar.cause());
               }
             });
-    return result;
+    return result.future();
   }
 
   private FincConfigMetadataCollection replaceFilterOfTenant(

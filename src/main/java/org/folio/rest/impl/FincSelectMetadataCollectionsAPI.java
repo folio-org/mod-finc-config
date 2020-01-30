@@ -57,12 +57,8 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
 
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
-        .future()
         .compose(
-            isil ->
-                selectMetadataCollectionsDAO
-                    .getAll(query, offset, limit, isil, vertxContext)
-                    .future())
+            isil -> selectMetadataCollectionsDAO.getAll(query, offset, limit, isil, vertxContext))
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -102,8 +98,7 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
 
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
-        .future()
-        .compose(isil -> selectMetadataCollectionsDAO.getById(id, isil, vertxContext).future())
+        .compose(isil -> selectMetadataCollectionsDAO.getById(id, isil, vertxContext))
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -131,7 +126,6 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
       Context vertxContext) {
     selectMetadataCollectionsHelper
         .selectMetadataCollection(id, entity, okapiHeaders, vertxContext)
-        .future()
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -189,7 +183,6 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
       Context vertxContext) {
     selectMetadataCollectionsFilterHelper
         .addFiltersToCollectionAndSave(id, entity, okapiHeaders, vertxContext)
-        .future()
         .setHandler(
             ar -> {
               if (ar.succeeded()) {

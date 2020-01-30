@@ -10,7 +10,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.Isil;
+import org.folio.rest.persist.Criteria.Criteria;
+import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,23 +48,38 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
     return fetchIsil(tenantId)
         .compose(isil -> fetchPermittedCollections(mdSourceId, isil))
         .compose(metadataCollections -> doSelectAndSave(metadataCollections, tenantId))
-        .compose(compositeFuture -> updateSelectedBy(mdSourceId, tenantId));
+        .compose(compositeFuture -> updateSelectedBy(mdSourceId));
   }
 
   private Future<List<FincConfigMetadataCollection>> fetchPermittedCollections(
       String mdSourceId, String isil) {
 
-    Future<List<FincConfigMetadataCollection>> result = Future.future();
-    String where =
-        String.format(
-            " WHERE (jsonb->>'usageRestricted'='no' OR (jsonb->>'permittedFor')::jsonb ? '%s') AND jsonb->'mdSource'->>'id'='%s'",
-            isil, mdSourceId);
+    Promise<List<FincConfigMetadataCollection>> result = Promise.promise();
+    Criteria usageRestrictedCrit =
+        new Criteria().addField("'usageRestricted'").setJSONB(true).setOperation("=").setVal("no");
+    Criteria permittedForCrit =
+        new Criteria()
+            .addField("(jsonb->>'permittedFor')::jsonb")
+            .setJSONB(false)
+            .setOperation("?")
+            .setVal(isil);
+    Criteria mdSourceCrit =
+        new Criteria()
+            .addField("jsonb->'mdSource'->>'id'")
+            .setJSONB(false)
+            .setOperation("=")
+            .setVal(mdSourceId);
+    Criterion c =
+        new Criterion()
+            .addCriterion(usageRestrictedCrit, "OR", permittedForCrit)
+            .addCriterion(mdSourceCrit);
+    CQLWrapper cql = new CQLWrapper(c);
 
     PostgresClient.getInstance(context.owner(), Constants.MODULE_TENANT)
         .get(
             METADATA_COLLECTIONS_TABLE,
             FincConfigMetadataCollection.class,
-            where,
+            cql,
             false,
             false,
             ar -> {
@@ -72,7 +90,7 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
               }
             });
 
-    return result;
+    return result.future();
   }
 
   private Future<CompositeFuture> doSelectAndSave(
@@ -91,39 +109,41 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
       List<FincConfigMetadataCollection> metadataCollections, String isil);
 
   private Future<String> fetchIsil(String tenantId) {
-    Future<String> future = Future.future();
-    String where = String.format(" WHERE (jsonb->>'tenant' = '%s')", tenantId);
+    Promise<String> result = Promise.promise();
+    Criteria tenantCrit =
+        new Criteria().addField("'tenant'").setJSONB(true).setOperation("=").setVal(tenantId);
+    Criterion criterion = new Criterion(tenantCrit);
     PostgresClient.getInstance(context.owner(), Constants.MODULE_TENANT)
         .get(
             ISILS_TABLE,
             Isil.class,
-            where,
+            criterion,
             false,
             false,
             ar -> {
               if (ar.succeeded()) {
                 List<Isil> isils = ar.result().getResults();
                 if (isils.isEmpty()) {
-                  future.fail("Cannot find isil for tenant " + tenantId);
+                  result.fail("Cannot find isil for tenant " + tenantId);
                 } else if (isils.size() > 1) {
-                  future.fail("Found multiple isils for tenant " + tenantId);
+                  result.fail("Found multiple isils for tenant " + tenantId);
                 } else {
                   Isil isil = isils.get(0);
-                  future.complete(isil.getIsil());
+                  result.complete(isil.getIsil());
                 }
               } else {
-                future.fail("Cannot fetch isil: " + ar.cause());
+                result.fail("Cannot fetch isil: " + ar.cause());
               }
             });
-    return future;
+    return result.future();
   }
 
   private List<Future> saveCollections(List<FincConfigMetadataCollection> selected) {
     return selected.stream().map(this::saveSingleCollection).collect(Collectors.toList());
   }
 
-  private Future saveSingleCollection(FincConfigMetadataCollection metadataCollection) {
-    Future future = Future.future();
+  private Future<Void> saveSingleCollection(FincConfigMetadataCollection metadataCollection) {
+    Promise<Void> result = Promise.promise();
     PostgresClient.getInstance(context.owner(), Constants.MODULE_TENANT)
         .update(
             METADATA_COLLECTIONS_TABLE,
@@ -131,18 +151,18 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
             metadataCollection.getId(),
             ar -> {
               if (ar.succeeded()) {
-                future.complete();
+                result.complete();
               } else {
-                future.fail("Cannot save md collection: " + ar.cause());
+                result.fail("Cannot save md collection: " + ar.cause());
               }
             });
-    return future;
+    return result.future();
   }
 
-  public Future<Void> updateSelectedBy(String mdSourceId, String tenantId) {
+  public Future<Void> updateSelectedBy(String mdSourceId) {
     Promise<Void> result = Promise.promise();
     String query = String.format("SELECT * FROM update_selected_state('%s')", mdSourceId);
-    PostgresClient.getInstance(context.owner(), tenantId)
+    PostgresClient.getInstance(context.owner(), Constants.MODULE_TENANT)
         .select(
             query,
             ar -> {

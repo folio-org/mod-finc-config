@@ -1,6 +1,7 @@
 package org.folio.finc.dao;
 
 import io.vertx.core.Context;
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import java.util.List;
 import org.folio.finc.select.isil.filter.IsilFilter;
@@ -26,13 +27,12 @@ public class SelectMetadataSourcesDAOImpl implements SelectMetadataSourcesDAO {
   }
 
   @Override
-  public Promise<FincSelectMetadataSources> getAll(
+  public Future<FincSelectMetadataSources> getAll(
       String query, int offset, int limit, String isil, Context vertxContext) {
     Promise<FincSelectMetadataSources> result = Promise.promise();
     query = queryTranslator.translateQuery(query, isil);
     metadataSourcesDAO
         .getAll(query, offset, limit, vertxContext)
-        .future()
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -49,16 +49,15 @@ public class SelectMetadataSourcesDAOImpl implements SelectMetadataSourcesDAO {
                 result.fail(ar.cause());
               }
             });
-    return result;
+    return result.future();
   }
 
   @Override
-  public Promise<FincSelectMetadataSource> getById(String id, String isil, Context vertxContext) {
+  public Future<FincSelectMetadataSource> getById(String id, String isil, Context vertxContext) {
     Promise<FincSelectMetadataSource> result = Promise.promise();
 
     metadataSourcesDAO
         .getById(id, vertxContext)
-        .future()
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -75,6 +74,6 @@ public class SelectMetadataSourcesDAOImpl implements SelectMetadataSourcesDAO {
               }
             });
 
-    return result;
+    return result.future();
   }
 }
