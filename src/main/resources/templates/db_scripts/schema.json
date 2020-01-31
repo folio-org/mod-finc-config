@@ -14,28 +14,44 @@
   "tables": [
     {
       "tableName": "metadata_collections",
-      "fromModuleVersion": "1.0",
+      "fromModuleVersion": "mod-finc-config-1.4.0",
       "withMetadata": true,
-      "index": [
+      "fullTextIndex": [
+        {
+          "fieldName": "freeContent",
+          "tOps": "ADD"
+        },
         {
           "fieldName": "label",
-          "tOps": "ADD",
-          "caseSensitive": false,
-          "removeAccents": true
+          "tOps": "ADD"
+        },
+        {
+          "fieldName": "metadataAvailable",
+          "tOps": "ADD"
+        },
+        {
+          "fieldName": "mdSource",
+          "tOps": "ADD"
+        },
+        {
+          "fieldName": "permittedFor",
+          "tOps": "ADD"
         },
         {
           "fieldName": "selectedBy",
-          "tOps": "ADD",
-          "arraySubfield": "value",
-          "arrayModifiers": ["selected", "isil"]
+          "tOps": "ADD"
+        },
+        {
+          "fieldName": "usageRestricted",
+          "tOps": "ADD"
         }
       ]
     },
     {
       "tableName": "isils",
-      "fromModuleVersion": "1.0",
+      "fromModuleVersion": "mod-finc-config-1.4.0",
       "withMetadata": true,
-      "uniqueIndex": [
+      "fullTextIndex": [
         {
           "fieldName": "isil",
           "tOps": "ADD"
@@ -47,19 +63,49 @@
       "fromModuleVersion": "mod-finc-config-1.4.0",
       "customSnippetPath": "migration/metadata_sources.sql",
       "withMetadata": true,
-      "index": [
+      "fullTextIndex": [
         {
           "fieldName": "label",
+          "tOps": "ADD"
+        },
+        {
+          "fieldName": "selectedBy",
           "tOps": "ADD",
-          "caseSensitive": false,
-          "removeAccents": true
+          "arraySubfield": "isil",
+          "arrayModifiers": ["selected"]
+        },
+        {
+          "fieldName": "solrShard",
+          "tOps": "ADD"
+        },
+        {
+          "fieldName": "sourceId",
+          "tOps": "ADD"
+        },
+        {
+          "fieldName": "status",
+          "tOps": "ADD"
         }
       ]
     },
     {
       "tableName": "filters",
-      "fromModuleVersion": "0.2",
-      "withMetadata": true
+      "fromModuleVersion": "mod-finc-config-1.4.0",
+      "withMetadata": true,
+      "fullTextIndex": [
+        {
+          "fieldName": "label",
+          "tOps": "ADD"
+        },
+        {
+          "fieldName": "isil",
+          "tOps": "ADD"
+        },
+        {
+          "fieldName": "type",
+          "tOps": "ADD"
+        }
+      ]
     },
     {
       "tableName": "filter_files",
