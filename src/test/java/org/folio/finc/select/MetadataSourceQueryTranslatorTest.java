@@ -21,10 +21,7 @@ public class MetadataSourceQueryTranslatorTest {
   @Test
   public void translateSelectedAll() {
     String query = "sourceId=\"1*\" AND selected=\"all\"";
-    String expected =
-        "(sourceId=\"1*\") AND (selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"all\\\"*\")";
+    String expected = String.format("(sourceId=\"1*\") AND (selectedBy =/@selected=all %s)", ISIL);
     String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
@@ -32,10 +29,7 @@ public class MetadataSourceQueryTranslatorTest {
   @Test
   public void translateSelectedSome() {
     String query = "sourceId=\"1*\" AND selected=\"some\"";
-    String expected =
-        "(sourceId=\"1*\") AND (selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"some\\\"*\")";
+    String expected = String.format("(sourceId=\"1*\") AND (selectedBy =/@selected=some %s)", ISIL);
     String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
@@ -43,10 +37,7 @@ public class MetadataSourceQueryTranslatorTest {
   @Test
   public void translateSelectedNone() {
     String query = "sourceId=\"1*\" AND selected=\"none\"";
-    String expected =
-        "(sourceId=\"1*\") AND (selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"none\\\"*\")";
+    String expected = String.format("(sourceId=\"1*\") AND (selectedBy =/@selected=none %s)", ISIL);
     String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
@@ -55,9 +46,7 @@ public class MetadataSourceQueryTranslatorTest {
   public void translateSelectedAllWithSortBy() {
     String query = "sourceId=\"1*\" AND selected=\"all\" sortby label";
     String expected =
-        "(sourceId=\"1*\") AND (selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"all\\\"*\") sortby label";
+        String.format("(sourceId=\"1*\") AND (selectedBy =/@selected=all %s) sortby label", ISIL);
     String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
@@ -66,9 +55,7 @@ public class MetadataSourceQueryTranslatorTest {
   public void translateSelectedAllWithSortBy2() {
     String query = "(sourceId=\"1*\" AND selected=\"all\") sortby label";
     String expected =
-        "(sourceId=\"1*\") AND (selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"all\\\"*\") sortby label";
+        String.format("(sourceId=\"1*\") AND (selectedBy =/@selected=all %s) sortby label", ISIL);
     String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
@@ -77,9 +64,9 @@ public class MetadataSourceQueryTranslatorTest {
   public void translateSelectedAllWithStatus() {
     String query = "sourceId=\"1*\" AND selected=\"all\" AND status=(\"active\")";
     String expected =
-        "(sourceId=\"1*\") AND (status=(\"active\")) AND (selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"all\\\"*\")";
+        String.format(
+            "(sourceId=\"1*\") AND (status=(\"active\")) AND (selectedBy =/@selected=all %s)",
+            ISIL);
     String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
@@ -88,9 +75,9 @@ public class MetadataSourceQueryTranslatorTest {
   public void translateSelectedAllWithStatusAndSortBy() {
     String query = "sourceId=\"1*\" AND selected=\"all\" AND status=(\"active\") sortby label";
     String expected =
-        "(sourceId=\"1*\") AND (status=(\"active\")) AND (selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"all\\\"*\") sortby label";
+        String.format(
+            "(sourceId=\"1*\") AND (status=(\"active\")) AND (selectedBy =/@selected=all %s) sortby label",
+            ISIL);
     String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
@@ -99,11 +86,9 @@ public class MetadataSourceQueryTranslatorTest {
   public void translateSelectedSomeAndNone() {
     String query = "sourceId=\"1*\" AND selected=(\"none\" OR \"some\")";
     String expected =
-        "(sourceId=\"1*\") AND ((selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"none\\\"*\") OR (selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"some\\\"*\"))";
+        String.format(
+            "(sourceId=\"1*\") AND ((selectedBy =/@selected=none %s) OR (selectedBy =/@selected=some %s))",
+            ISIL, ISIL);
     String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
@@ -112,11 +97,9 @@ public class MetadataSourceQueryTranslatorTest {
   public void translateSelectedSomeAndNoneWithSortBy() {
     String query = "sourceId=\"1*\" AND selected=(\"none\" OR \"some\") sortby label";
     String expected =
-        "(sourceId=\"1*\") AND ((selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"none\\\"*\") OR (selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"some\\\"*\")) sortby label";
+        String.format(
+            "(sourceId=\"1*\") AND ((selectedBy =/@selected=none %s) OR (selectedBy =/@selected=some %s)) sortby label",
+            ISIL, ISIL);
     String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
@@ -125,13 +108,9 @@ public class MetadataSourceQueryTranslatorTest {
   public void translateSelectedAllAndSomeAndNone() {
     String query = "sourceId=\"1*\" AND selected=(\"none\" OR \"some\" OR \"all\")";
     String expected =
-        "(sourceId=\"1*\") AND ((selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"none\\\"*\") OR (selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"some\\\"*\") OR (selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"all\\\"*\"))";
+        String.format(
+            "(sourceId=\"1*\") AND ((selectedBy =/@selected=none %s) OR (selectedBy =/@selected=some %s) OR (selectedBy =/@selected=all %s))",
+            ISIL, ISIL, ISIL);
     String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
@@ -140,13 +119,9 @@ public class MetadataSourceQueryTranslatorTest {
   public void translateSelectedAllAndSomeAndNoneWithSortBy() {
     String query = "sourceId=\"1*\" AND selected=(\"none\" OR \"some\" OR \"all\") sortby label";
     String expected =
-        "(sourceId=\"1*\") AND ((selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"none\\\"*\") OR (selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"some\\\"*\") OR (selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"all\\\"*\")) sortby label";
+        String.format(
+            "(sourceId=\"1*\") AND ((selectedBy =/@selected=none %s) OR (selectedBy =/@selected=some %s) OR (selectedBy =/@selected=all %s)) sortby label",
+            ISIL, ISIL, ISIL);
     String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }
@@ -156,13 +131,9 @@ public class MetadataSourceQueryTranslatorTest {
     String query =
         "sourceId=\"1*\" AND selected=(\"none\" OR \"some\" OR \"all\") AND status=\"active\" sortby label";
     String expected =
-        "(sourceId=\"1*\") AND (status=\"active\") AND ((selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"none\\\"*\") OR (selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"some\\\"*\") OR (selectedBy == \"*\\\"isil\\\": \\\""
-            + ISIL
-            + "\\\", \\\"selected\\\": \\\"all\\\"*\")) sortby label";
+        String.format(
+            "(sourceId=\"1*\") AND (status=\"active\") AND ((selectedBy =/@selected=none %s) OR (selectedBy =/@selected=some %s) OR (selectedBy =/@selected=all %s)) sortby label",
+            ISIL, ISIL, ISIL);
     String result = cut.translateQuery(query, ISIL);
     assertEquals(expected, result);
   }

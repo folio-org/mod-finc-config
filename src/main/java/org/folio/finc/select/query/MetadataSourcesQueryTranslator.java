@@ -58,8 +58,6 @@ public class MetadataSourcesQueryTranslator extends QueryTranslator {
   }
 
   private String formatQuery(String isil, String selected) {
-    return String.format(
-        "selectedBy == \"*\\\"isil\\\": \\\"%s\\\", \\\"selected\\\": \\\"%s\\\"*\"",
-        isil, selected);
+    return String.format("selectedBy =/@selected=%s %s", selected, isil);
   }
 }
