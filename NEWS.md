@@ -1,3 +1,9 @@
+## 1.4.0
+* Finc-select metadata sources can be filtered by select status of collections (UIFC-42)
+* Bugfix: Return correct "totalRecords"
+* Add several database indexes
+* Remove duplicate maven-failsafe-plugin from pom.xml (UIFC-117)
+
 ## 1.3.0
 * Replace uniqueIndex for labels (UIFC-104)
 * Update to RMB 29 (UIFC-100)
