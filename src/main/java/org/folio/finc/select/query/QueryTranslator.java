@@ -62,11 +62,11 @@ public abstract class QueryTranslator {
   }
 
   private String selectedBy(String isil) {
-    return String.format("selectedBy any \"%s\"", isil);
+    return String.format("selectedBy =/respectCase/respectAccents \"%s\"", isil);
   }
 
   private String permittedFor(String isil) {
-    return String.format("permittedFor any \"%s\"", isil);
+    return String.format("permittedFor =/respectCase/respectAccents \"%s\"", isil);
   }
 
   private String addUsageRestrictedNoIfUsagePermitted(String query) {
