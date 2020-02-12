@@ -4,6 +4,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -11,10 +12,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
+import org.folio.cql2pgjson.CQL2PgJSON;
+import org.folio.cql2pgjson.exception.FieldException;
+import org.folio.finc.dao.MetadataSourcesDAO;
+import org.folio.finc.dao.MetadataSourcesDAOImpl;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollectionsGetOrder;
+import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
+import org.folio.rest.jaxrs.model.MdSource;
 import org.folio.rest.jaxrs.resource.FincConfigMetadataCollections;
 import org.folio.rest.persist.Criteria.Limit;
 import org.folio.rest.persist.Criteria.Offset;
@@ -24,8 +31,6 @@ import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
 import org.folio.rest.utils.Constants;
-import org.folio.cql2pgjson.CQL2PgJSON;
-import org.folio.cql2pgjson.exception.FieldException;
 
 /**
  * ATTENTION: API works tenant agnostic. Thus, don't use 'x-okapi-tenant' header, but {@value
@@ -37,8 +42,11 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
   private final Messages messages = Messages.getInstance();
   private final Logger logger = LoggerFactory.getLogger(FincConfigMetadataCollectionsAPI.class);
 
+  private MetadataSourcesDAO metadataSourcesDAO;
+
   public FincConfigMetadataCollectionsAPI(Vertx vertx, String tenantId) {
-    PostgresClient.getInstance(vertx);//.setIdField(ID_FIELD);
+    PostgresClient.getInstance(vertx); // .setIdField(ID_FIELD);
+    metadataSourcesDAO = new MetadataSourcesDAOImpl();
   }
 
   private CQLWrapper getCQL(String query, int limit, int offset) throws FieldException {
@@ -164,13 +172,26 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
       Context vertxContext) {
     logger.debug("Posting metadata collection");
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
-    PgUtil.post(
-        TABLE_NAME,
-        entity,
-        okapiHeaders,
-        vertxContext,
-        PostFincConfigMetadataCollectionsResponse.class,
-        asyncResultHandler);
+
+    this.addMdSourceNameTo(entity, vertxContext)
+        .setHandler(
+            ar -> {
+              if (ar.succeeded()) {
+                FincConfigMetadataCollection newEntity = ar.result();
+                PgUtil.post(
+                    TABLE_NAME,
+                    newEntity,
+                    okapiHeaders,
+                    vertxContext,
+                    PostFincConfigMetadataCollectionsResponse.class,
+                    asyncResultHandler);
+              } else {
+                asyncResultHandler.handle(
+                    io.vertx.core.Future.succeededFuture(
+                        PostFincConfigMetadataCollectionsResponse.respond500WithTextPlain(
+                            ar.cause())));
+              }
+            });
   }
 
   @Override
@@ -223,13 +244,54 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
       Context vertxContext) {
     logger.debug("Update metadata collection: " + id);
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
-    PgUtil.put(
-        TABLE_NAME,
-        entity,
-        id,
-        okapiHeaders,
-        vertxContext,
-        PutFincConfigMetadataCollectionsByIdResponse.class,
-        asyncResultHandler);
+
+    this.addMdSourceNameTo(entity, vertxContext)
+        .setHandler(
+            ar -> {
+              if (ar.succeeded()) {
+                FincConfigMetadataCollection newEntity = ar.result();
+                PgUtil.put(
+                    TABLE_NAME,
+                    newEntity,
+                    id,
+                    okapiHeaders,
+                    vertxContext,
+                    PutFincConfigMetadataCollectionsByIdResponse.class,
+                    asyncResultHandler);
+              } else {
+                asyncResultHandler.handle(
+                    io.vertx.core.Future.succeededFuture(
+                        PutFincConfigMetadataCollectionsByIdResponse.respond500WithTextPlain(
+                            ar.cause())));
+              }
+            });
+  }
+
+  private Future<FincConfigMetadataCollection> addMdSourceNameTo(
+      FincConfigMetadataCollection entity, Context context) {
+    Promise<FincConfigMetadataCollection> result = Promise.promise();
+    MdSource entitiesMDSource = entity.getMdSource();
+    if (entitiesMDSource == null) {
+      result.complete(entity);
+    } else {
+      metadataSourcesDAO
+          .getById(entitiesMDSource.getId(), context)
+          .setHandler(
+              ar -> {
+                if (ar.succeeded()) {
+                  FincConfigMetadataSource mdSource = ar.result();
+                  if (mdSource != null) {
+                    entitiesMDSource.setName(mdSource.getLabel());
+                    result.complete(entity.withMdSource(entitiesMDSource));
+                  } else {
+                    logger.info("No metadata source found for id " + entitiesMDSource.getId());
+                    result.complete(entity);
+                  }
+                } else {
+                  result.fail("Cannot resolve name of linked metadata source");
+                }
+              });
+    }
+    return result.future();
   }
 }

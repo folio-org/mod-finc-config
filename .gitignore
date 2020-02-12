@@ -133,3 +133,5 @@ local.properties
 /.classpath
 /.project
 /.vscode/settings.json
+/mod-finc-config.iml
+/release.properties

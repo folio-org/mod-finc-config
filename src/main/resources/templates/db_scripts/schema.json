@@ -9,6 +9,11 @@
       "run": "after",
       "snippetPath": "metadata_collections_trigger.sql",
       "fromModuleVersion": "mod-finc-config-1.4.0"
+    },
+    {
+      "run": "after",
+      "snippetPath": "metadata_sources_trigger.sql",
+      "fromModuleVersion": "mod-finc-config-1.5.0"
     }
   ],
   "tables": [
