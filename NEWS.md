@@ -1,3 +1,6 @@
+## 1.4.1
+* Finc-Select metada collection selected=yes not working properly (UIFC-129)
+
 ## 1.4.0
 * Finc-select metadata sources can be filtered by select status of collections (UIFC-42)
 * Bugfix: Return correct "totalRecords"
