@@ -31,17 +31,22 @@ public class FincSelectFiltersIT extends ApiTestBase {
   private Isil isilDiku;
   private FincSelectFilter filter1;
   private FincSelectFilter filter2;
+  private UUID collectionId1;
+  private UUID collectionId2;
 
   @Before
   public void init() {
     isilUBL = loadIsilUbl();
     isilDiku = loadIsilDiku();
+    collectionId1 = UUID.randomUUID();
+    collectionId2 = UUID.randomUUID();
 
     filter1 =
         new FincSelectFilter()
             .withLabel("Holdings 1")
             .withId(UUID.randomUUID().toString())
-            .withType(Type.WHITELIST);
+            .withType(Type.WHITELIST)
+            .withCollectionIds(Arrays.asList(collectionId1.toString(), collectionId2.toString()));
     filter2 =
         new FincSelectFilter()
             .withLabel("Holdings 2")
@@ -114,6 +119,9 @@ public class FincSelectFiltersIT extends ApiTestBase {
     Assert.assertNotNull(postedFilter.getId());
     Assert.assertEquals(filter1.getLabel(), postedFilter.getLabel());
     Assert.assertEquals(filter1.getType(), postedFilter.getType());
+    Assert.assertEquals(
+        Arrays.asList(collectionId1.toString(), collectionId2.toString()),
+        postedFilter.getCollectionIds());
 
     // GET filter
     given()
@@ -134,7 +142,8 @@ public class FincSelectFiltersIT extends ApiTestBase {
     FincSelectFilter changed =
         postedFilter
             .withLabel("CHANGED")
-            .withFilterFiles(Arrays.asList(firstFilterFile, secondFilterFileToDelete));
+            .withFilterFiles(Arrays.asList(firstFilterFile, secondFilterFileToDelete))
+            .withCollectionIds(Arrays.asList(collectionId1.toString()));
 
     given()
         .body(Json.encode(changed))
@@ -166,6 +175,8 @@ public class FincSelectFiltersIT extends ApiTestBase {
         .body("fincSelectFilters[0].id", equalTo(changed.getId()))
         .body("fincSelectFilters[0].label", equalTo(changed.getLabel()))
         .body("fincSelectFilters[0].filterFiles.size()", equalTo(1))
+        .body("fincSelectFilters[0].collectionIds.size()", equalTo(1))
+        .body("fincSelectFilters[0].collectionIds[0]", equalTo(collectionId1.toString()))
         .body("$", not(hasKey("isil")));
 
     // GET - Different tenant

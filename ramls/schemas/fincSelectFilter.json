@@ -28,6 +28,15 @@
         "$ref": "fincSelectFilterFile.json"
       }
     },
+    "collectionIds": {
+      "type": "array",
+      "id": "collectionIds",
+      "description": "List of ids of associated metadata collections",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+      }
+    },
     "isil": {
       "type": "string",
       "description": "Isil of library using this filter"
