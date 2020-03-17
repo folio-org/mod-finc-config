@@ -16,6 +16,7 @@ import org.folio.finc.ApiTestBase;
 import org.folio.rest.jaxrs.model.FilterFile;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.jaxrs.model.FincSelectFilter.Type;
+import org.folio.rest.jaxrs.model.FincSelectFilterToCollections;
 import org.folio.rest.jaxrs.model.Isil;
 import org.junit.After;
 import org.junit.Assert;
@@ -284,5 +285,77 @@ public class FincSelectFiltersIT extends ApiTestBase {
         .delete(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter2.getId())
         .then()
         .statusCode(204);
+  }
+
+  @Test
+  public void checkThatWeCanCreateFiltersToCollectionAssociation() {
+    filter1.setId(UUID.randomUUID().toString());
+    FincSelectFilterToCollections fincSelectFilterCollections =
+        new FincSelectFilterToCollections()
+            .withCollectionIds(
+                Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
+
+    // POST filter
+    given()
+        .body(Json.encode(filter1))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .post(FINC_SELECT_FILTERS_ENDPOINT)
+        .then()
+        .statusCode(201)
+        .body("id", equalTo(filter1.getId()))
+        .body("label", equalTo(filter1.getLabel()))
+        .body("type", equalTo(filter1.getType().value()));
+
+    // PUT filter_to_collection
+    given()
+        .body(Json.encode(fincSelectFilterCollections))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .put(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter1.getId() + "/collections")
+        .then()
+        .statusCode(200)
+        .body("collectionIds.size()", equalTo(2))
+        .body("collectionIds", equalTo(fincSelectFilterCollections.getCollectionIds()))
+        .body("collectionsCount", equalTo(fincSelectFilterCollections.getCollectionIds().size()));
+
+    // GEt filter_to_collection
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter1.getId() + "/collections")
+        .then()
+        .contentType(ContentType.JSON)
+        .statusCode(200)
+        .body("collectionIds.size()", equalTo(2))
+        .body("collectionIds", equalTo(fincSelectFilterCollections.getCollectionIds()))
+        .body("collectionsCount", equalTo(fincSelectFilterCollections.getCollectionIds().size()));
+
+    // DELETE filter
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter1.getId())
+        .then()
+        .statusCode(204);
+  }
+
+  @Test
+  public void checkThatWeCannotCreateFiltersToCollectionAssociationIfFilterNotPresent() {
+    FincSelectFilterToCollections fincSelectFilterCollections =
+        new FincSelectFilterToCollections()
+            .withCollectionIds(
+                Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
+    // PUT
+    given()
+        .body(Json.encode(fincSelectFilterCollections))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .put(FINC_SELECT_FILTERS_ENDPOINT + "/" + UUID.randomUUID().toString() + "/collections")
+        .then()
+        .statusCode(400);
   }
 }
