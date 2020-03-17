@@ -6,20 +6,17 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
 
 import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
 import io.vertx.core.json.Json;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.util.Arrays;
 import java.util.UUID;
 import org.folio.finc.ApiTestBase;
-import org.folio.rest.jaxrs.model.FilterFile;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.jaxrs.model.FincSelectFilter.Type;
 import org.folio.rest.jaxrs.model.FincSelectFilterToCollections;
 import org.folio.rest.jaxrs.model.Isil;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,8 +43,7 @@ public class FincSelectFiltersIT extends ApiTestBase {
         new FincSelectFilter()
             .withLabel("Holdings 1")
             .withId(UUID.randomUUID().toString())
-            .withType(Type.WHITELIST)
-            .withCollectionIds(Arrays.asList(collectionId1.toString(), collectionId2.toString()));
+          .withType(Type.WHITELIST);
     filter2 =
         new FincSelectFilter()
             .withLabel("Holdings 2")
@@ -59,152 +55,6 @@ public class FincSelectFiltersIT extends ApiTestBase {
   public void tearDown() {
     deleteIsil(isilDiku.getId());
     deleteIsil(isilUBL.getId());
-  }
-
-  @Test
-  public void checkThatWeCanAddGetPutAndDeleteFilters() {
-
-    // POST File 1
-    Response firstPostFileResp =
-        given()
-            .body("foobar".getBytes())
-            .header("X-Okapi-Tenant", TENANT_UBL)
-            .header("content-type", ContentType.BINARY)
-            .post(FINC_SELECT_FILES_ENDPOINT)
-            .then()
-            .statusCode(200)
-            .extract()
-            .response();
-
-    // POST File 2
-    Response secondPostFileResp =
-        given()
-            .body("foobar2".getBytes())
-            .header("X-Okapi-Tenant", TENANT_UBL)
-            .header("content-type", ContentType.BINARY)
-            .post(FINC_SELECT_FILES_ENDPOINT)
-            .then()
-            .statusCode(200)
-            .extract()
-            .response();
-
-    // Add posted files to filter's filterFiles
-    String firstFileId = firstPostFileResp.getBody().print();
-    String secondFileId = secondPostFileResp.getBody().print();
-    FilterFile firstFilterFile =
-        new FilterFile()
-            .withId(UUID.randomUUID().toString())
-            .withLabel("First FilterFile")
-            .withFileId(firstFileId);
-    FilterFile secondFilterFile =
-        new FilterFile()
-            .withId(UUID.randomUUID().toString())
-            .withLabel("Second FilterFile")
-            .withFileId(secondFileId);
-    filter1.setFilterFiles(Arrays.asList(firstFilterFile, secondFilterFile));
-
-    // POST filter
-    Response resp =
-        given()
-            .body(Json.encode(filter1))
-            .header("X-Okapi-Tenant", TENANT_UBL)
-            .header("content-type", ContentType.JSON)
-            .header("accept", ContentType.JSON)
-            .post(FINC_SELECT_FILTERS_ENDPOINT)
-            .then()
-            .statusCode(201)
-            .extract()
-            .response();
-
-    FincSelectFilter postedFilter = resp.getBody().as(FincSelectFilter.class);
-    Assert.assertNotNull(postedFilter.getId());
-    Assert.assertEquals(filter1.getLabel(), postedFilter.getLabel());
-    Assert.assertEquals(filter1.getType(), postedFilter.getType());
-    Assert.assertEquals(
-        Arrays.asList(collectionId1.toString(), collectionId2.toString()),
-        postedFilter.getCollectionIds());
-
-    // GET filter
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
-        .get(FINC_SELECT_FILTERS_ENDPOINT + "/" + postedFilter.getId())
-        .then()
-        .contentType(ContentType.JSON)
-        .statusCode(200)
-        .body("id", equalTo(postedFilter.getId()))
-        .body("label", equalTo(filter1.getLabel()))
-        .body("type", equalTo(filter1.getType().value()))
-        .body("$", not(hasKey("isil")));
-
-    // PUT filter and define second filter file to be deleted
-    FilterFile secondFilterFileToDelete = secondFilterFile.withDelete(true);
-    FincSelectFilter changed =
-        postedFilter
-            .withLabel("CHANGED")
-            .withFilterFiles(Arrays.asList(firstFilterFile, secondFilterFileToDelete))
-            .withCollectionIds(Arrays.asList(collectionId1.toString()));
-
-    given()
-        .body(Json.encode(changed))
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.TEXT)
-        .put(FINC_SELECT_FILTERS_ENDPOINT + "/" + postedFilter.getId())
-        .then()
-        .statusCode(204);
-
-    // GET: check that second file is deleted
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.BINARY)
-        .get("/finc-select/files/" + secondFileId)
-        .then()
-        .statusCode(404);
-
-    // GET changed filter
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
-        .get(FINC_SELECT_FILTERS_ENDPOINT)
-        .then()
-        .contentType(ContentType.JSON)
-        .statusCode(200)
-        .body("fincSelectFilters.size()", equalTo(1))
-        .body("fincSelectFilters[0].id", equalTo(changed.getId()))
-        .body("fincSelectFilters[0].label", equalTo(changed.getLabel()))
-        .body("fincSelectFilters[0].filterFiles.size()", equalTo(1))
-        .body("fincSelectFilters[0].collectionIds.size()", equalTo(1))
-        .body("fincSelectFilters[0].collectionIds[0]", equalTo(collectionId1.toString()))
-        .body("$", not(hasKey("isil")));
-
-    // GET - Different tenant
-    given()
-        .header("X-Okapi-Tenant", TENANT_DIKU)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
-        .get(FINC_SELECT_FILTERS_ENDPOINT)
-        .then()
-        .contentType(ContentType.JSON)
-        .statusCode(200)
-        .body("fincSelectFilters.size()", equalTo(0));
-
-    // DELETE filter
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .delete(FINC_SELECT_FILTERS_ENDPOINT + "/" + postedFilter.getId())
-        .then()
-        .statusCode(204);
-
-    // GET first file and check that it was deleted
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.BINARY)
-        .get("/finc-select/files/" + firstFileId)
-        .then()
-        .statusCode(404);
   }
 
   @Test

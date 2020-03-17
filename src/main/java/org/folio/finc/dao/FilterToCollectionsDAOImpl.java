@@ -40,7 +40,7 @@ public class FilterToCollectionsDAOImpl implements FilterToCollectionsDAO {
               if (reply.succeeded()) {
                 List<FincSelectFilterToCollections> filterToCollections =
                     reply.result().getResults();
-                if (filterToCollections.isEmpty()) {
+                if (!filterToCollections.isEmpty()) {
                   result.complete(filterToCollections.get(0));
                 } else {
                   result.complete();
