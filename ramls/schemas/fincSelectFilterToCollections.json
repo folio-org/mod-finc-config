@@ -19,7 +19,8 @@
       }
     },
     "collectionsCount": {
-      "type": "integer"
+      "type": "integer",
+      "description": "Number of collection ids."
     },
     "isil": {
       "type": "string",
