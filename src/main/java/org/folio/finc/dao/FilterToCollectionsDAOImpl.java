@@ -3,8 +3,6 @@ package org.folio.finc.dao;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.UpdateResult;
 import java.util.List;
 import org.folio.rest.jaxrs.model.FincSelectFilterToCollections;
@@ -98,5 +96,4 @@ public class FilterToCollectionsDAOImpl implements FilterToCollectionsDAO {
             });
     return result.future();
   }
-
 }

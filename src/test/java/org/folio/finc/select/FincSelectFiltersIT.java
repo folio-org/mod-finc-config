@@ -29,21 +29,17 @@ public class FincSelectFiltersIT extends ApiTestBase {
   private Isil isilDiku;
   private FincSelectFilter filter1;
   private FincSelectFilter filter2;
-  private UUID collectionId1;
-  private UUID collectionId2;
 
   @Before
   public void init() {
     isilUBL = loadIsilUbl();
     isilDiku = loadIsilDiku();
-    collectionId1 = UUID.randomUUID();
-    collectionId2 = UUID.randomUUID();
 
     filter1 =
         new FincSelectFilter()
             .withLabel("Holdings 1")
             .withId(UUID.randomUUID().toString())
-          .withType(Type.WHITELIST);
+            .withType(Type.WHITELIST);
     filter2 =
         new FincSelectFilter()
             .withLabel("Holdings 2")
@@ -122,6 +118,30 @@ public class FincSelectFiltersIT extends ApiTestBase {
         .then()
         .statusCode(404);
 
+    // PUT Filter
+    filter1.setLabel("Holdings 1 - CHANGED");
+    given()
+      .body(Json.encode(filter1))
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .header("content-type", ContentType.JSON)
+      .header("accept", ContentType.TEXT)
+      .put(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter1.getId())
+      .then()
+      .statusCode(204);
+
+    // GET
+    given()
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .header("content-type", ContentType.JSON)
+      .header("accept", ContentType.JSON)
+      .get(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter1.getId())
+      .then()
+      .contentType(ContentType.JSON)
+      .statusCode(200)
+      .body("id", equalTo(filter1.getId()))
+      .body("label", equalTo(filter1.getLabel()))
+      .body("$", not(hasKey("isil")));
+
     // DELETE
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
@@ -171,7 +191,7 @@ public class FincSelectFiltersIT extends ApiTestBase {
         .body("collectionIds", equalTo(fincSelectFilterCollections.getCollectionIds()))
         .body("collectionsCount", equalTo(fincSelectFilterCollections.getCollectionIds().size()));
 
-    // GEt filter_to_collection
+    // Get filter_to_collection
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
         .header("content-type", ContentType.JSON)
@@ -181,6 +201,24 @@ public class FincSelectFiltersIT extends ApiTestBase {
         .contentType(ContentType.JSON)
         .statusCode(200)
         .body("collectionIds.size()", equalTo(2))
+        .body("collectionIds", equalTo(fincSelectFilterCollections.getCollectionIds()))
+        .body("collectionsCount", equalTo(fincSelectFilterCollections.getCollectionIds().size()));
+
+    // PUT filter_to_collection in order to update
+    fincSelectFilterCollections.setCollectionIds(
+        Arrays.asList(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()));
+    given()
+        .body(Json.encode(fincSelectFilterCollections))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .put(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter1.getId() + "/collections")
+        .then()
+        .statusCode(200)
+        .body("collectionIds.size()", equalTo(3))
         .body("collectionIds", equalTo(fincSelectFilterCollections.getCollectionIds()))
         .body("collectionsCount", equalTo(fincSelectFilterCollections.getCollectionIds().size()));
 
