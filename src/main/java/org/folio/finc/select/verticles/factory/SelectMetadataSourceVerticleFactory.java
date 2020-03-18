@@ -13,7 +13,7 @@ public class SelectMetadataSourceVerticleFactory {
 
   public static AbstractSelectMetadataSourceVerticle create(
       Vertx vertx, Context context, Select select) {
-    Boolean doSelect = select.getSelect();
+    boolean doSelect = select.getSelect();
     if (doSelect) {
       return new SelectMetadataSourceVerticle(vertx, context);
     } else {
