@@ -1,3 +1,8 @@
+## 1.5.0
+* Filters contain IDs of associated metadata collections (UIFC-136)
+* Resolve and keep updated name of associated metadata source (UIFC-126)
+* Bugfix: Finc-Select metada collection selected=yes not working (UIFC-129)
+
 ## 1.4.0
 * Finc-select metadata sources can be filtered by select status of collections (UIFC-42)
 * Bugfix: Return correct "totalRecords"
