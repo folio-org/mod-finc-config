@@ -45,7 +45,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
   private MetadataSourcesDAO metadataSourcesDAO;
 
   public FincConfigMetadataCollectionsAPI(Vertx vertx, String tenantId) {
-    PostgresClient.getInstance(vertx); // .setIdField(ID_FIELD);
+    PostgresClient.getInstance(vertx);
     metadataSourcesDAO = new MetadataSourcesDAOImpl();
   }
 

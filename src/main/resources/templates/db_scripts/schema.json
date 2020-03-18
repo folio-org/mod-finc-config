@@ -77,7 +77,9 @@
           "fieldName": "selectedBy",
           "tOps": "ADD",
           "arraySubfield": "isil",
-          "arrayModifiers": ["selected"]
+          "arrayModifiers": [
+            "selected"
+          ]
         },
         {
           "fieldName": "solrShard",
@@ -111,6 +113,11 @@
           "tOps": "ADD"
         }
       ]
+    },
+    {
+      "tableName": "filter_to_collections",
+      "fromModuleVersion": "mod-finc-config-1.6.0-SNAPSHOT",
+      "withMetadata": true
     },
     {
       "tableName": "filter_files",

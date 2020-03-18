@@ -13,7 +13,6 @@ import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
-import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,13 +72,12 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
         new Criterion()
             .addCriterion(usageRestrictedCrit, "OR", permittedForCrit)
             .addCriterion(mdSourceCrit);
-    CQLWrapper cql = new CQLWrapper(c);
 
     PostgresClient.getInstance(context.owner(), Constants.MODULE_TENANT)
         .get(
             METADATA_COLLECTIONS_TABLE,
             FincConfigMetadataCollection.class,
-            cql,
+            c,
             false,
             false,
             ar -> {

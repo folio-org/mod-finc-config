@@ -8,12 +8,10 @@ import io.vertx.core.json.Json;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 import org.folio.finc.ApiTestBase;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection.UsageRestricted;
-import org.folio.rest.jaxrs.model.FincSelectFiltersOfCollection;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollection.Permitted;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollection.Selected;
 import org.folio.rest.jaxrs.model.Isil;
@@ -329,122 +327,6 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
   }
 
   @Test
-  public void checkThatWeCanAddAndRemoveFilters() {
-    List<String> filterIds = Arrays.asList("uuid-1234", "uuid-5678");
-    FincSelectFiltersOfCollection filtersOfCollection =
-        new FincSelectFiltersOfCollection().withFilters(filterIds);
-
-    List<String> filterIdsChanged = Arrays.asList("uuid-9876", "uuid-5432");
-    FincSelectFiltersOfCollection filtersOfCollectionChanged =
-        new FincSelectFiltersOfCollection().withFilters(filterIdsChanged);
-
-    // POST
-    given()
-        .body(Json.encode(metadataCollectionPermitted))
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
-        .post(FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT)
-        .then()
-        .statusCode(201)
-        .body("id", equalTo(metadataCollectionPermitted.getId()))
-        .body("label", equalTo(metadataCollectionPermitted.getLabel()))
-        .body("description", equalTo(metadataCollectionPermitted.getDescription()));
-
-    // GET
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
-        .get(FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT + "/" + metadataCollectionPermitted.getId())
-        .then()
-        .contentType(ContentType.JSON)
-        .statusCode(200)
-        .body("id", equalTo(metadataCollectionPermitted.getId()))
-        .body("label", equalTo(metadataCollectionPermitted.getLabel()))
-        .body("filters.size()", equalTo(0));
-
-    // Put filter
-    given()
-        .body(Json.encode(filtersOfCollection))
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.TEXT)
-        .put(
-            FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT
-                + "/"
-                + metadataCollectionPermitted.getId()
-                + "/filters")
-        .then()
-        .statusCode(204);
-
-    // GET
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
-        .get(FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT + "/" + metadataCollectionPermitted.getId())
-        .then()
-        .contentType(ContentType.JSON)
-        .statusCode(200)
-        .body("id", equalTo(metadataCollectionPermitted.getId()))
-        .body("label", equalTo(metadataCollectionPermitted.getLabel()))
-        .body("filters.size()", equalTo(2))
-        .body("filters[0]", equalTo(filterIds.get(0)))
-        .body("filters[1]", equalTo(filterIds.get(1)));
-
-    // GET with different tenant
-    given()
-        .header("X-Okapi-Tenant", TENANT_DIKU)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
-        .get(FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT + "/" + metadataCollectionPermitted.getId())
-        .then()
-        .contentType(ContentType.JSON)
-        .statusCode(200)
-        .body("id", equalTo(metadataCollectionPermitted.getId()))
-        .body("label", equalTo(metadataCollectionPermitted.getLabel()))
-        .body("filters.size()", equalTo(0));
-
-    // Put changed filter
-    given()
-        .body(Json.encode(filtersOfCollectionChanged))
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.TEXT)
-        .put(
-            FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT
-                + "/"
-                + metadataCollectionPermitted.getId()
-                + "/filters")
-        .then()
-        .statusCode(204);
-
-    // GET
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
-        .get(FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT + "/" + metadataCollectionPermitted.getId())
-        .then()
-        .contentType(ContentType.JSON)
-        .statusCode(200)
-        .body("id", equalTo(metadataCollectionPermitted.getId()))
-        .body("label", equalTo(metadataCollectionPermitted.getLabel()))
-        .body("filters.size()", equalTo(2))
-        .body("filters[0]", equalTo(filterIdsChanged.get(0)))
-        .body("filters[1]", equalTo(filterIdsChanged.get(1)));
-
-    // DELETE
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .delete(
-            FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT + "/" + metadataCollectionPermitted.getId())
-        .then()
-        .statusCode(204);
-  }
-
-  @Test
   public void checkThatWeCanFilterForMetadataCollections() {
     // POST
     given()
@@ -546,29 +428,6 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
                 + "/"
                 + metadataCollectionPermitted.getId()
                 + "/select")
-        .then()
-        .statusCode(501);
-
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
-        .get(
-            FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT
-                + "/"
-                + metadataCollectionPermitted.getId()
-                + "/filters")
-        .then()
-        .contentType(ContentType.JSON)
-        .statusCode(501);
-
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .delete(
-            FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT
-                + "/"
-                + metadataCollectionPermitted.getId()
-                + "/filters")
         .then()
         .statusCode(501);
   }

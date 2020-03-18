@@ -45,7 +45,7 @@ public class SelectMetadataCollectionsHelper {
     }
 
     List<String> selectedBy = metadataCollection.getSelectedBy();
-    Boolean doSelect = select.getSelect();
+    boolean doSelect = select.getSelect();
     if (doSelect && !selectedBy.contains(isil)) {
       selectedBy.add(isil);
     } else if (!doSelect) {

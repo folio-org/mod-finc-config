@@ -13,12 +13,15 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 import org.folio.finc.dao.FilterDAO;
 import org.folio.finc.dao.FilterDAOImpl;
+import org.folio.finc.dao.FilterToCollectionsDAO;
+import org.folio.finc.dao.FilterToCollectionsDAOImpl;
 import org.folio.finc.dao.IsilDAO;
 import org.folio.finc.dao.IsilDAOImpl;
 import org.folio.finc.select.FilterHelper;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
+import org.folio.rest.jaxrs.model.FincSelectFilterToCollections;
 import org.folio.rest.jaxrs.model.FincSelectFiltersGetOrder;
 import org.folio.rest.jaxrs.resource.FincSelectFilters;
 import org.folio.rest.tools.messages.MessageConsts;
@@ -29,6 +32,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
 
   private final IsilDAO isilDAO;
   private final FilterDAO filterDAO;
+  private final FilterToCollectionsDAO filterToCollectionsDAO;
   private final FilterHelper filterHelper;
   private final Messages messages = Messages.getInstance();
   private final Logger logger = LoggerFactory.getLogger(FincSelectFiltersAPI.class);
@@ -36,6 +40,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
   public FincSelectFiltersAPI(Vertx vertx, String tenantId) {
     this.isilDAO = new IsilDAOImpl();
     this.filterDAO = new FilterDAOImpl();
+    this.filterToCollectionsDAO = new FilterToCollectionsDAOImpl();
     this.filterHelper = new FilterHelper();
   }
 
@@ -230,6 +235,125 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
                     Future.succeededFuture(
                         PutFincSelectFiltersByIdResponse.respond500WithTextPlain(
                             messages.getMessage(lang, MessageConsts.InternalServerError))));
+              }
+            });
+  }
+
+  @Override
+  @Validate
+  public void getFincSelectFiltersCollectionsById(
+      String id,
+      Map<String, String> okapiHeaders,
+      Handler<AsyncResult<Response>> asyncResultHandler,
+      Context vertxContext) {
+    String tenantId =
+        TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
+
+    isilDAO
+        .getIsilForTenant(tenantId, vertxContext)
+        .compose(isil -> filterToCollectionsDAO.getById(id, isil, vertxContext))
+        .setHandler(
+            reply -> {
+              if (reply.succeeded()) {
+                FincSelectFilterToCollections filterToCollections = reply.result();
+                if (filterToCollections != null) {
+                  filterToCollections.setIsil(null);
+                  filterToCollections.setId(null);
+                  asyncResultHandler.handle(
+                      Future.succeededFuture(
+                          GetFincSelectFiltersCollectionsByIdResponse.respond200WithApplicationJson(
+                              filterToCollections)));
+                } else {
+                  asyncResultHandler.handle(
+                      Future.succeededFuture(
+                          GetFincSelectFiltersCollectionsByIdResponse.respond404WithTextPlain(
+                              "Not found")));
+                }
+              } else {
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        GetFincSelectFiltersCollectionsByIdResponse.respond500WithTextPlain(
+                            MessageConsts.InternalServerError)));
+              }
+            });
+  }
+
+  @Override
+  @Validate
+  public void putFincSelectFiltersCollectionsById(
+      String id,
+      FincSelectFilterToCollections entity,
+      Map<String, String> okapiHeaders,
+      Handler<AsyncResult<Response>> asyncResultHandler,
+      Context vertxContext) {
+    String tenantId =
+        TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
+
+    isilDAO
+        .getIsilForTenant(tenantId, vertxContext)
+        .compose(isil -> filterDAO.getById(id, isil, vertxContext))
+        .setHandler(
+            reply -> {
+              if (reply.succeeded()) {
+                if (reply.result() == null) {
+                  asyncResultHandler.handle(
+                      Future.succeededFuture(
+                          PutFincSelectFiltersCollectionsByIdResponse.respond400WithTextPlain(
+                              "Cannot find filter with id " + id)));
+                } else {
+                  saveFiltersToCollections(id, entity, tenantId, asyncResultHandler, vertxContext);
+                }
+              } else {
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        PutFincSelectFiltersCollectionsByIdResponse.respond500WithTextPlain(
+                            reply.cause())));
+              }
+            });
+  }
+
+  private void saveFiltersToCollections(
+      String id,
+      FincSelectFilterToCollections entity,
+      String tenantId,
+      Handler<AsyncResult<Response>> asyncResultHandler,
+      Context vertxContext) {
+    entity.setId(id);
+    entity.setCollectionsCount(entity.getCollectionIds().size());
+    isilDAO
+        .getIsilForTenant(tenantId, vertxContext)
+        .compose(
+            isil -> {
+              entity.setIsil(isil);
+              return filterToCollectionsDAO.getById(id, isil, vertxContext);
+            })
+        .compose(
+            fincSelectFilterCollections -> {
+              if (fincSelectFilterCollections == null) {
+                // do insert
+                return filterToCollectionsDAO.insert(entity, vertxContext);
+              } else {
+                // do update -> delete and insert
+                return filterToCollectionsDAO
+                    .deleteById(entity.getId(), vertxContext)
+                    .compose(integer -> filterToCollectionsDAO.insert(entity, vertxContext));
+              }
+            })
+        .setHandler(
+            reply -> {
+              if (reply.succeeded()) {
+                FincSelectFilterToCollections filterToCollections = reply.result();
+                filterToCollections.setId(null);
+                filterToCollections.setIsil(null);
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        PutFincSelectFiltersCollectionsByIdResponse.respond200WithApplicationJson(
+                            filterToCollections)));
+              } else {
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        PutFincSelectFiltersCollectionsByIdResponse.respond500WithTextPlain(
+                            reply.cause())));
               }
             });
   }

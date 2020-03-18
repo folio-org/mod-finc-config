@@ -21,11 +21,5 @@
   "solrMegaCollections": [
     "21st Century COE Program"
   ],
-  "selectedBy": [ "DE-15", "DE-14" ],
-  "filters": [
-    {
-    "isil": "DE-15",
-    "filters": [ "uuid-123", "uuid-789" ]
-    }
-   ]
+  "selectedBy": [ "DE-15", "DE-14" ]
 }

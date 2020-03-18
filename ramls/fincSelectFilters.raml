@@ -10,6 +10,7 @@ documentation:
 types:
   fincSelectFilter: !include schemas/fincSelectFilter.json
   fincSelectFilters: !include schemas/fincSelectFilters.json
+  fincSelectFilterToCollections: !include schemas/fincSelectFilterToCollections.json
   errors: !include ./raml-util/schemas/errors.schema
 
 traits:
@@ -52,4 +53,43 @@ resourceTypes:
       description: Delete a filter identified by id
     put:
       description: Put a filter identified by id
-
+    /collections:
+      get:
+        description: Get collections the current filter is assigned to
+        responses:
+          200:
+            description: The collection IDs of collection assigned to this filter
+            body:
+              application/json:
+                type: fincSelectFilterToCollections
+          404:
+            description: Not found
+            body:
+              text/plain:
+                example: Not found
+          500:
+            description: Internal server error
+            body:
+              text/plain:
+                example: "Internal server error"
+      put:
+        description: Add collections to this filter
+        body:
+          application/json:
+            type: fincSelectFilterToCollections
+        responses:
+          200:
+            description: The added collections
+            body:
+              application/json:
+                type: fincSelectFilterToCollections
+          400:
+            description: Bad request
+            body:
+              text/plain:
+                example: Bad request
+          500:
+            description: Internal server error
+            body:
+              text/plain:
+                example: Internal server error

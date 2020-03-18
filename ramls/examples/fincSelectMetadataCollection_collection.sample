@@ -21,8 +21,7 @@
       "solrMegaCollections": [
         "21st Century COE Program"
       ],
-      "selected": "yes",
-      "filters": []
+      "selected": "yes"
     }
   ],
   "totalRecords": 1

@@ -19,6 +19,5 @@
   "solrMegaCollections": [
     "21st Century COE Program"
   ],
-  "selected": "yes",
-  "filters": [ "uuid-123", "uuid-789" ]
+  "selected": "yes"
 }

@@ -132,15 +132,6 @@
         "type": "string"
       }
     },
-    "filters": {
-      "type": "array",
-      "description": "Filters associated to this metadata collection",
-      "minItems": 0,
-      "items": {
-        "type": "object",
-        "$ref": "fincConfigFiltersOfCollection.json"
-      }
-    },
     "generalNotes": {
       "type": "string",
       "description": "Some notes"

@@ -1,9 +1,7 @@
 package org.folio.finc.select.isil.filter;
 
-import io.vertx.core.json.Json;
+import io.vertx.core.json.jackson.DatabindCodec;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.folio.rest.jaxrs.model.Filter;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection.UsageRestricted;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollection;
@@ -30,20 +28,11 @@ public class MetadataCollectionIsilFilter
     }
     entry.setPermittedFor(null);
 
-    List<Filter> filters = entry.getFilters();
-    List<String> filterIds =
-        filters.stream()
-            .filter(f -> f.getIsil().equals(isil))
-            .map(Filter::getFilters)
-            .flatMap(List::stream)
-            .collect(Collectors.toList());
-    entry.setFilters(null);
-
     FincSelectMetadataCollection result =
-        Json.mapper.convertValue(entry, FincSelectMetadataCollection.class);
+        DatabindCodec.mapper().convertValue(entry, FincSelectMetadataCollection.class);
+
     result.setSelected(selected);
     result.setPermitted(permitted);
-    result.setFilters(filterIds);
     return result;
   }
 }
