@@ -287,6 +287,24 @@
           "permissionsRequired": [
             "finc-select.filters.item.post"
           ]
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-select/filters/{id}/collections",
+          "permissionsRequired": [
+            "finc-select.filters.item.get"
+          ]
+        },
+        {
+          "methods": [
+            "PUT"
+          ],
+          "pathPattern": "/finc-select/filters/{id}/collections",
+          "permissionsRequired": [
+            "finc-select.filters.item.put"
+          ]
         }
       ]
     },
