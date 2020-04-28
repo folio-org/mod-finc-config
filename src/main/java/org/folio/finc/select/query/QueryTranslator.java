@@ -24,7 +24,7 @@ public abstract class QueryTranslator {
 
     String permitted = "";
     String selected = "";
-    String q = "";
+    StringBuilder sb = new StringBuilder();
     String[] ands = query.split("[aA][nN][dD]");
     for (String s : ands) {
       if (s.contains(PERMITTED)) {
@@ -33,11 +33,11 @@ public abstract class QueryTranslator {
         selected = processSelectedQuery(s, isil);
       } else {
         String tmp = processRemainingQuery(s);
-        q += calculateAppendable(q, tmp);
+        sb.append(calculateAppendable(sb.toString(), tmp));
       }
     }
 
-    String result = balanceBrackets(q);
+    String result = balanceBrackets(sb.toString());
     result += calculateAppendable(result, selected);
     result += calculateAppendable(result, permitted);
     result += sortBy;
@@ -45,12 +45,12 @@ public abstract class QueryTranslator {
   }
 
   private String processSelectedQuery(String query, String isil) {
-    return doTranslate(query, SELECTED, isil, this::selectedBy, UnaryOperator.identity());
+    return doTranslate(query, SELECTED, isil, this::selectedBy);
   }
 
   private String processPermittedQuery(String query, String isil) {
     return doTranslate(
-        query, PERMITTED, isil, this::permittedFor, this::addUsageRestrictedNoIfUsagePermitted);
+        query, PERMITTED, isil, this::permittedFor);
   }
 
   private String processRemainingQuery(String query) {
@@ -69,9 +69,16 @@ public abstract class QueryTranslator {
     return String.format("permittedFor =/respectCase/respectAccents \"%s\"", isil);
   }
 
-  private String addUsageRestrictedNoIfUsagePermitted(String query) {
+  protected String addUsageRestrictedNoIfUsagePermitted(String query) {
     if (query.contains("permittedFor")) {
       return query + " OR usageRestricted=\"no\"";
+    }
+    return query;
+  }
+
+  protected String addUsageRestrictedYesIfUsagePermitted(String query) {
+    if (query.contains("permittedFor")) {
+      return query + " AND usageRestricted=\"yes\"";
     }
     return query;
   }
@@ -100,7 +107,7 @@ public abstract class QueryTranslator {
 
   public String[] splitSortBy(String query) {
     if (query == null) {
-      return new String[] {"", ""};
+      return new String[]{"", ""};
     }
     int sortbyIndex = query.toLowerCase().indexOf("sortby");
     String sortBy = "";
@@ -108,7 +115,7 @@ public abstract class QueryTranslator {
       sortBy = " " + query.substring(sortbyIndex);
       query = query.substring(0, sortbyIndex);
     }
-    return new String[] {query, sortBy};
+    return new String[]{query, sortBy};
   }
 
   private String balanceBrackets(String query) {
@@ -146,6 +153,5 @@ public abstract class QueryTranslator {
       String query,
       String key,
       String isil,
-      UnaryOperator<String> replaceQueryFunc,
-      UnaryOperator<String> postProcessQueryFunc);
+      UnaryOperator<String> replaceQueryFunc);
 }

@@ -11,8 +11,7 @@ public class MetadataSourcesQueryTranslator extends QueryTranslator {
       String query,
       String key,
       String isil,
-      UnaryOperator<String> replaceQueryFunc,
-      UnaryOperator<String> postProcessQueryFunc) {
+      UnaryOperator<String> replaceQueryFunc) {
 
     query = prepareQuery(query);
 
