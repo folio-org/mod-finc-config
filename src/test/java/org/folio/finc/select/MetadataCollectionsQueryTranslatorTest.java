@@ -24,7 +24,8 @@ public class MetadataCollectionsQueryTranslatorTest {
   public void translatePermittedFalse() {
     String query = "mdSource.id=\"uuid-1234\" AND permitted=no";
     String expected =
-        "(mdSource.id=\"uuid-1234\") AND (cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \"" + isil + "\")";
+        "(mdSource.id=\"uuid-1234\") AND (cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \""
+            + isil + "\" AND usageRestricted=\"yes\")";
     String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
@@ -46,7 +47,8 @@ public class MetadataCollectionsQueryTranslatorTest {
   public void translatePermittedFalseWithoutSource() {
     String query = "permitted=no";
     String expected =
-        "(cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \"" + isil + "\")";
+        "(cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \"" + isil
+            + "\" AND usageRestricted=\"yes\")";
     String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
@@ -110,7 +112,7 @@ public class MetadataCollectionsQueryTranslatorTest {
     String query = "mdSource.id=\"uuid-1234\" AND selected=no AND permitted=no";
     String expected =
         String.format(
-            "(mdSource.id=\"uuid-1234\") AND (cql.allRecords=1 NOT selectedBy =/respectCase/respectAccents \"%s\") AND (cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \"%s\")",
+            "(mdSource.id=\"uuid-1234\") AND (cql.allRecords=1 NOT selectedBy =/respectCase/respectAccents \"%s\") AND (cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \"%s\" AND usageRestricted=\"yes\")",
             isil, isil);
     String result = cut.translateQuery(query, isil);
     assertNotNull(result);
@@ -134,7 +136,7 @@ public class MetadataCollectionsQueryTranslatorTest {
     String query = "selected=no AND permitted=no";
     String expected =
         String.format(
-            "(cql.allRecords=1 NOT selectedBy =/respectCase/respectAccents \"%s\") AND (cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \"%s\")",
+            "(cql.allRecords=1 NOT selectedBy =/respectCase/respectAccents \"%s\") AND (cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \"%s\" AND usageRestricted=\"yes\")",
             isil, isil);
     String result = cut.translateQuery(query, isil);
     assertNotNull(result);
@@ -199,7 +201,7 @@ public class MetadataCollectionsQueryTranslatorTest {
             + isil
             + "\" OR usageRestricted=\"no\") OR (cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \""
             + isil
-            + "\"))";
+            + "\" AND usageRestricted=\"yes\"))";
     String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
@@ -211,7 +213,7 @@ public class MetadataCollectionsQueryTranslatorTest {
     String expected =
         "((cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \""
             + isil
-            + "\") OR (permittedFor =/respectCase/respectAccents \""
+            + "\" AND usageRestricted=\"yes\") OR (permittedFor =/respectCase/respectAccents \""
             + isil
             + "\" OR usageRestricted=\"no\"))";
     String result = cut.translateQuery(query, isil);
@@ -230,7 +232,7 @@ public class MetadataCollectionsQueryTranslatorTest {
             + "\")) AND "
             + "((cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \""
             + isil
-            + "\") OR (permittedFor =/respectCase/respectAccents \""
+            + "\" AND usageRestricted=\"yes\") OR (permittedFor =/respectCase/respectAccents \""
             + isil
             + "\" OR usageRestricted=\"no\"))";
 
@@ -252,7 +254,7 @@ public class MetadataCollectionsQueryTranslatorTest {
             + "\")) AND "
             + "((cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \""
             + isil
-            + "\") OR (permittedFor =/respectCase/respectAccents \""
+            + "\" AND usageRestricted=\"yes\") OR (permittedFor =/respectCase/respectAccents \""
             + isil
             + "\" OR usageRestricted=\"no\"))";
     String result = cut.translateQuery(query, isil);
@@ -273,7 +275,7 @@ public class MetadataCollectionsQueryTranslatorTest {
             + "\")) AND "
             + "((cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \""
             + isil
-            + "\") OR (permittedFor =/respectCase/respectAccents \""
+            + "\" AND usageRestricted=\"yes\") OR (permittedFor =/respectCase/respectAccents \""
             + isil
             + "\" OR usageRestricted=\"no\"))";
     String result = cut.translateQuery(query, isil);
@@ -292,7 +294,7 @@ public class MetadataCollectionsQueryTranslatorTest {
             + isil
             + "\" OR usageRestricted=\"no\") OR (cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \""
             + isil
-            + "\"))";
+            + "\" AND usageRestricted=\"yes\"))";
 
     String result = cut.translateQuery(query, isil);
     assertNotNull(result);
@@ -305,7 +307,7 @@ public class MetadataCollectionsQueryTranslatorTest {
     String expected =
         "(cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \""
             + isil
-            + "\") sortby label/sort.descending";
+            + "\" AND usageRestricted=\"yes\") sortby label/sort.descending";
     String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
@@ -316,7 +318,7 @@ public class MetadataCollectionsQueryTranslatorTest {
     String query =
         "(selected=\"no\" and permitted=\"no\" and freeContent=(\"yes\" or \"undetermined\"))";
     String expected =
-        "(freeContent=(\"yes\" or \"undetermined\")) AND (cql.allRecords=1 NOT selectedBy =/respectCase/respectAccents \"ISIL-01\") AND (cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \"ISIL-01\")";
+        "(freeContent=(\"yes\" or \"undetermined\")) AND (cql.allRecords=1 NOT selectedBy =/respectCase/respectAccents \"ISIL-01\") AND (cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \"ISIL-01\" AND usageRestricted=\"yes\")";
     String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
@@ -327,7 +329,7 @@ public class MetadataCollectionsQueryTranslatorTest {
     String query =
         "(freeContent=(\"yes\" or \"undetermined\") and selected=\"no\" and permitted=\"no\")";
     String expected =
-        "(freeContent=(\"yes\" or \"undetermined\")) AND (cql.allRecords=1 NOT selectedBy =/respectCase/respectAccents \"ISIL-01\") AND (cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \"ISIL-01\")";
+        "(freeContent=(\"yes\" or \"undetermined\")) AND (cql.allRecords=1 NOT selectedBy =/respectCase/respectAccents \"ISIL-01\") AND (cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \"ISIL-01\" AND usageRestricted=\"yes\")";
     String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);
@@ -338,7 +340,7 @@ public class MetadataCollectionsQueryTranslatorTest {
     String query =
         "(selected=\"no\" and freeContent=(\"yes\" or \"undetermined\") and permitted=\"no\")";
     String expected =
-        "(freeContent=(\"yes\" or \"undetermined\")) AND (cql.allRecords=1 NOT selectedBy =/respectCase/respectAccents \"ISIL-01\") AND (cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \"ISIL-01\")";
+        "(freeContent=(\"yes\" or \"undetermined\")) AND (cql.allRecords=1 NOT selectedBy =/respectCase/respectAccents \"ISIL-01\") AND (cql.allRecords=1 NOT permittedFor =/respectCase/respectAccents \"ISIL-01\" AND usageRestricted=\"yes\")";
     String result = cut.translateQuery(query, isil);
     assertNotNull(result);
     assertEquals(expected, result);

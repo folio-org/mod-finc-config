@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 public class MetadataCollectionsQueryTranslator extends QueryTranslator {
 
   private static final String YES = "yes";
+  private static final String NO = "no";
   private static final String CQL_ALL_RECORDS_1_NOT = "cql.allRecords=1 NOT";
 
   @Override
@@ -20,8 +21,7 @@ public class MetadataCollectionsQueryTranslator extends QueryTranslator {
       String query,
       String key,
       String isil,
-      UnaryOperator<String> replaceQueryFunc,
-      UnaryOperator<String> postProcessQueryFunc) {
+      UnaryOperator<String> replaceQueryFunc) {
 
     query = prepareQuery(query);
 
@@ -43,8 +43,11 @@ public class MetadataCollectionsQueryTranslator extends QueryTranslator {
       String replacedQuery = replaceQueryFunc.apply(isil);
 
       if (YES.equals(firstYesNo)) {
-        String q = postProcessQueryFunc.apply(replacedQuery);
+        String q = super.addUsageRestrictedNoIfUsagePermitted(replacedQuery);
         query = query.replace(group, q);
+      } else if (NO.equals(firstYesNo)) {
+        String q = super.addUsageRestrictedYesIfUsagePermitted(replacedQuery);
+        query = query.replace(group, CQL_ALL_RECORDS_1_NOT + " " + q);
       } else { // selectedValue is false
         query = query.replace(group, CQL_ALL_RECORDS_1_NOT + " " + replacedQuery);
       }
@@ -52,10 +55,11 @@ public class MetadataCollectionsQueryTranslator extends QueryTranslator {
       if (multiValAndOr != null) {
         query = "(" + query + ")" + " " + multiValAndOr.toUpperCase();
         if (YES.equals(secondYesNo)) {
-          String q = postProcessQueryFunc.apply(replacedQuery);
+          String q = super.addUsageRestrictedNoIfUsagePermitted(replacedQuery);
           query = query + " (" + q + ")";
         } else {
-          query = query + " (" + CQL_ALL_RECORDS_1_NOT + " " + replacedQuery + ")";
+          String q = super.addUsageRestrictedYesIfUsagePermitted(replacedQuery);
+          query = query + " (" + CQL_ALL_RECORDS_1_NOT + " " + q + ")";
         }
       }
     }
