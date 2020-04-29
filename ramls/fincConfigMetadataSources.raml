@@ -35,8 +35,8 @@ resourceTypes:
       schemaItem: fincConfigMetadataSource
   get:
     is: [
-      searchable: {description: "", example: "active=true sortBy username"},
-      orderable: {fieldsList: "field A, field B"},
+      searchable: {description: "", example: "((label=\"Journals*\" or sourceId=\"Journals*\") and status=(\"active\" or \"technical implementation\")) sortby label"},
+      orderable: {fieldsList: "label, sourceId, status, solrShard, lastProcessed"},
       pageable
     ]
     description: Get all metadata sources
@@ -49,7 +49,7 @@ resourceTypes:
         exampleItem: !include examples/fincConfigMetadataSource.sample
         schema: fincConfigMetadataSource
     get:
-      description: Get one metadatasource identified by id
+      description: Get one metadata source identified by id
     delete:
       description: Delete an metadata source identified by id
     put:

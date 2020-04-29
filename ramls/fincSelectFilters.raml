@@ -34,8 +34,8 @@ resourceTypes:
       schemaItem: fincSelectFilter
   get:
     is: [
-      searchable: {description: "", example: "active=true sortBy username"},
-      orderable: {fieldsList: "field A, field B"},
+      searchable: {description: "", example: "((label=\"test*\") and type=\"Blacklist\") sortby label"},
+      orderable: {fieldsList: "label, type"},
       pageable
     ]
     description: Get all filters

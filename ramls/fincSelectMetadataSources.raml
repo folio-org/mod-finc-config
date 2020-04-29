@@ -36,8 +36,8 @@ resourceTypes:
       schemaItem: fincSelectMetadataSource
   get:
     is: [
-      searchable: {description: "", example: "active=true sortBy username"},
-      orderable: {fieldsList: "field A, field B"},
+      searchable: {description: "", example: "((label=\"Journals*\") and status=(\"active\" or \"technical implementation\") and selected=\"none\") sortby label"},
+      orderable: {fieldsList: "label, sourceId, status, lastProcessed"},
       pageable
     ]
     description: Get all metadata sources
@@ -47,7 +47,7 @@ resourceTypes:
         exampleItem: !include examples/fincSelectMetadataSource.sample
         schema: fincSelectMetadataSource
     get:
-      description: Get one metadatasource identified by id
+      description: Get one metadata source identified by id
     /collections:
       get:
         description: Get metadata collections assigned to this metadata source

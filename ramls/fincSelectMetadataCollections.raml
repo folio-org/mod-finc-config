@@ -36,8 +36,8 @@ resourceTypes:
       schemaCollection: fincSelectMetadataCollections
   get:
     is: [
-      searchable: {description: "", example: "active=true sortBy username"},
-      orderable: {fieldsList: "field A, field B"},
+      searchable: {description: "", example: "((label=\"Science*\") and permitted=\"yes\" and selected=\"no\") sortby label"},
+      orderable: {fieldsList: "label, mdSource, permitted, filters, freeContent"},
       pageable
     ]
     description: Get all metadata collections
