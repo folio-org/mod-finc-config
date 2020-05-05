@@ -19,12 +19,13 @@
       "type": "string",
       "description" : "Current status of metadata source",
       "enum": [
-        "wish",
-        "negotiation",
-        "technical implementation",
         "active",
-        "deactivated",
-        "terminated"
+        "terminated",
+        "impossible",
+        "negotiation",
+        "wish",
+        "trial",
+        "technical implementation"
       ]
     },
     "organization": {
@@ -106,10 +107,11 @@
       "type": "string",
       "description": "Used solr shard",
       "enum": [
-        "UBL main",
+        "SLUB DBoD",
+        "SLUB dswarm",
         "UBL ai",
-        "SLUB main",
-        "SLUB DBoD"
+        "UBL DNB",
+        "UBL main"
       ]
     },
     "deliveryMethods": {
