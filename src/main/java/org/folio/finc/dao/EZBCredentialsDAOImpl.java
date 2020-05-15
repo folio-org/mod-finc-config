@@ -84,7 +84,7 @@ public class EZBCredentialsDAOImpl implements EZBCredentialsDAO {
           if (ar.succeeded()) {
             Credential credential = ar.result();
             if (credential != null) {
-              result.fail("Cannot insert credential. Isil must be unique.");
+              result.fail(new EZBCredentialsException("Isil must be unique."));
             } else {
               PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
                   .save(TABLE_NAME, entity, reply -> {
@@ -130,5 +130,12 @@ public class EZBCredentialsDAOImpl implements EZBCredentialsDAO {
     return new CQLWrapper(cql2PgJSON, query)
         .setLimit(new Limit(limit))
         .setOffset(new Offset(offset));
+  }
+
+  public static class EZBCredentialsException extends RuntimeException {
+
+    public EZBCredentialsException(String message) {
+      super(message);
+    }
   }
 }

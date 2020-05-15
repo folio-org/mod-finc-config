@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 import org.folio.finc.dao.EZBCredentialsDAO;
 import org.folio.finc.dao.EZBCredentialsDAOImpl;
+import org.folio.finc.dao.EZBCredentialsDAOImpl.EZBCredentialsException;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.Credential;
@@ -61,8 +62,14 @@ public class FincConfigEZBCredentialsAPI implements FincConfigEzbCredentials {
                 .respond201WithApplicationJson(entity,
                     PostFincConfigEzbCredentialsResponse.headersFor201())));
           } else {
-            asyncResultHandler.handle(Future.succeededFuture(
-                PostFincConfigEzbCredentialsResponse.respond500WithTextPlain(ar.cause())));
+            if (ar.cause() instanceof EZBCredentialsException) {
+              asyncResultHandler.handle(Future.succeededFuture(
+                  PostFincConfigEzbCredentialsResponse
+                      .respond400WithTextPlain(ar.cause().getLocalizedMessage())));
+            } else {
+              asyncResultHandler.handle(Future.succeededFuture(
+                  PostFincConfigEzbCredentialsResponse.respond500WithTextPlain(ar.cause())));
+            }
           }
         });
   }
@@ -77,9 +84,15 @@ public class FincConfigEZBCredentialsAPI implements FincConfigEzbCredentials {
         .setHandler(ar -> {
           if (ar.succeeded()) {
             Credential cred = ar.result();
-            asyncResultHandler.handle(Future.succeededFuture(
-                GetFincConfigEzbCredentialsByIsilResponse
-                    .respond200WithApplicationJson(cred.withId(null))));
+            if (cred == null) {
+              asyncResultHandler.handle(Future.succeededFuture(
+                  GetFincConfigEzbCredentialsByIsilResponse
+                      .respond404WithTextPlain("Not found.")));
+            } else {
+              asyncResultHandler.handle(Future.succeededFuture(
+                  GetFincConfigEzbCredentialsByIsilResponse
+                      .respond200WithApplicationJson(cred.withId(null))));
+            }
           } else {
             asyncResultHandler.handle(Future.succeededFuture(
                 GetFincConfigEzbCredentialsByIsilResponse.respond500WithTextPlain(ar.cause())));

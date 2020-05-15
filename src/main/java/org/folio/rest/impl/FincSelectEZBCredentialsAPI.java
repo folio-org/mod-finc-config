@@ -7,6 +7,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import java.util.Map;
 import javax.ws.rs.core.Response;
+import org.folio.finc.dao.EZBCredentialsDAOImpl.EZBCredentialsException;
 import org.folio.finc.dao.IsilDAO;
 import org.folio.finc.dao.IsilDAOImpl;
 import org.folio.finc.dao.SelectEZBCredentialsDAO;
@@ -65,7 +66,8 @@ public class FincSelectEZBCredentialsAPI implements FincSelectEzbCredentials {
     isilDAO.getIsilForTenant(tenantId, vertxContext)
         .compose(isil -> {
               if (!isil.equals(entity.getIsil())) {
-                return Future.failedFuture("Wrong isil specified for tenant.");
+                return Future.failedFuture(new EZBCredentialsException(
+                    "Wrong isil specified for tenant."));
               } else {
                 return selectEZBCredentialsDAO
                     .upsert(entity.withIsil(isil), vertxContext);
@@ -78,9 +80,14 @@ public class FincSelectEZBCredentialsAPI implements FincSelectEzbCredentials {
             asyncResultHandler.handle(Future.succeededFuture(
                 PutFincSelectEzbCredentialsResponse.respond200WithApplicationJson(cred)));
           } else {
-            asyncResultHandler.handle(Future.succeededFuture(
-                PutFincSelectEzbCredentialsResponse
-                    .respond500WithTextPlain(ar.cause().getLocalizedMessage())));
+            if (ar.cause() instanceof EZBCredentialsException) {
+              asyncResultHandler.handle(Future.succeededFuture(PutFincSelectEzbCredentialsResponse
+                  .respond400WithTextPlain(ar.cause().getLocalizedMessage())));
+            } else {
+              asyncResultHandler.handle(Future.succeededFuture(
+                  PutFincSelectEzbCredentialsResponse
+                      .respond500WithTextPlain(ar.cause().getLocalizedMessage())));
+            }
           }
         });
   }

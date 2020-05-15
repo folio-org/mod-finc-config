@@ -25,6 +25,8 @@ public class ApiTestBase {
   protected static final String FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT = "/finc-config/metadata-collections";
   protected static final String FINC_CONFIG_METADATA_SOURCES_ENDPOINT = "/finc-config/metadata-sources";
   protected static final String FINC_CONFIG_TINY_METADATA_SOURCES_ENDPOINT = "/finc-config/tiny-metadata-sources";
+  protected static final String FINC_CONFIG_EZB_CREDENTIALS_ENDPOINT = "/finc-config/ezb-credentials";
+  protected static final String FINC_SELECT_EZB_CREDENTIALS_ENDPOINT = "/finc-select/ezb-credentials";
 
   private static boolean runningOnOwn;
 

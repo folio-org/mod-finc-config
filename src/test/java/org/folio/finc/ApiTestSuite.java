@@ -14,12 +14,14 @@ import java.util.concurrent.TimeoutException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.folio.finc.config.ConfigEZBCredentialsIT;
 import org.folio.finc.config.ConfigMetadataCollectionsIT;
 import org.folio.finc.config.ConfigMetadataSourcesIT;
 import org.folio.finc.config.TinyMetadataSourcesIT;
 import org.folio.finc.select.FincSelectFilesIT;
 import org.folio.finc.select.FincSelectFiltersIT;
 import org.folio.finc.select.IsilsIT;
+import org.folio.finc.select.SelectEZBCredentialsIT;
 import org.folio.finc.select.SelectMetadataCollectionsIT;
 import org.folio.finc.select.SelectMetadataSourcesIT;
 import org.folio.rest.RestVerticle;
@@ -35,14 +37,16 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-  ConfigMetadataCollectionsIT.class,
-  ConfigMetadataSourcesIT.class,
-  FincSelectFilesIT.class,
-  FincSelectFiltersIT.class,
-  IsilsIT.class,
-  SelectMetadataCollectionsIT.class,
-  SelectMetadataSourcesIT.class,
-  TinyMetadataSourcesIT.class
+    ConfigMetadataCollectionsIT.class,
+    ConfigMetadataSourcesIT.class,
+    FincSelectFilesIT.class,
+    FincSelectFiltersIT.class,
+    IsilsIT.class,
+    SelectMetadataCollectionsIT.class,
+    SelectMetadataSourcesIT.class,
+    TinyMetadataSourcesIT.class,
+    ConfigEZBCredentialsIT.class,
+    SelectEZBCredentialsIT.class
 })
 public class ApiTestSuite {
 
@@ -52,13 +56,17 @@ public class ApiTestSuite {
   private static Vertx vertx;
   private static boolean initialised = false;
 
+  static {
+    vertx = Vertx.vertx();
+  }
+
   @BeforeClass
   public static void before()
       throws IOException, InterruptedException, ExecutionException, TimeoutException {
-
+/*
     if (vertx == null) {
       vertx = Vertx.vertx();
-    }
+    }*/
 
     PostgresClient.setIsEmbedded(true);
     PostgresClient.setEmbeddedPort(NetworkUtils.nextFreePort());
