@@ -1,5 +1,5 @@
 {
-  "metadataCollections": [
+  "fincConfigMetadataCollections": [
     {
       "id": "6dd325f8-b1d5-4568-a0d7-aecf6b8d6123",
       "label": "21st Century COE Program",
@@ -23,7 +23,8 @@
       "facetLabel": "012.1 21st Century COE",
       "solrMegaCollections": [
         "21st Century COE Program"
-      ]
+      ],
+      "selectedBy": [ "DE-15", "DE-14" ]
     },
     {
       "id": "9a2427cd-4110-4bd9-b6f9-e3475631bbac",
@@ -47,7 +48,8 @@
       "facetLabel": "093.8 21st Century Political Science",
       "solrMegaCollections": [
         "21st Century Political Science"
-      ]
+      ],
+      "selectedBy": [ "DE-14" ]
     }
   ],
   "totalRecords": 2
