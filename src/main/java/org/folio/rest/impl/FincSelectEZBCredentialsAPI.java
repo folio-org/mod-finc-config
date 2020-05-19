@@ -4,7 +4,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import org.folio.finc.dao.EZBCredentialsDAOImpl.EZBCredentialsException;
@@ -24,7 +23,7 @@ public class FincSelectEZBCredentialsAPI implements FincSelectEzbCredentials {
   private final IsilDAO isilDAO;
   private final SelectEZBCredentialsDAO selectEZBCredentialsDAO;
 
-  public FincSelectEZBCredentialsAPI(Vertx vertx, String tenantId) {
+  public FincSelectEZBCredentialsAPI() {
     this.isilDAO = new IsilDAOImpl();
     this.selectEZBCredentialsDAO = new SelectEZBCredentialsDAOImpl();
   }
