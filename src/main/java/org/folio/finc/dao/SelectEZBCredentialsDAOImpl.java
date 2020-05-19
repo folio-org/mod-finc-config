@@ -16,22 +16,7 @@ public class SelectEZBCredentialsDAOImpl implements SelectEZBCredentialsDAO {
 
   @Override
   public Future<Credential> getByIsil(String isil, Context ctx) {
-    Promise<Credential> result = Promise.promise();
-    String query = String.format("isil=%s", isil);
-    ezbCredentialsDAO.getAll(query, 0, 1, ctx)
-        .setHandler(ar -> {
-          if (ar.succeeded()) {
-            if (ar.result().getTotalRecords() == 0) {
-              result.complete();
-              return;
-            }
-            Credential cred = ar.result().getCredentials().get(0);
-            result.complete(cred);
-          } else {
-            result.fail(ar.cause());
-          }
-        });
-    return result.future();
+    return ezbCredentialsDAO.getByIsil(isil, ctx);
   }
 
   @Override
