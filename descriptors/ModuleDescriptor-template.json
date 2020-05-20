@@ -165,6 +165,54 @@
       ]
     },
     {
+      "id": "finc-config/filters",
+      "version": "1.0",
+      "handlers": [
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-config/filters",
+          "permissionsRequired": [
+            "finc-config.filters.collection.get"
+          ]
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-config/filters/{id}",
+          "permissionsRequired": [
+            "finc-config.filters.item.get"
+          ]
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-config/filters/{id}/collections",
+          "permissionsRequired": [
+            "finc-config.filters.item.get"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "finc-config/files",
+      "version": "1.0",
+      "handlers": [
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-config/files/{id}",
+          "permissionsRequired": [
+            "finc-config.files.item.get"
+          ]
+        }
+      ]
+    },
+    {
       "id": "finc-select/metadata-collections",
       "version": "1.0",
       "handlers": [
@@ -476,6 +524,21 @@
       "description": "Finc config: Delete an isil"
     },
     {
+      "permissionName": "finc-config.filters.collection.get",
+      "displayName": "finc config filters collection get",
+      "description": "Finc config: Get collection of filters"
+    },
+    {
+      "permissionName": "finc-config.filters.item.get",
+      "displayName": "finc config filters item get",
+      "description": "Finc config: Get a single filter"
+    },
+    {
+      "permissionName": "finc-config.files.item.get",
+      "displayName": "finc config files item get",
+      "description": "Finc config: Get a single file"
+    },
+    {
       "permissionName": "finc-select.metadata-collections.collection.get",
       "displayName": "finc select metadata collections collection get",
       "description": "Finc select: Get a collection of metadata collections"
@@ -589,7 +652,10 @@
         "finc-config.isils.item.get",
         "finc-config.isils.item.post",
         "finc-config.isils.item.put",
-        "finc-config.isils.item.delete"
+        "finc-config.isils.item.delete",
+        "finc-config.filters.collection.get",
+        "finc-config.filters.item.get",
+        "finc-config.files.item.get"
       ],
       "visible": true
     },
