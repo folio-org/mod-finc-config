@@ -14,6 +14,8 @@ import java.util.concurrent.TimeoutException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.folio.finc.config.ConfigFilesIT;
+import org.folio.finc.config.ConfigFiltersIT;
 import org.folio.finc.config.ConfigMetadataCollectionsIT;
 import org.folio.finc.config.ConfigMetadataSourcesIT;
 import org.folio.finc.config.TinyMetadataSourcesIT;
@@ -35,14 +37,16 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-  ConfigMetadataCollectionsIT.class,
-  ConfigMetadataSourcesIT.class,
-  FincSelectFilesIT.class,
-  FincSelectFiltersIT.class,
-  IsilsIT.class,
-  SelectMetadataCollectionsIT.class,
-  SelectMetadataSourcesIT.class,
-  TinyMetadataSourcesIT.class
+    ConfigMetadataCollectionsIT.class,
+    ConfigMetadataSourcesIT.class,
+    ConfigFiltersIT.class,
+    ConfigFilesIT.class,
+    FincSelectFilesIT.class,
+    FincSelectFiltersIT.class,
+    IsilsIT.class,
+    SelectMetadataCollectionsIT.class,
+    SelectMetadataSourcesIT.class,
+    TinyMetadataSourcesIT.class
 })
 public class ApiTestSuite {
 

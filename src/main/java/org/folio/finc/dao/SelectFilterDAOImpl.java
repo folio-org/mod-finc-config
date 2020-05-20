@@ -6,7 +6,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.UpdateResult;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.folio.cql2pgjson.CQL2PgJSON;
@@ -23,16 +23,16 @@ import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.utils.Constants;
 
-public class FilterDAOImpl implements FilterDAO {
+public class SelectFilterDAOImpl implements SelectFilterDAO {
 
   private static final String ID_FIELD = "id";
   private static final String TABLE_NAME = "filters";
 
-  private final Logger logger = LoggerFactory.getLogger(FilterDAOImpl.class);
+  private final Logger logger = LoggerFactory.getLogger(SelectFilterDAOImpl.class);
 
   private final QueryTranslator queryTranslator;
 
-  public FilterDAOImpl() {
+  public SelectFilterDAOImpl() {
     queryTranslator = new MetadataCollectionsQueryTranslator();
   }
 
@@ -183,10 +183,8 @@ public class FilterDAOImpl implements FilterDAO {
 
   private CQLWrapper getCQL(String query, int limit, int offset, String isil)
       throws FieldException {
-    CQL2PgJSON cql2PgJSON = new CQL2PgJSON(Arrays.asList(TABLE_NAME + ".jsonb"));
-
+    CQL2PgJSON cql2PgJSON = new CQL2PgJSON(Collections.singletonList(TABLE_NAME + ".jsonb"));
     query = addIsilTo(query, isil);
-
     return new CQLWrapper(cql2PgJSON, query)
         .setLimit(new Limit(limit))
         .setOffset(new Offset(offset));
