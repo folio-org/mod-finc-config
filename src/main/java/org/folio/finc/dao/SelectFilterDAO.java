@@ -5,7 +5,7 @@ import io.vertx.core.Future;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.jaxrs.model.FincSelectFilters;
 
-public interface FilterDAO {
+public interface SelectFilterDAO {
 
   Future<FincSelectFilters> getAll(
       String query, int offset, int limit, String isil, Context vertxContext);

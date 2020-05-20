@@ -4,19 +4,18 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
-import org.folio.finc.dao.FilterDAO;
-import org.folio.finc.dao.FilterDAOImpl;
 import org.folio.finc.dao.FilterToCollectionsDAO;
 import org.folio.finc.dao.FilterToCollectionsDAOImpl;
 import org.folio.finc.dao.IsilDAO;
 import org.folio.finc.dao.IsilDAOImpl;
+import org.folio.finc.dao.SelectFilterDAO;
+import org.folio.finc.dao.SelectFilterDAOImpl;
 import org.folio.finc.select.FilterHelper;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.annotations.Validate;
@@ -31,15 +30,15 @@ import org.folio.rest.tools.utils.TenantTool;
 public class FincSelectFiltersAPI implements FincSelectFilters {
 
   private final IsilDAO isilDAO;
-  private final FilterDAO filterDAO;
+  private final SelectFilterDAO selectFilterDAO;
   private final FilterToCollectionsDAO filterToCollectionsDAO;
   private final FilterHelper filterHelper;
   private final Messages messages = Messages.getInstance();
   private final Logger logger = LoggerFactory.getLogger(FincSelectFiltersAPI.class);
 
-  public FincSelectFiltersAPI(Vertx vertx, String tenantId) {
+  public FincSelectFiltersAPI() {
     this.isilDAO = new IsilDAOImpl();
-    this.filterDAO = new FilterDAOImpl();
+    this.selectFilterDAO = new SelectFilterDAOImpl();
     this.filterToCollectionsDAO = new FilterToCollectionsDAOImpl();
     this.filterHelper = new FilterHelper();
   }
@@ -62,7 +61,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
 
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
-        .compose(isil -> filterDAO.getAll(query, offset, limit, isil, vertxContext))
+        .compose(isil -> selectFilterDAO.getAll(query, offset, limit, isil, vertxContext))
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -104,7 +103,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
 
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
-        .compose(isil -> filterDAO.insert(entity.withIsil(isil), vertxContext))
+        .compose(isil -> selectFilterDAO.insert(entity.withIsil(isil), vertxContext))
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -138,7 +137,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
-        .compose(isil -> filterDAO.getById(id, isil, vertxContext))
+        .compose(isil -> selectFilterDAO.getById(id, isil, vertxContext))
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -183,7 +182,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
                 isil ->
                     filterHelper
                         .deleteFilesOfFilter(id, isil, vertxContext)
-                        .compose(integer -> filterDAO.deleteById(id, isil, vertxContext)));
+                        .compose(integer -> selectFilterDAO.deleteById(id, isil, vertxContext)));
 
     compose.setHandler(
         ar -> {
@@ -222,7 +221,8 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
                     .removeFilesToDelete(entity, isil, vertxContext)
                     .compose(
                         fincSelectFilter ->
-                            filterDAO.update(fincSelectFilter.withIsil(isil), id, vertxContext)))
+                            selectFilterDAO
+                                .update(fincSelectFilter.withIsil(isil), id, vertxContext)))
         .setHandler(
             ar -> {
               if (ar.succeeded()) {
@@ -291,7 +291,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
 
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
-        .compose(isil -> filterDAO.getById(id, isil, vertxContext))
+        .compose(isil -> selectFilterDAO.getById(id, isil, vertxContext))
         .setHandler(
             reply -> {
               if (reply.succeeded()) {

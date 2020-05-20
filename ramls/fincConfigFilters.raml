@@ -1,0 +1,74 @@
+#%RAML 1.0
+title: Filters for Finc Config
+version: v1
+baseUri: http://localhost/mod-finc-config
+
+documentation:
+  - title: mod-finc-config API
+    content: This documents the API calls that can be made to query filters of metadata collections
+
+types:
+  fincSelectFilter: !include schemas/fincSelectFilter.json
+  fincSelectFilters: !include schemas/fincSelectFilters.json
+  fincSelectFilterToCollections: !include schemas/fincSelectFilterToCollections.json
+  errors: !include ./raml-util/schemas/errors.schema
+
+traits:
+  orderable: !include ./raml-util/traits/orderable.raml
+  pageable: !include ./raml-util/traits/pageable.raml
+  searchable: !include ./raml-util/traits/searchable.raml
+  language: !include ./raml-util/traits/language.raml
+  validate: !include ./raml-util/traits/validation.raml
+
+resourceTypes:
+  collection: !include ./raml-util/rtypes/collection.raml
+  collection-item: !include ./raml-util/rtypes/item-collection.raml
+
+/finc-config/filters:
+  displayName: Finc config filters
+  type:
+    collection:
+      exampleCollection: !include examples/fincSelectFilter_collection.sample
+      exampleItem: !include examples/fincSelectFilter1.sample
+      schemaCollection: fincSelectFilters
+      schemaItem: fincSelectFilter
+  get:
+    is: [
+      searchable: {description: "", example: "((label=\"test*\") and type=\"Blacklist\") sortby label"},
+      orderable: {fieldsList: "label, type"},
+      pageable
+    ]
+    description: Get all filters
+  post:
+    description: Not implemented.
+  /{id}:
+    type:
+      collection-item:
+        exampleItem: !include examples/fincSelectFilter1.sample
+        schema: fincSelectFilter
+    get:
+      description: Get one finc select filter identified by id
+    put:
+      description: Not implemented.
+    delete:
+      description: Not implemented.
+    /collections:
+      get:
+        description: Get collections the current filter is assigned to
+        responses:
+          200:
+            description: The collection IDs of collection assigned to this filter
+            body:
+              application/json:
+                type: fincSelectFilterToCollections
+                example: !include examples/fincSelectFilterToMetadataCollections.sample
+          404:
+            description: Not found
+            body:
+              text/plain:
+                example: Not found
+          500:
+            description: Internal server error
+            body:
+              text/plain:
+                example: "Internal server error"
