@@ -7,8 +7,6 @@ import org.folio.rest.persist.Criteria.Criterion;
 
 public interface FileDAO {
 
-  String TABLE_NAME = "files";
-
   Future<File> getById(String id, Context vertxContext);
 
   Future<File> getByCriterion(Criterion criterion, Context vertxContext);

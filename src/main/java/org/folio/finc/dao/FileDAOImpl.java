@@ -12,6 +12,8 @@ import org.folio.rest.utils.Constants;
 
 public class FileDAOImpl implements FileDAO {
 
+  private static final String TABLE_NAME = "files";
+
   @Override
   public Future<File> getById(String id, Context vertxContext) {
     Criteria idCrit =
