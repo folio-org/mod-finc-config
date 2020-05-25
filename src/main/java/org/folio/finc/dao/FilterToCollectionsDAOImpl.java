@@ -3,7 +3,8 @@ package org.folio.finc.dao;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-import io.vertx.ext.sql.UpdateResult;
+import io.vertx.sqlclient.Row;
+import io.vertx.sqlclient.RowSet;
 import java.util.List;
 import org.folio.rest.jaxrs.model.FincSelectFilterToCollections;
 import org.folio.rest.persist.Criteria.Criteria;
@@ -87,8 +88,8 @@ public class FilterToCollectionsDAOImpl implements FilterToCollectionsDAO {
             criterion,
             reply -> {
               if (reply.succeeded()) {
-                UpdateResult updateResult = reply.result();
-                result.complete(updateResult.getUpdated());
+                RowSet<Row> rowSet = reply.result();
+                result.complete(rowSet.rowCount());
               } else {
                 result.fail(
                     "Error while deleting finc select filter to collections. " + reply.cause());

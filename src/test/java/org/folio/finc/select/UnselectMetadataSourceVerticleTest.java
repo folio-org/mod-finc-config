@@ -19,7 +19,6 @@ import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
-import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
 import org.junit.AfterClass;
@@ -33,15 +32,15 @@ import org.junit.runner.RunWith;
 public class UnselectMetadataSourceVerticleTest {
 
   private static final String TENANT_UBL = "ubl";
-  private static Vertx vertx;
+  private static Vertx vertx = Vertx.vertx();
   private static UnselectMetadataSourceVerticle cut;
-  @Rule public Timeout timeout = Timeout.seconds(10);
+  @Rule
+  public Timeout timeout = Timeout.seconds(10);
+  private static SelectMetadataSourceVerticleTestHelper selectMetadataSourceVerticleTestHelper;
 
   @BeforeClass
   public static void setUp(TestContext context) {
-    SelectMetadataSourceVerticleTestHelper selectMetadataSourceVerticleTestHelper =
-        new SelectMetadataSourceVerticleTestHelper();
-    selectMetadataSourceVerticleTestHelper.readData(context);
+    selectMetadataSourceVerticleTestHelper = new SelectMetadataSourceVerticleTestHelper();
     vertx = Vertx.vertx();
     try {
       PostgresClient.setIsEmbedded(true);
@@ -74,17 +73,20 @@ public class UnselectMetadataSourceVerticleTest {
           try {
             tenantClientFinc.postTenant(
                 new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
-                postTenantRes -> async.countDown());
-            tenantClientUBL.postTenant(
-                new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
                 postTenantRes -> {
                   Future<Void> future =
                       selectMetadataSourceVerticleTestHelper.writeDataToDB(context, vertx);
                   future.setHandler(
                       ar -> {
-                        if (ar.succeeded()) async.countDown();
+                        if (ar.succeeded()) {
+                          async.countDown();
+                        }
                       });
                 });
+            tenantClientUBL.postTenant(
+                new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
+                postTenantRes -> async.countDown()
+            );
           } catch (Exception e) {
             context.fail(e);
           }
@@ -107,7 +109,6 @@ public class UnselectMetadataSourceVerticleTest {
   @Before
   public void before(TestContext context) {
     Async async = context.async();
-    vertx = Vertx.vertx();
     JsonObject cfg2 = vertx.getOrCreateContext().config();
     cfg2.put("tenantId", TENANT_UBL);
     cfg2.put(
@@ -117,16 +118,17 @@ public class UnselectMetadataSourceVerticleTest {
         cut,
         new DeploymentOptions().setConfig(cfg2).setWorker(true),
         context.asyncAssertSuccess(
-            h -> {
-              async.complete();
-            }));
+            h ->
+                async.complete()
+        )
+    );
   }
 
   @Test
   public void testSuccessfulUnSelect(TestContext context) {
     Async async = context.async();
     cut.selectAllCollections(
-            SelectMetadataSourceVerticleTestHelper.getMetadataSource1().getId(), TENANT_UBL)
+        SelectMetadataSourceVerticleTestHelper.getMetadataSource1().getId(), TENANT_UBL)
         .setHandler(
             aVoid -> {
               if (aVoid.succeeded()) {
@@ -140,12 +142,11 @@ public class UnselectMetadataSourceVerticleTest {
                               SelectMetadataSourceVerticleTestHelper.getMetadataCollection1()
                                   .getLabel());
                   Criterion criterion = new Criterion(labelCrit);
-                  CQLWrapper cql = new CQLWrapper(criterion);
                   PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
                       .get(
                           "metadata_collections",
                           FincConfigMetadataCollection.class,
-                          cql,
+                          criterion,
                           true,
                           true,
                           ar -> {

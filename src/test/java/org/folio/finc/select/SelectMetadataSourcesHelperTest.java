@@ -35,14 +35,12 @@ public class SelectMetadataSourcesHelperTest {
   private static final String TENANT_UBL = "ubl";
   private static Vertx vertx;
   private static SelectMetadataSourcesHelper cut;
-  @Rule public Timeout timeout = Timeout.seconds(1000);
+  @Rule
+  public Timeout timeout = Timeout.seconds(10);
 
   @BeforeClass
   public static void setUp(TestContext context)
       throws InterruptedException, ExecutionException, TimeoutException {
-    SelectMetadataSourceVerticleTestHelper selectMetadataSourceVerticleTestHelper =
-        new SelectMetadataSourceVerticleTestHelper();
-    selectMetadataSourceVerticleTestHelper.readData(context);
     vertx = Vertx.vertx();
     try {
       PostgresClient.setIsEmbedded(true);
@@ -94,10 +92,10 @@ public class SelectMetadataSourcesHelperTest {
       TenantClient tenantClientUbl = new TenantClient(url, TENANT_UBL, TENANT_UBL);
       tenantClientFinc.postTenant(
           new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
-          postTenantRes -> fincFuture.complete(postTenantRes));
+          fincFuture::complete);
       tenantClientUbl.postTenant(
           new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
-          postTenantRes -> ublFuture.complete(postTenantRes));
+          ublFuture::complete);
       fincFuture.get(30, TimeUnit.SECONDS);
       ublFuture.get(30, TimeUnit.SECONDS);
     } catch (Exception e) {

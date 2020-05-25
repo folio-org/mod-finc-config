@@ -5,7 +5,8 @@ import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.sql.UpdateResult;
+import io.vertx.sqlclient.Row;
+import io.vertx.sqlclient.RowSet;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +20,7 @@ import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.Criteria.Limit;
 import org.folio.rest.persist.Criteria.Offset;
+import org.folio.rest.persist.PgExceptionUtil;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.utils.Constants;
@@ -49,7 +51,7 @@ public class SelectFilterDAOImpl implements SelectFilterDAO {
     try {
       cql = getCQL(query, limit, offset, isil);
     } catch (FieldException e) {
-      logger.error("Error while processing CQL " + e.getMessage());
+      logger.error("Error while processing CQL " + PgExceptionUtil.getMessage(e));
       result.fail("Cannot get filters. Error while processing CQL: " + e);
     }
 
@@ -172,8 +174,8 @@ public class SelectFilterDAOImpl implements SelectFilterDAO {
             criterion,
             reply -> {
               if (reply.succeeded()) {
-                UpdateResult updateResult = reply.result();
-                result.complete(updateResult.getUpdated());
+                RowSet<Row> rowSet = reply.result();
+                result.complete(rowSet.rowCount());
               } else {
                 result.fail("Error while deleting finc select filter. " + reply.cause());
               }

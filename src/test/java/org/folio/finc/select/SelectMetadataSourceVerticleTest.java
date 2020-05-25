@@ -23,7 +23,6 @@ import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
-import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
 import org.junit.AfterClass;
@@ -37,16 +36,14 @@ import org.junit.runner.RunWith;
 public class SelectMetadataSourceVerticleTest {
 
   private static final String TENANT_UBL = "ubl";
-  private static Vertx vertx;
+  private static Vertx vertx = Vertx.vertx();
   private static SelectMetadataSourceVerticle cut;
-  @Rule public Timeout timeout = Timeout.seconds(1000);
+  @Rule
+  public Timeout timeout = Timeout.seconds(10);
 
   @BeforeClass
   public static void setUp(TestContext context)
       throws InterruptedException, ExecutionException, TimeoutException {
-    SelectMetadataSourceVerticleTestHelper selectMetadataSourceVerticleTestHelper =
-        new SelectMetadataSourceVerticleTestHelper();
-    selectMetadataSourceVerticleTestHelper.readData(context);
     vertx = Vertx.vertx();
     try {
       PostgresClient.setIsEmbedded(true);
@@ -100,17 +97,18 @@ public class SelectMetadataSourceVerticleTest {
       TenantClient tenantClientUbl = new TenantClient(url, TENANT_UBL, TENANT_UBL);
       tenantClientFinc.postTenant(
           new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
-          postTenantRes -> fincFuture.complete(postTenantRes));
-      tenantClientUbl.postTenant(
-          new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
           postTenantRes -> {
             Future<Void> future =
                 selectMetadataSourceVerticleTestHelper.writeDataToDB(context, vertx);
             future.setHandler(
                 ar -> {
-                  ublFuture.complete(postTenantRes);
+                  fincFuture.complete(postTenantRes);
                 });
           });
+      tenantClientUbl.postTenant(
+          new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
+          ublFuture::complete
+      );
       fincFuture.get(30, TimeUnit.SECONDS);
       ublFuture.get(30, TimeUnit.SECONDS);
     } catch (Exception e) {
@@ -136,7 +134,6 @@ public class SelectMetadataSourceVerticleTest {
 
   @Before
   public void before() throws InterruptedException, ExecutionException, TimeoutException {
-    vertx = Vertx.vertx();
     JsonObject cfg2 = vertx.getOrCreateContext().config();
     cfg2.put("tenantId", TENANT_UBL);
     cfg2.put(
@@ -161,7 +158,7 @@ public class SelectMetadataSourceVerticleTest {
   public void testSuccessfulSelect(TestContext context) {
     Async async = context.async();
     cut.selectAllCollections(
-            SelectMetadataSourceVerticleTestHelper.getMetadataSource2().getId(), TENANT_UBL)
+        SelectMetadataSourceVerticleTestHelper.getMetadataSource2().getId(), TENANT_UBL)
         .setHandler(
             aVoid -> {
               if (aVoid.succeeded()) {
@@ -175,12 +172,11 @@ public class SelectMetadataSourceVerticleTest {
                               SelectMetadataSourceVerticleTestHelper.getMetadataCollection3()
                                   .getLabel());
                   Criterion criterion = new Criterion(labelCrit);
-                  CQLWrapper cql = new CQLWrapper(criterion);
                   PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
                       .get(
                           "metadata_collections",
                           FincConfigMetadataCollection.class,
-                          cql,
+                          criterion,
                           true,
                           true,
                           ar -> {
@@ -210,7 +206,7 @@ public class SelectMetadataSourceVerticleTest {
   public void testNoSelect(TestContext context) {
     Async async = context.async();
     cut.selectAllCollections(
-            SelectMetadataSourceVerticleTestHelper.getMetadataSource2().getId(), TENANT_UBL)
+        SelectMetadataSourceVerticleTestHelper.getMetadataSource2().getId(), TENANT_UBL)
         .setHandler(
             aVoid -> {
               if (aVoid.succeeded()) {
@@ -224,12 +220,11 @@ public class SelectMetadataSourceVerticleTest {
                               SelectMetadataSourceVerticleTestHelper.getMetadataCollection2()
                                   .getLabel());
                   Criterion criterion = new Criterion(labelCrit);
-                  CQLWrapper cql = new CQLWrapper(criterion);
                   PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
                       .get(
                           "metadata_collections",
                           FincConfigMetadataCollection.class,
-                          cql,
+                          criterion,
                           true,
                           true,
                           ar -> {
