@@ -39,7 +39,7 @@ public class SelectMetadataSourceVerticleTest {
   private static Vertx vertx = Vertx.vertx();
   private static SelectMetadataSourceVerticle cut;
   @Rule
-  public Timeout timeout = Timeout.seconds(1000);
+  public Timeout timeout = Timeout.seconds(10);
 
   @BeforeClass
   public static void setUp(TestContext context)
@@ -134,7 +134,6 @@ public class SelectMetadataSourceVerticleTest {
 
   @Before
   public void before() throws InterruptedException, ExecutionException, TimeoutException {
-//    vertx = Vertx.vertx();
     JsonObject cfg2 = vertx.getOrCreateContext().config();
     cfg2.put("tenantId", TENANT_UBL);
     cfg2.put(

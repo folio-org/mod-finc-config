@@ -19,6 +19,7 @@ import org.folio.finc.config.ConfigFiltersIT;
 import org.folio.finc.config.ConfigMetadataCollectionsIT;
 import org.folio.finc.config.ConfigMetadataSourcesIT;
 import org.folio.finc.config.TinyMetadataSourcesIT;
+import org.folio.finc.select.FilterHelperTest;
 import org.folio.finc.select.FincSelectFilesIT;
 import org.folio.finc.select.FincSelectFiltersIT;
 import org.folio.finc.select.IsilsIT;
@@ -46,7 +47,8 @@ import org.junit.runners.Suite;
     IsilsIT.class,
     SelectMetadataCollectionsIT.class,
     SelectMetadataSourcesIT.class,
-    TinyMetadataSourcesIT.class
+    TinyMetadataSourcesIT.class,
+    FilterHelperTest.class
 })
 public class ApiTestSuite {
 
@@ -56,13 +58,13 @@ public class ApiTestSuite {
   private static Vertx vertx;
   private static boolean initialised = false;
 
+  static {
+    vertx = Vertx.vertx();
+  }
+
   @BeforeClass
   public static void before()
       throws IOException, InterruptedException, ExecutionException, TimeoutException {
-
-    if (vertx == null) {
-      vertx = Vertx.vertx();
-    }
 
     PostgresClient.setIsEmbedded(true);
     PostgresClient.setEmbeddedPort(NetworkUtils.nextFreePort());

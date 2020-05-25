@@ -36,7 +36,7 @@ public class SelectMetadataSourcesHelperTest {
   private static Vertx vertx;
   private static SelectMetadataSourcesHelper cut;
   @Rule
-  public Timeout timeout = Timeout.seconds(1000);
+  public Timeout timeout = Timeout.seconds(10);
 
   @BeforeClass
   public static void setUp(TestContext context)
