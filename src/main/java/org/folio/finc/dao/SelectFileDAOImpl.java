@@ -49,7 +49,7 @@ public class SelectFileDAOImpl implements SelectFileDAO {
             criterion,
             reply -> {
               if (reply.succeeded()) {
-                result.complete(reply.result().getUpdated());
+                result.complete(reply.result().rowCount());
               } else {
                 result.fail(reply.cause());
               }

@@ -14,6 +14,7 @@ import org.folio.finc.dao.SelectFilterDAO;
 import org.folio.finc.dao.SelectFilterDAOImpl;
 import org.folio.rest.jaxrs.model.FilterFile;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
+import org.folio.rest.persist.PgExceptionUtil;
 
 public class FilterHelper {
 
@@ -54,7 +55,8 @@ public class FilterHelper {
     } else {
       List<Future> deleteFutures =
           filterFiles.stream()
-              .map(filterFile -> selectFileDAO.deleteById(filterFile.getFileId(), isil, vertxContext))
+              .map(filterFile -> selectFileDAO
+                  .deleteById(filterFile.getFileId(), isil, vertxContext))
               .collect(Collectors.toList());
 
       CompositeFuture.all(deleteFutures)
@@ -69,7 +71,7 @@ public class FilterHelper {
                       "Error while deleting files of filter "
                           + filter.getId()
                           + ". \n"
-                          + ar.cause().getMessage());
+                          + PgExceptionUtil.getMessage(ar.cause()));
                   result.fail(ar.cause());
                 }
               });
