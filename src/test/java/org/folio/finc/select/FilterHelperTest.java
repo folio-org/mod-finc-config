@@ -225,7 +225,7 @@ public class FilterHelperTest extends ApiTestBase {
     // DELETE Filter
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
-        .delete(FINC_SELECT_FILTERS_ENDPOINT + "/" + fileId)
+        .delete(FINC_SELECT_FILTERS_ENDPOINT + "/" + filterId)
         .then()
         .statusCode(204);
   }
