@@ -19,6 +19,7 @@ import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSources;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.jaxrs.model.Isils;
+import org.folio.rest.persist.PgExceptionUtil;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.utils.Constants;
 
@@ -35,27 +36,7 @@ public class SelectMetadataSourceVerticleTestHelper {
   static Isil isil1;
   static Isil isil2;
 
-  public static FincConfigMetadataSource getMetadataSource1() {
-    return metadataSource1;
-  }
-
-  public static FincConfigMetadataSource getMetadataSource2() {
-    return metadataSource2;
-  }
-
-  public static FincConfigMetadataCollection getMetadataCollection1() {
-    return metadataCollection1;
-  }
-
-  public static FincConfigMetadataCollection getMetadataCollection2() {
-    return metadataCollection2;
-  }
-
-  public static FincConfigMetadataCollection getMetadataCollection3() {
-    return metadataCollection3;
-  }
-
-  public void readData(TestContext context) {
+  static {
     try {
       String metadataSourceStr1 =
           new String(
@@ -88,8 +69,28 @@ public class SelectMetadataSourceVerticleTestHelper {
       String isilStr2 = new String(Files.readAllBytes(Paths.get("ramls/examples/isil2.sample")));
       isil2 = Json.decodeValue(isilStr2, Isil.class);
     } catch (Exception e) {
-      context.fail(e);
+      logger.error(e.getMessage());
     }
+  }
+
+  public static FincConfigMetadataSource getMetadataSource1() {
+    return metadataSource1;
+  }
+
+  public static FincConfigMetadataSource getMetadataSource2() {
+    return metadataSource2;
+  }
+
+  public static FincConfigMetadataCollection getMetadataCollection1() {
+    return metadataCollection1;
+  }
+
+  public static FincConfigMetadataCollection getMetadataCollection2() {
+    return metadataCollection2;
+  }
+
+  public static FincConfigMetadataCollection getMetadataCollection3() {
+    return metadataCollection3;
   }
 
   public Future<Void> writeDataToDB(TestContext context, Vertx vertx) {
@@ -113,7 +114,8 @@ public class SelectMetadataSourceVerticleTestHelper {
                       logger.info("Loaded isils");
                       async.countDown();
                     } else {
-                      context.fail("Could not load isils");
+                      context.fail("Could not load isils. " + PgExceptionUtil
+                          .getMessage(asyncResult.cause()));
                     }
                   });
 

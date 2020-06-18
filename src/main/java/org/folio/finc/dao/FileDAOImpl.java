@@ -8,50 +8,37 @@ import org.folio.finc.model.File;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
-import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.utils.Constants;
 
 public class FileDAOImpl implements FileDAO {
 
-  private static final String ID_FIELD = "id";
   private static final String TABLE_NAME = "files";
 
   @Override
-  public Future<File> getById(String id, String isil, Context vertxContext) {
+  public Future<File> getById(String id, Context vertxContext) {
+    Criteria idCrit =
+        new Criteria().addField("id").setJSONB(false).setOperation("=").setVal(id);
+    Criterion criterion = new Criterion(idCrit);
+    return getByCriterion(criterion, vertxContext);
+  }
+
+  @Override
+  public Future<File> getByCriterion(Criterion criterion, Context vertxContext) {
     Promise<File> result = Promise.promise();
-    Criterion criterion = getCriterion(id, isil);
-    CQLWrapper cql = new CQLWrapper(criterion);
     PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
         .get(
             TABLE_NAME,
             File.class,
-            cql,
+            criterion,
             false,
             reply -> {
               if (reply.succeeded()) {
                 List<File> fileList = reply.result().getResults();
-
-                if (fileList.size() > 1) {
-                  result.fail(
-                      "Error while getting file by id. Found "
-                          + fileList.size()
-                          + " entries for id "
-                          + id
-                          + ".");
-                }
-
                 File file;
                 if (fileList.isEmpty()) {
                   file = null;
                 } else {
                   file = fileList.get(0);
-                  if (!(id.equals(file.getId()))) {
-                    result.fail(
-                        "Error while getting file by id. Ids do not match. Expected: "
-                            + id
-                            + " - Actual: "
-                            + file.getId());
-                  }
                 }
                 result.complete(file);
               } else {
@@ -59,52 +46,5 @@ public class FileDAOImpl implements FileDAO {
               }
             });
     return result.future();
-  }
-
-  @Override
-  public Future<File> upsert(File entity, String id, Context vertxContext) {
-    Promise<File> result = Promise.promise();
-    PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
-        .upsert(
-            TABLE_NAME,
-            id,
-            entity,
-            asyncResult -> {
-              if (asyncResult.succeeded()) {
-                result.complete(entity);
-              } else {
-                result.fail("Cannot upsert file: " + asyncResult.cause());
-              }
-            });
-    return result.future();
-  }
-
-  @Override
-  public Future<Integer> deleteById(String id, String isil, Context vertxContext) {
-    Promise<Integer> result = Promise.promise();
-    Criterion criterion = getCriterion(id, isil);
-    PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
-        .delete(
-            TABLE_NAME,
-            criterion,
-            reply -> {
-              if (reply.succeeded()) {
-                result.complete(reply.result().getUpdated());
-              } else {
-                result.fail(reply.cause());
-              }
-            });
-    return result.future();
-  }
-
-  private Criterion getCriterion(String id, String isil) {
-    Criteria idCrit =
-        new Criteria().addField(ID_FIELD).setJSONB(false).setOperation("=").setVal(id);
-    Criterion criterion = new Criterion(idCrit);
-
-    Criteria isilCrit =
-        new Criteria().addField("'isil'").setJSONB(true).setOperation("=").setVal(isil);
-    criterion.addCriterion(isilCrit);
-    return criterion;
   }
 }

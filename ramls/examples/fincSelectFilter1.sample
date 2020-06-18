@@ -1,4 +1,5 @@
 {
+  "id": "084befb6-a264-4dd0-ade9-1aaae390c483",
   "label": "Holdings 1",
   "type": "Whitelist",
   "filterFiles": [
@@ -9,8 +10,5 @@
       "fileId": "aa9202b7-754a-414a-8bf6-378df78e5985"
     }
   ],
-  "collectionIds": [
-    "6dd325f8-b1d5-4568-a0d7-aecf6b8d6123",
-    "9a2427cd-4110-4bd9-b6f9-e3475631bbac"
-  ]
+  "isil": "DE-15"
 }

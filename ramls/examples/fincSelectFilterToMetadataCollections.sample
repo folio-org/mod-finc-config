@@ -1,8 +1,10 @@
 {
+  "id": "6dd325f8-b1d5-4568-a0d7-aecf6b8d6123",
   "collectionIds": [
     "4c890350-4ddf-4851-ae2b-e4403eacca08",
     "4c890350-4ddf-4851-ae2b-e4403eacca09",
     "4c890350-4ddf-4851-ae2b-e4403eacca07"
   ],
+  "isil": "DE-15",
   "collectionsCount": 3
 }

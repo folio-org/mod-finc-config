@@ -4,7 +4,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
@@ -12,26 +11,25 @@ import java.util.Map;
 import java.util.UUID;
 import javax.ws.rs.core.Response;
 import org.apache.commons.io.IOUtils;
-import org.folio.finc.dao.FileDAO;
-import org.folio.finc.dao.FileDAOImpl;
 import org.folio.finc.dao.IsilDAO;
 import org.folio.finc.dao.IsilDAOImpl;
+import org.folio.finc.dao.SelectFileDAO;
+import org.folio.finc.dao.SelectFileDAOImpl;
 import org.folio.finc.model.File;
 import org.folio.finc.select.IsilHelper;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.jaxrs.resource.FincSelectFiles;
-import org.folio.rest.tools.utils.BinaryOutStream;
 import org.folio.rest.tools.utils.TenantTool;
 
-public class FincSelectFilesAPI implements FincSelectFiles {
+public class FincSelectFilesAPI extends FincFileHandler implements FincSelectFiles {
 
   private final IsilHelper isilHelper;
   private final IsilDAO isilDAO;
-  private final FileDAO fileDAO;
+  private final SelectFileDAO selectFileDAO;
 
-  public FincSelectFilesAPI(Vertx vertx, String tenantId) {
+  public FincSelectFilesAPI() {
     this.isilHelper = new IsilHelper();
-    this.fileDAO = new FileDAOImpl();
+    this.selectFileDAO = new SelectFileDAOImpl();
     this.isilDAO = new IsilDAOImpl();
   }
 
@@ -46,32 +44,16 @@ public class FincSelectFilesAPI implements FincSelectFiles {
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
-        .compose(isil -> fileDAO.getById(id, isil, vertxContext))
+        .compose(isil -> selectFileDAO.getById(id, isil, vertxContext))
         .setHandler(
-            ar -> {
-              if (ar.succeeded()) {
-                File file = ar.result();
-                if (file == null) {
-                  asyncResultHandler.handle(
-                      Future.succeededFuture(
-                          GetFincSelectFilesByIdResponse.respond404WithTextPlain("Not found")));
-                } else {
-                  String dataAsString = file.getData();
-                  byte[] decoded = Base64.getDecoder().decode(dataAsString);
-
-                  BinaryOutStream binaryOutStream = new BinaryOutStream();
-                  binaryOutStream.setData(decoded);
-                  asyncResultHandler.handle(
-                      Future.succeededFuture(
-                          GetFincSelectFilesByIdResponse.respond200WithApplicationOctetStream(
-                              binaryOutStream)));
-                }
-              } else {
-                asyncResultHandler.handle(
-                    Future.succeededFuture(
-                        GetFincSelectFilesByIdResponse.respond500WithTextPlain(ar.cause())));
-              }
-            });
+            ar ->
+                handleAsyncFileReponse(
+                    ar,
+                    GetFincSelectFilesByIdResponse::respond200WithApplicationOctetStream,
+                    GetFincSelectFilesByIdResponse::respond404WithTextPlain,
+                    GetFincSelectFilesByIdResponse::respond500WithTextPlain,
+                    asyncResultHandler)
+        );
   }
 
   @Override
@@ -101,7 +83,7 @@ public class FincSelectFilesAPI implements FincSelectFiles {
         .compose(
             isil -> {
               File file = new File().withData(base64Data).withId(uuid).withIsil(isil);
-              return fileDAO.upsert(file, uuid, vertxContext);
+              return selectFileDAO.upsert(file, uuid, vertxContext);
             })
         .setHandler(
             ar -> {
@@ -130,7 +112,7 @@ public class FincSelectFilesAPI implements FincSelectFiles {
 
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
-        .compose(isil -> fileDAO.deleteById(id, isil, vertxContext))
+        .compose(isil -> selectFileDAO.deleteById(id, isil, vertxContext))
         .setHandler(
             ar -> {
               if (ar.succeeded()) {

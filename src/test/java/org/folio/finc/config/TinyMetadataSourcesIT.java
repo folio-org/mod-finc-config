@@ -5,9 +5,12 @@ import static org.hamcrest.Matchers.equalTo;
 
 import com.jayway.restassured.http.ContentType;
 import io.vertx.core.json.Json;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.finc.mocks.MockOrganization;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(VertxUnitRunner.class)
 public class TinyMetadataSourcesIT extends AbstractMetadataSourcesIT {
 
   @Test

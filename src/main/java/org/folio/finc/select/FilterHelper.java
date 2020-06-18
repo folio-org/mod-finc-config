@@ -8,30 +8,31 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.folio.finc.dao.FileDAO;
-import org.folio.finc.dao.FileDAOImpl;
-import org.folio.finc.dao.FilterDAO;
-import org.folio.finc.dao.FilterDAOImpl;
+import org.folio.finc.dao.SelectFileDAO;
+import org.folio.finc.dao.SelectFileDAOImpl;
+import org.folio.finc.dao.SelectFilterDAO;
+import org.folio.finc.dao.SelectFilterDAOImpl;
 import org.folio.rest.jaxrs.model.FilterFile;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
+import org.folio.rest.persist.PgExceptionUtil;
 
 public class FilterHelper {
 
   private static final Logger logger = LoggerFactory.getLogger(FilterHelper.class);
 
-  private final FilterDAO filterDAO;
-  private final FileDAO fileDAO;
+  private final SelectFilterDAO selectFilterDAO;
+  private final SelectFileDAO selectFileDAO;
 
   public FilterHelper() {
-    this.filterDAO = new FilterDAOImpl();
-    this.fileDAO = new FileDAOImpl();
+    this.selectFilterDAO = new SelectFilterDAOImpl();
+    this.selectFileDAO = new SelectFileDAOImpl();
   }
 
   public Future<Void> deleteFilesOfFilter(String filterId, String isil, Context vertxContext) {
 
     Promise<Void> result = Promise.promise();
 
-    Future<FincSelectFilter> byId = filterDAO.getById(filterId, isil, vertxContext);
+    Future<FincSelectFilter> byId = selectFilterDAO.getById(filterId, isil, vertxContext);
     byId.compose(fincSelectFilter -> deleteFilesOfFilter(fincSelectFilter, isil, vertxContext))
         .setHandler(
             voidAsyncResult -> {
@@ -54,7 +55,8 @@ public class FilterHelper {
     } else {
       List<Future> deleteFutures =
           filterFiles.stream()
-              .map(filterFile -> fileDAO.deleteById(filterFile.getFileId(), isil, vertxContext))
+              .map(filterFile -> selectFileDAO
+                  .deleteById(filterFile.getFileId(), isil, vertxContext))
               .collect(Collectors.toList());
 
       CompositeFuture.all(deleteFutures)
@@ -69,7 +71,7 @@ public class FilterHelper {
                       "Error while deleting files of filter "
                           + filter.getId()
                           + ". \n"
-                          + ar.cause().getMessage());
+                          + PgExceptionUtil.getMessage(ar.cause()));
                   result.fail(ar.cause());
                 }
               });
@@ -88,7 +90,7 @@ public class FilterHelper {
     List<Future> filesToDeleteFuture =
         filter.getFilterFiles().stream()
             .filter(filterFile -> filterFile.getDelete() != null && filterFile.getDelete())
-            .map(filterFile -> fileDAO.deleteById(filterFile.getFileId(), isil, vertxContext))
+            .map(filterFile -> selectFileDAO.deleteById(filterFile.getFileId(), isil, vertxContext))
             .collect(Collectors.toList());
 
     Promise<FincSelectFilter> result = Promise.promise();

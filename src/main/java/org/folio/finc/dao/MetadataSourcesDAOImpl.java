@@ -5,7 +5,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.folio.cql2pgjson.CQL2PgJSON;
 import org.folio.cql2pgjson.exception.FieldException;
@@ -14,6 +14,7 @@ import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSources;
 import org.folio.rest.persist.Criteria.Limit;
 import org.folio.rest.persist.Criteria.Offset;
+import org.folio.rest.persist.PgExceptionUtil;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.utils.Constants;
@@ -26,7 +27,8 @@ public class MetadataSourcesDAOImpl implements MetadataSourcesDAO {
 
   private CQLWrapper getCQL(String query, int limit, int offset) throws FieldException {
     CQL2PgJSON cql2PgJSON =
-        new CQL2PgJSON(Arrays.asList(FincConfigMetadataSourcesAPI.TABLE_NAME + ".jsonb"));
+        new CQL2PgJSON(
+            Collections.singletonList(FincConfigMetadataSourcesAPI.TABLE_NAME + ".jsonb"));
     return new CQLWrapper(cql2PgJSON, query)
         .setLimit(new Limit(limit))
         .setOffset(new Offset(offset));
@@ -45,7 +47,7 @@ public class MetadataSourcesDAOImpl implements MetadataSourcesDAO {
     try {
       cql = getCQL(query, limit, offset);
     } catch (FieldException e) {
-      logger.error("Error while processing CQL " + e.getMessage());
+      logger.error("Error while processing CQL " + PgExceptionUtil.getMessage(e));
       result.fail(e);
     }
 
