@@ -62,7 +62,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectFilterDAO.getAll(query, offset, limit, isil, vertxContext))
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 org.folio.rest.jaxrs.model.FincSelectFilters filters = ar.result();
@@ -104,7 +104,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectFilterDAO.insert(entity.withIsil(isil), vertxContext))
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 FincSelectFilter fincSelectFilter = ar.result();
@@ -138,7 +138,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectFilterDAO.getById(id, isil, vertxContext))
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 FincSelectFilter result = ar.result();
@@ -184,7 +184,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
                         .deleteFilesOfFilter(id, isil, vertxContext)
                         .compose(integer -> selectFilterDAO.deleteById(id, isil, vertxContext)));
 
-    compose.setHandler(
+    compose.onComplete(
         ar -> {
           if (ar.succeeded()) {
             asyncResultHandler.handle(
@@ -223,7 +223,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
                         fincSelectFilter ->
                             selectFilterDAO
                                 .update(fincSelectFilter.withIsil(isil), id, vertxContext)))
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 FincSelectFilter fincSelectFilter = ar.result();
@@ -252,7 +252,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
         .compose(isil -> filterToCollectionsDAO.getById(id, isil, vertxContext))
-        .setHandler(
+        .onComplete(
             reply -> {
               if (reply.succeeded()) {
                 FincSelectFilterToCollections filterToCollections = reply.result();
@@ -292,7 +292,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectFilterDAO.getById(id, isil, vertxContext))
-        .setHandler(
+        .onComplete(
             reply -> {
               if (reply.succeeded()) {
                 if (reply.result() == null) {
@@ -339,7 +339,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
                     .compose(integer -> filterToCollectionsDAO.insert(entity, vertxContext));
               }
             })
-        .setHandler(
+        .onComplete(
             reply -> {
               if (reply.succeeded()) {
                 FincSelectFilterToCollections filterToCollections = reply.result();

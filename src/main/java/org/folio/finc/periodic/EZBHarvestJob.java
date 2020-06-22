@@ -29,7 +29,7 @@ public class EZBHarvestJob implements Job {
       Object o = jobExecutionContext.getScheduler().getContext().get("vertxContext");
       vertxContext = o instanceof Context ? (Context) o : null;
       ezbCredentialsDAO.getAll(null, 0, 1000, vertxContext)
-          .setHandler(ar -> {
+          .onComplete(ar -> {
             if (ar.succeeded()) {
               Credentials credentials = ar.result();
               List<JsonObject> configs = createConfigs(credentials, vertxContext.config());

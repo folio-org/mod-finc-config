@@ -32,7 +32,7 @@ public class SelectMetadataCollectionsDAOImpl implements SelectMetadataCollectio
     query = queryTranslator.translateQuery(query, isil);
     metadataCollectionsDAO
         .getAll(query, offset, limit, vertxContext)
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
 
@@ -63,7 +63,7 @@ public class SelectMetadataCollectionsDAOImpl implements SelectMetadataCollectio
 
     metadataCollectionsDAO
         .getById(id, vertxContext)
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 FincSelectMetadataCollection fincSelectMetadataCollection =

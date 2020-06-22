@@ -40,7 +40,7 @@ public class FincSelectEZBCredentialsAPI implements FincSelectEzbCredentials {
         .compose(isil ->
             selectEZBCredentialsDAO.getByIsil(isil, vertxContext)
         )
-        .setHandler(ar -> {
+        .onComplete(ar -> {
           if (ar.succeeded()) {
             Credential cred = ar.result();
             asyncResultHandler.handle(
@@ -73,7 +73,7 @@ public class FincSelectEZBCredentialsAPI implements FincSelectEzbCredentials {
               }
             }
         )
-        .setHandler(ar -> {
+        .onComplete(ar -> {
           if (ar.succeeded()) {
             Credential cred = ar.result();
             asyncResultHandler.handle(Future.succeededFuture(

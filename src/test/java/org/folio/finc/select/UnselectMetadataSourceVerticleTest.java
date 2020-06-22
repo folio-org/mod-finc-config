@@ -76,7 +76,7 @@ public class UnselectMetadataSourceVerticleTest {
                 postTenantRes -> {
                   Future<Void> future =
                       selectMetadataSourceVerticleTestHelper.writeDataToDB(context, vertx);
-                  future.setHandler(
+                  future.onComplete(
                       ar -> {
                         if (ar.succeeded()) {
                           async.countDown();
@@ -129,7 +129,7 @@ public class UnselectMetadataSourceVerticleTest {
     Async async = context.async();
     cut.selectAllCollections(
         SelectMetadataSourceVerticleTestHelper.getMetadataSource1().getId(), TENANT_UBL)
-        .setHandler(
+        .onComplete(
             aVoid -> {
               if (aVoid.succeeded()) {
                 try {

@@ -97,7 +97,7 @@ public class FilterHelperTest extends ApiTestBase {
 
     Async async = context.async();
     cut.deleteFilesOfFilter(filter.getId(), isilUBL.getIsil(), Vertx.vertx().getOrCreateContext())
-        .setHandler(ar -> {
+        .onComplete(ar -> {
           if (ar.succeeded()) {
             Criteria idCrit =
                 new Criteria()
@@ -187,7 +187,7 @@ public class FilterHelperTest extends ApiTestBase {
     filterFile2.setDelete(true);
     Async async = context.async();
     cut.removeFilesToDelete(filter, isilUBL.getIsil(), Vertx.vertx().getOrCreateContext())
-        .setHandler(ar -> {
+        .onComplete(ar -> {
           if (ar.succeeded()) {
             PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
                 .get(

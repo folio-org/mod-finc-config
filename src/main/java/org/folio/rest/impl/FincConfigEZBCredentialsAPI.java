@@ -32,7 +32,7 @@ public class FincConfigEZBCredentialsAPI implements FincConfigEzbCredentials {
       Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     ezbCredentialsDAO.getAll(query, offset, limit, vertxContext)
-        .setHandler(ar -> {
+        .onComplete(ar -> {
           if (ar.succeeded()) {
             Credentials creds = ar.result();
             List<Credential> credentialsWithouId = creds.getCredentials().stream()
@@ -56,7 +56,7 @@ public class FincConfigEZBCredentialsAPI implements FincConfigEzbCredentials {
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
 
     ezbCredentialsDAO.insert(entity, vertxContext)
-        .setHandler(ar -> {
+        .onComplete(ar -> {
           if (ar.succeeded()) {
             asyncResultHandler.handle(Future.succeededFuture(PostFincConfigEzbCredentialsResponse
                 .respond201WithApplicationJson(entity,
@@ -81,7 +81,7 @@ public class FincConfigEZBCredentialsAPI implements FincConfigEzbCredentials {
       Context vertxContext) {
 
     ezbCredentialsDAO.getByIsil(isil, vertxContext)
-        .setHandler(ar -> {
+        .onComplete(ar -> {
           if (ar.succeeded()) {
             Credential cred = ar.result();
             if (cred == null) {
@@ -107,7 +107,7 @@ public class FincConfigEZBCredentialsAPI implements FincConfigEzbCredentials {
       Context vertxContext) {
 
     ezbCredentialsDAO.deleteByIsil(isil, vertxContext)
-        .setHandler(ar -> {
+        .onComplete(ar -> {
           if (ar.succeeded()) {
             asyncResultHandler.handle(Future.succeededFuture(
                 DeleteFincConfigEzbCredentialsByIsilResponse.respond204()));
@@ -139,7 +139,7 @@ public class FincConfigEZBCredentialsAPI implements FincConfigEzbCredentials {
                       integer -> ezbCredentialsDAO.insert(entity, vertxContext)
                   );
             }
-          }).setHandler(ar -> {
+          }).onComplete(ar -> {
         if (ar.succeeded()) {
           asyncResultHandler
               .handle(

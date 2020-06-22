@@ -53,7 +53,7 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectMetadataSourcesDAO.getAll(query, offset, limit, isil, vertxContext))
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 org.folio.rest.jaxrs.model.FincSelectMetadataSources metadataSources = ar.result();
@@ -103,7 +103,7 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectMetadataSourcesDAO.getById(id, isil, vertxContext))
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 FincSelectMetadataSource fincSelectMetadataSource = ar.result();

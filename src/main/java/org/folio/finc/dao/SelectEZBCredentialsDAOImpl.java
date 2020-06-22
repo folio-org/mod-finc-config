@@ -32,7 +32,7 @@ public class SelectEZBCredentialsDAOImpl implements SelectEZBCredentialsDAO {
                     integer -> ezbCredentialsDAO.insert(entity, ctx)
                 );
           }
-        }).setHandler(ar -> {
+        }).onComplete(ar -> {
       if (ar.succeeded()) {
         result.complete(entity);
       } else {

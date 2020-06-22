@@ -100,7 +100,7 @@ public class SelectMetadataSourceVerticleTest {
           postTenantRes -> {
             Future<Void> future =
                 selectMetadataSourceVerticleTestHelper.writeDataToDB(context, vertx);
-            future.setHandler(
+            future.onComplete(
                 ar -> {
                   fincFuture.complete(postTenantRes);
                 });
@@ -159,7 +159,7 @@ public class SelectMetadataSourceVerticleTest {
     Async async = context.async();
     cut.selectAllCollections(
         SelectMetadataSourceVerticleTestHelper.getMetadataSource2().getId(), TENANT_UBL)
-        .setHandler(
+        .onComplete(
             aVoid -> {
               if (aVoid.succeeded()) {
                 try {
@@ -207,7 +207,7 @@ public class SelectMetadataSourceVerticleTest {
     Async async = context.async();
     cut.selectAllCollections(
         SelectMetadataSourceVerticleTestHelper.getMetadataSource2().getId(), TENANT_UBL)
-        .setHandler(
+        .onComplete(
             aVoid -> {
               if (aVoid.succeeded()) {
                 try {

@@ -174,7 +174,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
 
     this.addMdSourceNameTo(entity, vertxContext)
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 FincConfigMetadataCollection newEntity = ar.result();
@@ -246,7 +246,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
 
     this.addMdSourceNameTo(entity, vertxContext)
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 FincConfigMetadataCollection newEntity = ar.result();
@@ -276,7 +276,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
     } else {
       metadataSourcesDAO
           .getById(entitiesMDSource.getId(), context)
-          .setHandler(
+          .onComplete(
               ar -> {
                 if (ar.succeeded()) {
                   FincConfigMetadataSource mdSource = ar.result();

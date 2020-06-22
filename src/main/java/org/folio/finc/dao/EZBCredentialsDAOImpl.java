@@ -61,7 +61,7 @@ public class EZBCredentialsDAOImpl implements EZBCredentialsDAO {
     Promise<Credential> result = Promise.promise();
     String query = String.format("isil=%s", isil);
     getAll(query, 0, 1, vertxContext)
-        .setHandler(ar -> {
+        .onComplete(ar -> {
           if (ar.succeeded()) {
             if (ar.result().getTotalRecords() == 0) {
               result.complete();
@@ -80,7 +80,7 @@ public class EZBCredentialsDAOImpl implements EZBCredentialsDAO {
   public Future<Credential> insert(Credential entity, Context vertxContext) {
     Promise<Credential> result = Promise.promise();
     getByIsil(entity.getIsil(), vertxContext)
-        .setHandler(ar -> {
+        .onComplete(ar -> {
           if (ar.succeeded()) {
             Credential credential = ar.result();
             if (credential != null) {
@@ -105,7 +105,7 @@ public class EZBCredentialsDAOImpl implements EZBCredentialsDAO {
   public Future<Integer> deleteByIsil(String isil, Context vertxContext) {
     Promise<Integer> result = Promise.promise();
     getByIsil(isil, vertxContext)
-        .setHandler(ar -> {
+        .onComplete(ar -> {
           if (ar.succeeded()) {
             Credential credential = ar.result();
             if (credential == null) {

@@ -23,7 +23,7 @@
     <ramlfiles_path>${basedir}/ramls</ramlfiles_path>
     <database_setup_path>${basedir}/database-setup</database_setup_path>
     <okapi.version>2.36.3</okapi.version>
-    <vertx-version>3.8.4</vertx-version>
+    <vertx-version>3.9.1</vertx-version>
   </properties>
 
   <repositories>

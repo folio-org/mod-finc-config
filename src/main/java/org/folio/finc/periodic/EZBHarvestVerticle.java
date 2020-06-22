@@ -18,4 +18,9 @@ public class EZBHarvestVerticle extends AbstractVerticle {
     System.out.println(String.format("Yeah! Done: %s, %s, %s, %s", user, password, libId, isil));
   }
 
+  private void fetchFileFromEZB() {
+
+
+  }
+
 }

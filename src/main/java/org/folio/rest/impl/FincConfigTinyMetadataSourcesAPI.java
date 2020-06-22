@@ -38,7 +38,7 @@ public class FincConfigTinyMetadataSourcesAPI implements FincConfigTinyMetadataS
 
     metadataSourcesTinyDAO
         .getAll(vertxContext)
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 asyncResultHandler.handle(
