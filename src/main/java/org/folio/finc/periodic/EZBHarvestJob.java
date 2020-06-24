@@ -19,10 +19,10 @@ import org.quartz.SchedulerException;
 public class EZBHarvestJob implements Job {
 
   private static final Logger log = LoggerFactory.getLogger(EZBHarvestJob.class);
-  private EZBCredentialsDAO ezbCredentialsDAO = new EZBCredentialsDAOImpl();
+  private final EZBCredentialsDAO ezbCredentialsDAO = new EZBCredentialsDAOImpl();
 
   @Override
-  public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+  public void execute(JobExecutionContext jobExecutionContext) {
 
     final Context vertxContext;
     try {

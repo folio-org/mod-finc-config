@@ -1,5 +1,6 @@
 package org.folio.rest.impl;
 
+import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
@@ -40,14 +41,19 @@ public class PostDeployImpl implements PostDeployVerticle {
           .withIdentity("harvest-ezb-files-job")
           .build();
 
-      Trigger trigger = newTrigger()
+     /* Trigger trigger = newTrigger()
           .withIdentity("harvest-ezb-files-trigger")
           .startNow()
+          .build();*/
+
+      Trigger trigger = newTrigger()
+          .withIdentity("harvest-ezb-files-trigger")
+          .withSchedule(cronSchedule("0 30 17 1/1 * ? *"))
           .build();
 
-      scheduler.scheduleJob(job, trigger);
+       scheduler.scheduleJob(job, trigger);
     } catch (SchedulerException e) {
-      e.printStackTrace();
+      log.error(e);
     }
 
   }
