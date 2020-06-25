@@ -41,14 +41,10 @@ public class PostDeployImpl implements PostDeployVerticle {
           .withIdentity("harvest-ezb-files-job")
           .build();
 
-     /* Trigger trigger = newTrigger()
-          .withIdentity("harvest-ezb-files-trigger")
-          .startNow()
-          .build();*/
-
       Trigger trigger = newTrigger()
           .withIdentity("harvest-ezb-files-trigger")
-          .withSchedule(cronSchedule("0 30 17 1/1 * ? *"))
+          // .withSchedule(cronSchedule("0 30 17 1/1 * ? *"))
+          .startNow()
           .build();
 
        scheduler.scheduleJob(job, trigger);

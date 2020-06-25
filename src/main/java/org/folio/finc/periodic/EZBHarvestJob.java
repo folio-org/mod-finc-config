@@ -13,7 +13,6 @@ import org.folio.finc.dao.EZBCredentialsDAOImpl;
 import org.folio.rest.jaxrs.model.Credentials;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
 
 public class EZBHarvestJob implements Job {
@@ -23,11 +22,14 @@ public class EZBHarvestJob implements Job {
 
   @Override
   public void execute(JobExecutionContext jobExecutionContext) {
-
     final Context vertxContext;
     try {
       Object o = jobExecutionContext.getScheduler().getContext().get("vertxContext");
       vertxContext = o instanceof Context ? (Context) o : null;
+      if (vertxContext == null) {
+        log.error("Cannot find vertxContext.");
+        return;
+      }
       ezbCredentialsDAO.getAll(null, 0, 1000, vertxContext)
           .onComplete(ar -> {
             if (ar.succeeded()) {
@@ -49,11 +51,11 @@ public class EZBHarvestJob implements Job {
                     });
               });
             } else {
-              log.error("ERROR!");
+              log.error("Error getting ezb credentials", ar.cause());
             }
           });
     } catch (SchedulerException e) {
-      e.printStackTrace();
+      log.error("Error while executing job to update ezb file.", e);
     }
   }
 

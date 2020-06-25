@@ -43,32 +43,108 @@ public class EZBHarvestVerticle extends AbstractVerticle {
     Future<String> ezbFileFuture = fetchFileFromEZB(user, password, libId);
     Future<FincSelectFilter> dbFilterFuture = fetchFilterFromDB(isil);
     CompositeFuture.all(ezbFileFuture, dbFilterFuture)
-        .onComplete(compositeFuture -> {
-          if (compositeFuture.succeeded()) {
-            updateEZBFileOfFilter(dbFilterFuture.result(), ezbFileFuture.result(), isil);
+        .compose(compositeFuture ->
+            updateEZBFileOfFilter(dbFilterFuture.result(), ezbFileFuture.result(), isil)
+        )
+        .onComplete(ar -> {
+          if (ar.succeeded()) {
+            log.info(String
+                .format("Successfully executed ezb updater for %s", isil));
           } else {
             log.error(String.format("Error while updating ezb file for isil %s: %s", isil,
-                compositeFuture.cause()));
+                ar.cause()));
           }
         });
   }
 
-  private void updateEZBFileOfFilter(FincSelectFilter filter, String ezbFileString, String isil) {
+  /**
+   * Fetches ezb holding file from ezb
+   *
+   * @param user     Username
+   * @param password Password
+   * @param libId    libid resp. bibid
+   * @return
+   */
+  private Future<String> fetchFileFromEZB(String user, String password, String libId) {
+    Promise<String> result = Promise.promise();
+    WebClient client = WebClient.create(vertx);
+    String url = String.format(
+        "https://rzbezb2.ur.de/ezb/export/licenselist_html.php?pack=0&bibid=%s&lang=de&output_style=kbart&todo_license=ALkbart",
+        libId);
+    HttpRequest<Buffer> get = client.getAbs(url)
+        .basicAuthentication(user, password);
+    get.send(ar -> {
+      if (ar.succeeded()) {
+        HttpResponse<Buffer> response = ar.result();
+        if (ar.result().statusCode() == 200) {
+          result.complete(response.bodyAsString());
+        } else {
+          result.fail(
+              String
+                  .format(
+                      "Failed to fetch ezb file. Status code: %s. Status message: %s. %s ",
+                      response.statusCode(), response.statusMessage(), response.bodyAsString()));
+        }
+      } else {
+        result.fail("Failed to fetch ezb file. " + ar.cause());
+      }
+    });
+    return result.future();
+  }
+
+  /**
+   * Fetches ezb holding filter from database
+   *
+   * @param isil Isil of current tenant
+   * @return
+   */
+  private Future<FincSelectFilter> fetchFilterFromDB(String isil) {
+    Promise<FincSelectFilter> result = Promise.promise();
+    selectFilterDAO
+        .getAll("label==\"" + LABEL_EZB_HOLDINGS + "\"", 0, 1, isil, vertx.getOrCreateContext())
+        .onComplete(ar -> {
+          if (ar.succeeded()) {
+            FincSelectFilters fincSelectFilters = ar.result();
+            List<FincSelectFilter> filters = fincSelectFilters.getFincSelectFilters();
+            if (filters.isEmpty()) {
+              result.complete();
+            } else {
+              result.complete(filters.get(0));
+            }
+          } else {
+            result.fail(String.format("Failed to fetch filter from DB: %s", ar.cause()));
+          }
+        });
+    return result.future();
+  }
+
+  /**
+   * Updates given ezb holding file for the specified filter. Update only happens if content of
+   * given ezb file is not equal to content of ezb file saved in the database.
+   *
+   * @param filter        The filter
+   * @param ezbFileString The ezb holding file
+   * @param isil          Isil of current tenant
+   * @return
+   */
+  private Future<Void> updateEZBFileOfFilter(FincSelectFilter filter, String ezbFileString,
+      String isil) {
     if (filter == null) {
       // we have no filter, so we do not need to update its file
-      return;
+      log.info(String.format("No ezb filter found for isil %s. Will do nothing.", isil));
+      return Future.succeededFuture();
     }
 
     if (filter.getFilterFiles().isEmpty() || !hasEZBFile(filter)) {
-      insertFileAndUpdateFilter(ezbFileString, filter, isil);
+      return insertFileAndUpdateFilter(ezbFileString, filter, isil);
     } else {
       // compare old and new filter
-      calcFilesToDelete(ezbFileString, filter, isil)
+      return calcFilesToRemove(ezbFileString, filter, isil)
           .compose(filesToDelete ->
-              deleteFiles(filter, filesToDelete, isil)
+              removeFiles(filter, filesToDelete, isil)
           )
           .compose(updatedFilterFiles -> {
-                if (updatedFilterFiles.size() != filter.getFilterFiles().size()) {
+                if (shouldUpdateFilter(filter, updatedFilterFiles)) {
                   // Update file and filter only if changed
                   filter.setFilterFiles(updatedFilterFiles);
                   return insertFileAndUpdateFilter(ezbFileString, filter, isil);
@@ -81,23 +157,28 @@ public class EZBHarvestVerticle extends AbstractVerticle {
     }
   }
 
-  private Future insertFileAndUpdateFilter(String ezbFile, FincSelectFilter filter, String isil) {
+  /**
+   * Inserts given ezbFile into the database, and adds it to the given {@link FincSelectFilter}.
+   *
+   * @param ezbFile Given ezb file
+   * @param filter  The filter
+   * @param isil    Isil of current tenant
+   * @return
+   */
+  private Future<Void> insertFileAndUpdateFilter(String ezbFile, FincSelectFilter filter,
+      String isil) {
     Promise<Void> result = Promise.promise();
     insertEZBFile(ezbFile, isil)
         .compose(file -> {
-          FilterFile ff = new FilterFile().withFileId(file.getId())
+          FilterFile ff = new FilterFile()
+              .withFileId(file.getId())
               .withLabel(LABEL_EZB_FILE);
           filter.getFilterFiles().add(ff);
           return updateFilter(filter)
               .onComplete(ar -> {
                 if (ar.succeeded()) {
-                  log.info(String
-                      .format("Successfully executed ezb updater for %s", isil));
                   result.complete();
                 } else {
-                  log.error(String
-                      .format("Failed executing ezb updater for %s: %s", isil,
-                          ar.cause()));
                   result.fail(ar.cause());
                 }
               });
@@ -105,101 +186,59 @@ public class EZBHarvestVerticle extends AbstractVerticle {
     return result.future();
   }
 
-  private Future<String> fetchFileFromEZB(String user, String password, String libId) {
-    Promise<String> result = Promise.promise();
-    WebClient client = WebClient.create(vertx);
-    String url = String.format(
-        "https://rzbezb2.ur.de/ezb/export/licenselist_html.php?pack=0&bibid=%s&lang=de&output_style=kbart&todo_license=ALkbart",
-        libId);
-    HttpRequest<Buffer> get = client.getAbs(
-        url)
-        .basicAuthentication(user, password);
-    get.send(ar -> {
-      if (ar.succeeded()) {
-        HttpResponse<Buffer> response = ar.result();
-        if (ar.result().statusCode() == 200) {
-          result.complete(response.bodyAsString());
-        } else {
-          result.fail(
-              String
-                  .format(
-                      "Failed to fetch ezb file. Http status code: %s. Status message: %s. %s ",
-                      response.statusCode(), response.statusMessage(), response.bodyAsString()));
-        }
-      } else {
-        result.fail("Failed to fetch ezb file. " + ar.cause());
-      }
-    });
-    return result.future();
+  /**
+   * Inserts the given ezb file as base64 into the database
+   *
+   * @param ezbFile The ezb file
+   * @param isil    Isil of current tenant
+   * @return
+   */
+  private Future<File> insertEZBFile(String ezbFile, String isil) {
+    String base64Data = Base64.getEncoder().encodeToString(ezbFile.getBytes());
+    String uuid = UUID.randomUUID().toString();
+    File file = new File().withData(base64Data).withId(uuid).withIsil(isil);
+    return selectFileDAO.upsert(file, uuid, vertx.getOrCreateContext());
   }
 
-  private Future<FincSelectFilter> fetchFilterFromDB(String isil) {
-    Promise<FincSelectFilter> result = Promise.promise();
-    selectFilterDAO
-        .getAll("label=\"" + LABEL_EZB_HOLDINGS + "\"", 0, 1, isil, vertx.getOrCreateContext())
-        .onComplete(ar -> {
-          if (ar.succeeded()) {
-            FincSelectFilters fincSelectFilters = ar.result();
-            List<FincSelectFilter> filters = fincSelectFilters.getFincSelectFilters();
-            if (filters.isEmpty()) {
-              result.complete();
-            } else {
-              result.complete(filters.get(0));
-            }
-          } else {
-            result.fail("Failed to fetch filter from DB: " + ar.cause());
-          }
-        });
-    return result.future();
+  /**
+   * Updates the given {@link FincSelectFilter} in the database
+   *
+   * @param filter The filter
+   * @return
+   */
+  private Future<FincSelectFilter> updateFilter(FincSelectFilter filter) {
+    filter.getMetadata().setUpdatedDate(new Date());
+    return selectFilterDAO.update(filter, filter.getId(), vertx.getOrCreateContext());
   }
 
-  private boolean hasEZBFile(FincSelectFilter filter) {
-    return filter.getFilterFiles().stream()
-        .anyMatch(filterFile -> LABEL_EZB_FILE.equals(filterFile.getLabel()));
-  }
-
-  private Future<File> fetchFileFromDB(String id, String isil) {
-    Promise<File> result = Promise.promise();
-    selectFileDAO.getById(id, isil, vertx.getOrCreateContext())
-        .onComplete(ar -> {
-          if (ar.succeeded()) {
-            result.complete(ar.result());
-          } else {
-            result.fail("Failed to fetch file from DB: " + ar.cause());
-          }
-        });
-    return result.future();
-  }
-
-  private Future<List<String>> calcFilesToDelete(String ezbFile, FincSelectFilter filter,
+  /**
+   * Calculates a list of file ids that shall be removed from the given {@link FincSelectFilter}. If
+   * given filter has more than one ezb file, all ezb files shall be removed. Else the ezb file
+   * shall be removed if content from database differs from actual content from ezb server.
+   *
+   * @param ezbFile Content of actual ezb file
+   * @param filter  The filter
+   * @param isil    Isil of current tenant
+   * @return
+   */
+  private Future<List<String>> calcFilesToRemove(String ezbFile, FincSelectFilter filter,
       String isil) {
     Promise<List<String>> result = Promise.promise();
     List<FilterFile> filterFiles = filter.getFilterFiles();
-    List<String> fileIds = filterFiles.stream()
+    List<String> ezbFileIds = filterFiles.stream()
         .filter(filterFile -> LABEL_EZB_FILE.equals(filterFile.getLabel()))
         .map(FilterFile::getFileId).collect(
             Collectors.toList());
-    if (fileIds.size() > 1) {
-      result.complete(fileIds);
+    if (ezbFileIds.size() > 1) {
+      // if there is more than one file named "EZB file" we need to delete all of them
+      result.complete(ezbFileIds);
     } else {
-      fetchFileFromDB(fileIds.get(0), isil)
+      String ezbFileIdInDB = ezbFileIds.get(0);
+      fetchFileFromDB(ezbFileIdInDB, isil)
           .onComplete(ar -> {
             if (ar.succeeded()) {
-              File file = ar.result();
-              if (file == null) {
-                log.info("Will update ezb file. Old file not found.");
-                result.complete(Collections.singletonList(fileIds.get(0)));
-              } else {
-                String fromDBAsBase64 = file.getData();
-                String ezbAsBase64 = Base64.getEncoder().encodeToString(ezbFile.getBytes());
-                if (fromDBAsBase64.equals(ezbAsBase64)) {
-                  log.info("Will not update ezb file. Content of new and old file is equal.");
-                  result.complete(Collections.emptyList());
-                } else {
-                  log.info("Will update ezb file. Content of new and old file is not equal.");
-                  result.complete(Collections.singletonList(file.getId()));
-                }
-              }
+              File fileFromDB = ar.result();
+              result.complete(fileIdsToDelete(ezbFile, ezbFileIdInDB, fileFromDB));
             } else {
               result.fail(ar.cause());
             }
@@ -208,7 +247,34 @@ public class EZBHarvestVerticle extends AbstractVerticle {
     return result.future();
   }
 
-  private Future<List<FilterFile>> deleteFiles(FincSelectFilter filter, List<String> fileIds,
+  private List<String> fileIdsToDelete(String ezbFileContent, String ezbFileIdInDB,
+      File fileFromDB) {
+    if (fileFromDB == null) {
+      log.info("Will update ezb file. Old file not found.");
+      return Collections.singletonList(ezbFileIdInDB);
+    } else {
+      String fromDBAsBase64 = fileFromDB.getData();
+      String ezbAsBase64 = Base64.getEncoder().encodeToString(ezbFileContent.getBytes());
+      if (fromDBAsBase64.equals(ezbAsBase64)) {
+        log.info("Will not update ezb file. Content of new and old file is equal.");
+        return Collections.emptyList();
+      } else {
+        log.info("Will update ezb file. Content of new and old file is not equal.");
+        return Collections.singletonList(fileFromDB.getId());
+      }
+    }
+  }
+
+  /**
+   * Removes files with given fileIds from database and from filter files of given {@link
+   * FincSelectFilter}
+   *
+   * @param filter  The filter
+   * @param fileIds Ids of files that will be removed
+   * @param isil    Isil of current tenant
+   * @return
+   */
+  private Future<List<FilterFile>> removeFiles(FincSelectFilter filter, List<String> fileIds,
       String isil) {
     Promise<List<FilterFile>> result = Promise.promise();
 
@@ -218,11 +284,10 @@ public class EZBHarvestVerticle extends AbstractVerticle {
 
     CompositeFuture.all(futures).onComplete(ar -> {
       if (ar.succeeded()) {
-        // delete filter files with matching ids
+        // delete filter files with matching ids from filter
         List<FilterFile> filteredFileIds = filter.getFilterFiles().stream()
             .filter(filterFile -> !fileIds.contains(filterFile.getFileId()))
             .collect(Collectors.toList());
-        // filter.setFilterFiles(filteredFileIds);
         result.complete(filteredFileIds);
       } else {
         result.fail(ar.cause());
@@ -231,16 +296,47 @@ public class EZBHarvestVerticle extends AbstractVerticle {
     return result.future();
   }
 
-  private Future<File> insertEZBFile(String ezbFile, String isil) {
-    String base64Data = Base64.getEncoder().encodeToString(ezbFile.getBytes());
-    String uuid = UUID.randomUUID().toString();
-    File file = new File().withData(base64Data).withId(uuid).withIsil(isil);
-    return selectFileDAO.upsert(file, uuid, vertx.getOrCreateContext());
+  /**
+   * Determines if the given {@link FincSelectFilter} shall be updated with given {@link
+   * FilterFile}s.
+   *
+   * @param filter             The filter
+   * @param updatedFilterFiles List of updated {@link FilterFile}s
+   * @return
+   */
+  private boolean shouldUpdateFilter(FincSelectFilter filter, List<FilterFile> updatedFilterFiles) {
+    return updatedFilterFiles.size() != filter.getFilterFiles().size();
   }
 
-  private Future<FincSelectFilter> updateFilter(FincSelectFilter filter) {
-    filter.getMetadata().setUpdatedDate(new Date());
-    return selectFilterDAO.update(filter, filter.getId(), vertx.getOrCreateContext());
+  /**
+   * Determines if {@link FincSelectFilter} has at least one ezb file in its filter files
+   *
+   * @param filter The filter
+   * @return
+   */
+  private boolean hasEZBFile(FincSelectFilter filter) {
+    return filter.getFilterFiles().stream()
+        .anyMatch(filterFile -> LABEL_EZB_FILE.equals(filterFile.getLabel()));
+  }
+
+  /**
+   * Fetches a {@link File} from database
+   *
+   * @param id   Id of the file
+   * @param isil Isil of current tenant
+   * @return
+   */
+  private Future<File> fetchFileFromDB(String id, String isil) {
+    Promise<File> result = Promise.promise();
+    selectFileDAO.getById(id, isil, vertx.getOrCreateContext())
+        .onComplete(ar -> {
+          if (ar.succeeded()) {
+            result.complete(ar.result());
+          } else {
+            result.fail(String.format("Failed to fetch file from DB: %s", ar.cause()));
+          }
+        });
+    return result.future();
   }
 
 }
