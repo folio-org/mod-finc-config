@@ -1,6 +1,5 @@
 package org.folio.rest.impl;
 
-import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
@@ -14,6 +13,7 @@ import io.vertx.core.logging.LoggerFactory;
 import org.folio.finc.periodic.EZBHarvestJob;
 import org.folio.rest.resource.interfaces.PostDeployVerticle;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -38,7 +38,7 @@ public class PostDeployImpl implements PostDeployVerticle {
       scheduler.start();
 
       JobDetail job = newJob(EZBHarvestJob.class)
-          .withIdentity("harvest-ezb-files-job")
+          .withIdentity(new JobKey("harvest-ezb-files-job"))
           .build();
 
       Trigger trigger = newTrigger()
@@ -47,7 +47,7 @@ public class PostDeployImpl implements PostDeployVerticle {
           .startNow()
           .build();
 
-       scheduler.scheduleJob(job, trigger);
+      scheduler.scheduleJob(job, trigger);
     } catch (SchedulerException e) {
       log.error(e);
     }

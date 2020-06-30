@@ -4,12 +4,8 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.web.client.HttpRequest;
-import io.vertx.ext.web.client.HttpResponse;
-import io.vertx.ext.web.client.WebClient;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
@@ -21,9 +17,11 @@ import org.folio.finc.dao.SelectFileDAOImpl;
 import org.folio.finc.dao.SelectFilterDAO;
 import org.folio.finc.dao.SelectFilterDAOImpl;
 import org.folio.finc.model.File;
+import org.folio.finc.periodic.ezb.EZBService;
 import org.folio.rest.jaxrs.model.FilterFile;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.jaxrs.model.FincSelectFilters;
+import org.folio.rest.jaxrs.model.Metadata;
 
 public class EZBHarvestVerticle extends AbstractVerticle {
 
@@ -32,15 +30,21 @@ public class EZBHarvestVerticle extends AbstractVerticle {
   public static final String LABEL_EZB_HOLDINGS = "EZB holdings";
   private final SelectFilterDAO selectFilterDAO = new SelectFilterDAOImpl();
   private final SelectFileDAO selectFileDAO = new SelectFileDAOImpl();
+  private final EZBService ezbService;
+
+  public EZBHarvestVerticle(EZBService ezbService) {
+    super();
+    this.ezbService = ezbService;
+  }
 
   @Override
-  public void start() {
+  public void start(Promise<Void> startFuture) {
     String user = config().getString("user");
     String password = config().getString("password");
     String libId = config().getString("libId");
     String isil = config().getString("isil");
 
-    Future<String> ezbFileFuture = fetchFileFromEZB(user, password, libId);
+    Future<String> ezbFileFuture = ezbService.fetchEZBFile(user, password, libId, vertx);
     Future<FincSelectFilter> dbFilterFuture = fetchFilterFromDB(isil);
     CompositeFuture.all(ezbFileFuture, dbFilterFuture)
         .compose(compositeFuture ->
@@ -50,46 +54,13 @@ public class EZBHarvestVerticle extends AbstractVerticle {
           if (ar.succeeded()) {
             log.info(String
                 .format("Successfully executed ezb updater for %s", isil));
+            startFuture.complete();
           } else {
             log.error(String.format("Error while updating ezb file for isil %s: %s", isil,
                 ar.cause()));
+            startFuture.fail(ar.cause());
           }
         });
-  }
-
-  /**
-   * Fetches ezb holding file from ezb
-   *
-   * @param user     Username
-   * @param password Password
-   * @param libId    libid resp. bibid
-   * @return
-   */
-  private Future<String> fetchFileFromEZB(String user, String password, String libId) {
-    Promise<String> result = Promise.promise();
-    WebClient client = WebClient.create(vertx);
-    String url = String.format(
-        "https://rzbezb2.ur.de/ezb/export/licenselist_html.php?pack=0&bibid=%s&lang=de&output_style=kbart&todo_license=ALkbart",
-        libId);
-    HttpRequest<Buffer> get = client.getAbs(url)
-        .basicAuthentication(user, password);
-    get.send(ar -> {
-      if (ar.succeeded()) {
-        HttpResponse<Buffer> response = ar.result();
-        if (ar.result().statusCode() == 200) {
-          result.complete(response.bodyAsString());
-        } else {
-          result.fail(
-              String
-                  .format(
-                      "Failed to fetch ezb file. Status code: %s. Status message: %s. %s ",
-                      response.statusCode(), response.statusMessage(), response.bodyAsString()));
-        }
-      } else {
-        result.fail("Failed to fetch ezb file. " + ar.cause());
-      }
-    });
-    return result.future();
   }
 
   /**
@@ -207,7 +178,15 @@ public class EZBHarvestVerticle extends AbstractVerticle {
    * @return
    */
   private Future<FincSelectFilter> updateFilter(FincSelectFilter filter) {
-    filter.getMetadata().setUpdatedDate(new Date());
+    Date date = new Date();
+    if (filter.getMetadata() == null) {
+      Metadata md = new Metadata()
+          .withCreatedDate(date)
+          .withUpdatedDate(date);
+      filter.setMetadata(md);
+    } else {
+      filter.getMetadata().setUpdatedDate(date);
+    }
     return selectFilterDAO.update(filter, filter.getId(), vertx.getOrCreateContext());
   }
 
