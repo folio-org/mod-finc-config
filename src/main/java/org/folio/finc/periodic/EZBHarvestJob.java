@@ -1,6 +1,7 @@
 package org.folio.finc.periodic;
 
 import com.google.gson.Gson;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -8,6 +9,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.folio.finc.dao.EZBCredentialsDAO;
@@ -48,16 +50,38 @@ public class EZBHarvestJob implements Job {
 
   public Future<Void> run(Context vertxContext) {
     Promise<Void> result = Promise.promise();
+    List<Future> futures = new ArrayList<>();
     ezbCredentialsDAO.getAll(null, 0, 1000, vertxContext)
         .onComplete(ar -> {
           if (ar.succeeded()) {
             Credentials credentials = ar.result();
             List<JsonObject> configs = createConfigs(credentials, vertxContext.config());
             configs.forEach(c -> {
+              Promise<Void> singleResult = Promise.promise();
+              futures.add(singleResult.future());
               EZBHarvestVerticle verticle = new EZBHarvestVerticle(ezbService);
               vertxContext.owner().deployVerticle(
                   verticle,
-                  new DeploymentOptions().setConfig(c).setWorker(true));
+                  new DeploymentOptions().setConfig(c).setWorker(true),
+                  stringAsyncResult -> {
+                    if (stringAsyncResult.failed()) {
+                      log.error(
+                          String.format(
+                              "Failed to deploy ezb verticle: %s",
+                              stringAsyncResult.cause().getMessage()),
+                          stringAsyncResult.cause());
+                      singleResult.fail(stringAsyncResult.cause());
+                    } else {
+                      singleResult.complete();
+                    }
+                  });
+            });
+            CompositeFuture.all(futures).onComplete(comFutAR -> {
+              if (comFutAR.succeeded()) {
+                result.complete();
+              } else {
+                result.fail(comFutAR.cause());
+              }
             });
           } else {
             log.error("Error getting ezb credentials", ar.cause());

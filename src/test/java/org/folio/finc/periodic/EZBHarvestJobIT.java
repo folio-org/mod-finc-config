@@ -164,6 +164,7 @@ public class EZBHarvestJobIT {
                               });
                             } else {
                               context.fail(a.cause());
+                              async.countDown();
                             }
                           });
                         } else {
