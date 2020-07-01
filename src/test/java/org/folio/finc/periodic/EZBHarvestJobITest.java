@@ -37,7 +37,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class EZBHarvestJobIT {
+public class EZBHarvestJobITest {
 
   private static Vertx vertx;
   private static Context vertxContext;
@@ -49,7 +49,7 @@ public class EZBHarvestJobIT {
   public Timeout timeout = Timeout.seconds(50);
 
   @BeforeClass
-  public static void beforeClass(TestContext ctx) {
+  public static void beforeClass() {
     vertx = Vertx.vertx();
     vertxContext = vertx.getOrCreateContext();
   }
@@ -192,11 +192,11 @@ public class EZBHarvestJobIT {
     String fileId = UUID.randomUUID().toString();
     File file = new File()
         .withData(Base64.getEncoder().encodeToString(content.getBytes()))
-        .withIsil(EZBHarvestJobIT.tenant)
+        .withIsil(EZBHarvestJobITest.tenant)
         .withId(fileId);
     fileDAO.upsert(file, fileId, vertx.getOrCreateContext())
         .onComplete(fileAR -> {
-          filterDAO.getAll("label==\"EZB holdings\"", 0, 1, EZBHarvestJobIT.tenant, vertx.getOrCreateContext())
+          filterDAO.getAll("label==\"EZB holdings\"", 0, 1, EZBHarvestJobITest.tenant, vertx.getOrCreateContext())
               .onComplete(filterAR -> {
                 if (filterAR.succeeded()) {
                   List<FincSelectFilter> selectFilters = filterAR.result().getFincSelectFilters();
@@ -226,7 +226,7 @@ public class EZBHarvestJobIT {
     Promise<String> result = Promise.promise();
     SelectFilterDAO selectFilterDAO = new SelectFilterDAOImpl();
 
-    selectFilterDAO.getAll("label==\"EZB holdings\"", 0, 1, EZBHarvestJobIT.tenant, vertx.getOrCreateContext())
+    selectFilterDAO.getAll("label==\"EZB holdings\"", 0, 1, EZBHarvestJobITest.tenant, vertx.getOrCreateContext())
         .onComplete(filterAr -> {
           if (filterAr.succeeded()) {
             List<FincSelectFilter> filters = filterAr.result().getFincSelectFilters();
@@ -264,7 +264,7 @@ public class EZBHarvestJobIT {
     Promise<Metadata> result = Promise.promise();
     SelectFilterDAO selectFilterDAO = new SelectFilterDAOImpl();
 
-    selectFilterDAO.getAll("label==\"EZB holdings\"", 0, 1, EZBHarvestJobIT.tenant, vertx.getOrCreateContext())
+    selectFilterDAO.getAll("label==\"EZB holdings\"", 0, 1, EZBHarvestJobITest.tenant, vertx.getOrCreateContext())
         .onComplete(filterAr -> {
           if (filterAr.succeeded()) {
             List<FincSelectFilter> filters = filterAr.result().getFincSelectFilters();

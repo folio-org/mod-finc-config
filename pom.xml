@@ -468,6 +468,7 @@
           </excludes>
           <includes>
             <include>**/ApiTestSuite.java</include>
+            <include>**/*ITest.java</include>
           </includes>
         </configuration>
       </plugin>

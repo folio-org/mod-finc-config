@@ -50,7 +50,7 @@ public class EZBHarvestJob implements Job {
 
   public Future<Void> run(Context vertxContext) {
     Promise<Void> result = Promise.promise();
-    List<Future> futures = new ArrayList<>();
+    List<Future> composedFutures = new ArrayList<>();
     ezbCredentialsDAO.getAll(null, 0, 1000, vertxContext)
         .onComplete(ar -> {
           if (ar.succeeded()) {
@@ -58,7 +58,7 @@ public class EZBHarvestJob implements Job {
             List<JsonObject> configs = createConfigs(credentials, vertxContext.config());
             configs.forEach(c -> {
               Promise<Void> singleResult = Promise.promise();
-              futures.add(singleResult.future());
+              composedFutures.add(singleResult.future());
               EZBHarvestVerticle verticle = new EZBHarvestVerticle(ezbService);
               vertxContext.owner().deployVerticle(
                   verticle,
@@ -76,7 +76,7 @@ public class EZBHarvestJob implements Job {
                     }
                   });
             });
-            CompositeFuture.all(futures).onComplete(comFutAR -> {
+            CompositeFuture.all(composedFutures).onComplete(comFutAR -> {
               if (comFutAR.succeeded()) {
                 result.complete();
               } else {

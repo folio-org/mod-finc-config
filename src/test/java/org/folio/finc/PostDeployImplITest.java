@@ -30,7 +30,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.listeners.SchedulerListenerSupport;
 
 @RunWith(VertxUnitRunner.class)
-public class PostDeployImplIT {
+public class PostDeployImplITest {
 
   private static final String TENANT = "finc";
   private static Vertx vertx;

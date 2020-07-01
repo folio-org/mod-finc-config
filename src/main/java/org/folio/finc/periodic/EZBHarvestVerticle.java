@@ -217,7 +217,7 @@ public class EZBHarvestVerticle extends AbstractVerticle {
           .onComplete(ar -> {
             if (ar.succeeded()) {
               File fileFromDB = ar.result();
-              result.complete(fileIdsToDelete(ezbFile, ezbFileIdInDB, fileFromDB));
+              result.complete(calcFileIdsToDelete(ezbFile, ezbFileIdInDB, fileFromDB));
             } else {
               result.fail(ar.cause());
             }
@@ -226,7 +226,7 @@ public class EZBHarvestVerticle extends AbstractVerticle {
     return result.future();
   }
 
-  private List<String> fileIdsToDelete(String ezbFileContent, String ezbFileIdInDB,
+  private List<String> calcFileIdsToDelete(String ezbFileContent, String ezbFileIdInDB,
       File fileFromDB) {
     if (fileFromDB == null) {
       log.info("Will update ezb file. Old file not found.");
@@ -257,11 +257,11 @@ public class EZBHarvestVerticle extends AbstractVerticle {
       String isil) {
     Promise<List<FilterFile>> result = Promise.promise();
 
-    List<Future> futures = fileIds.stream().map(id ->
+    List<Future> deleteFileFutures = fileIds.stream().map(id ->
         selectFileDAO.deleteById(id, isil, vertx.getOrCreateContext())
     ).collect(Collectors.toList());
 
-    CompositeFuture.all(futures).onComplete(ar -> {
+    CompositeFuture.all(deleteFileFutures).onComplete(ar -> {
       if (ar.succeeded()) {
         // delete filter files with matching ids from filter
         List<FilterFile> filteredFileIds = filter.getFilterFiles().stream()
