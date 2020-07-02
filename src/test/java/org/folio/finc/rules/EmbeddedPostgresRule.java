@@ -100,11 +100,9 @@ public class EmbeddedPostgresRule implements TestRule {
     try {
       PostgresClient.getInstance(vertx).startEmbeddedPostgres();
 
-      CompletableFuture<Void> future = new CompletableFuture<>();
+      CompletableFuture<List<String>> future = new CompletableFuture<>();
 
       createSchema(tenant)
-          .compose(s -> insertIsil(tenant))
-          // .compose(aVoid -> insertFilter(tenant))
           .onComplete(
               ar -> {
                 if (ar.succeeded()) {

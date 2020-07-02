@@ -7,17 +7,40 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.finc.mocks.EZBServiceMock;
 import org.folio.rest.jaxrs.model.Credential;
 import org.folio.rest.persist.PostgresClient;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
 public class EZBHarvestJobWithoutFilterITest extends AbstractEZBHarvestJobTest {
 
-  @BeforeClass
-  public static void beforeClass(TestContext context) {
+  @Before
+  public void setUp(TestContext context) {
     vertx = Vertx.vertx();
     vertxContext = vertx.getOrCreateContext();
+    Async async = context.async();
+    try {
+      PostgresClient.getInstance(vertx).startEmbeddedPostgres();
+
+      createSchema(tenant)
+          .compose(s -> insertIsil(tenant))
+          .onComplete(
+              ar -> {
+                if (ar.succeeded()) {
+                  async.complete();
+                } else {
+                  context.fail(ar.cause());
+                }
+              });
+    } catch (Exception e) {
+      context.fail(e);
+    }
+  }
+
+  @After
+  public void cleanUp(TestContext context) {
+    PostgresClient.stopEmbeddedPostgres();
   }
 
   @Test

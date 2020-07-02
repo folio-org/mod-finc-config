@@ -24,6 +24,8 @@ import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.jaxrs.model.FincSelectFilter.Type;
 import org.folio.rest.jaxrs.model.Metadata;
 import org.folio.rest.persist.PostgresClient;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,15 +33,41 @@ import org.junit.runner.RunWith;
 @RunWith(VertxUnitRunner.class)
 public class EZBHarvestJobWithFilterITest extends AbstractEZBHarvestJobTest {
 
+  private static final String filterId = UUID.randomUUID().toString();
+
   @BeforeClass
-  public static void beforeClass(TestContext context) {
+  public static void beforeClass() {
     vertx = Vertx.vertx();
     vertxContext = vertx.getOrCreateContext();
+  }
 
-    Async async = context.async(1);
-    insertFilter(tenant)
-        .onSuccess(aVoid -> async.complete())
-        .onFailure(context::fail);
+  @Before
+  public void setUp(TestContext context) {
+    vertx = Vertx.vertx();
+    vertxContext = vertx.getOrCreateContext();
+    Async async = context.async();
+    try {
+      PostgresClient.getInstance(vertx).startEmbeddedPostgres();
+
+      createSchema(tenant)
+          .compose(s -> insertIsil(tenant))
+          .compose(aVoid -> insertFilter(tenant))
+          .onComplete(
+              ar -> {
+                if (ar.succeeded()) {
+                  async.complete();
+                } else {
+                  context.fail(ar.cause());
+                }
+              });
+    } catch (Exception e) {
+      context.fail(e);
+    }
+  }
+
+  @After
+  public void cleanUp(TestContext context) {
+    PostgresClient.stopEmbeddedPostgres();
   }
 
   @Test
@@ -80,9 +108,10 @@ public class EZBHarvestJobWithFilterITest extends AbstractEZBHarvestJobTest {
   @Test
   public void checkThatFilterFileIsUpdated(TestContext context) {
     Async async = context.async(1);
+    String fileId = UUID.randomUUID().toString();
     Date date = Date
         .from(LocalDate.of(1977, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC));
-    insertEZBFile("foobar", date)
+    insertEZBFile("foobar", fileId, date)
         .onSuccess(aVoid -> {
           Credential credential = new Credential().withUser("user").withPassword("password")
               .withLibId("libId").withIsil(tenant);
@@ -125,8 +154,8 @@ public class EZBHarvestJobWithFilterITest extends AbstractEZBHarvestJobTest {
     Async async = context.async(1);
     Date date = Date
         .from(LocalDate.of(1977, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC));
-
-    insertEZBFile(EZBServiceMock.EZB_FILE_CONTENT, date)
+    String fileId = UUID.randomUUID().toString();
+    insertEZBFile(EZBServiceMock.EZB_FILE_CONTENT, fileId, date)
         .onSuccess(aVoid -> {
           Credential credential = new Credential().withUser("user").withPassword("password")
               .withLibId("libId").withIsil(tenant);
@@ -172,12 +201,11 @@ public class EZBHarvestJobWithFilterITest extends AbstractEZBHarvestJobTest {
         });
   }
 
-  private Future<Void> insertEZBFile(String content, Date date) {
+  private Future<Void> insertEZBFile(String content, String fileId, Date date) {
     Promise<Void> result = Promise.promise();
     SelectFileDAO fileDAO = new SelectFileDAOImpl();
     SelectFilterDAO filterDAO = new SelectFilterDAOImpl();
 
-    String fileId = UUID.randomUUID().toString();
     File file = new File()
         .withData(Base64.getEncoder().encodeToString(content.getBytes()))
         .withIsil(EZBHarvestJobWithFilterITest.tenant)
@@ -236,7 +264,7 @@ public class EZBHarvestJobWithFilterITest extends AbstractEZBHarvestJobTest {
   private static Future<Void> insertFilter(String tenant) {
     Promise<Void> result = Promise.promise();
     FincSelectFilter filter = new FincSelectFilter()
-        .withId(UUID.randomUUID().toString())
+        .withId(filterId)
         .withLabel("EZB holdings")
         .withType(Type.WHITELIST)
         .withIsil(tenant);
