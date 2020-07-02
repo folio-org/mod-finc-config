@@ -104,7 +104,7 @@ public class EmbeddedPostgresRule implements TestRule {
 
       createSchema(tenant)
           .compose(s -> insertIsil(tenant))
-          .compose(aVoid -> insertFilter(tenant))
+          // .compose(aVoid -> insertFilter(tenant))
           .onComplete(
               ar -> {
                 if (ar.succeeded()) {

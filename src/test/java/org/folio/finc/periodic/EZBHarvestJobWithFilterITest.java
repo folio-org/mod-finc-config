@@ -1,57 +1,45 @@
 package org.folio.finc.periodic;
 
-import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import org.folio.finc.dao.FileDAO;
-import org.folio.finc.dao.FileDAOImpl;
 import org.folio.finc.dao.SelectFileDAO;
 import org.folio.finc.dao.SelectFileDAOImpl;
 import org.folio.finc.dao.SelectFilterDAO;
 import org.folio.finc.dao.SelectFilterDAOImpl;
 import org.folio.finc.mocks.EZBServiceMock;
 import org.folio.finc.model.File;
-import org.folio.finc.rules.EmbeddedPostgresRule;
 import org.folio.rest.jaxrs.model.Credential;
 import org.folio.rest.jaxrs.model.FilterFile;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
+import org.folio.rest.jaxrs.model.FincSelectFilter.Type;
 import org.folio.rest.jaxrs.model.Metadata;
 import org.folio.rest.persist.PostgresClient;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class EZBHarvestJobITest {
-
-  private static Vertx vertx;
-  private static Context vertxContext;
-  private static final String tenant = "finc";
-
-  @ClassRule
-  public static EmbeddedPostgresRule pgRule = new EmbeddedPostgresRule(tenant);
-  @Rule
-  public Timeout timeout = Timeout.seconds(50);
+public class EZBHarvestJobWithFilterITest extends AbstractEZBHarvestJobTest {
 
   @BeforeClass
-  public static void beforeClass() {
+  public static void beforeClass(TestContext context) {
     vertx = Vertx.vertx();
     vertxContext = vertx.getOrCreateContext();
+
+    Async async = context.async(1);
+    insertFilter(tenant)
+        .onSuccess(aVoid -> async.complete())
+        .onFailure(context::fail);
   }
 
   @Test
@@ -192,11 +180,12 @@ public class EZBHarvestJobITest {
     String fileId = UUID.randomUUID().toString();
     File file = new File()
         .withData(Base64.getEncoder().encodeToString(content.getBytes()))
-        .withIsil(EZBHarvestJobITest.tenant)
+        .withIsil(EZBHarvestJobWithFilterITest.tenant)
         .withId(fileId);
     fileDAO.upsert(file, fileId, vertx.getOrCreateContext())
         .onComplete(fileAR -> {
-          filterDAO.getAll("label==\"EZB holdings\"", 0, 1, EZBHarvestJobITest.tenant, vertx.getOrCreateContext())
+          filterDAO.getAll("label==\"EZB holdings\"", 0, 1, EZBHarvestJobWithFilterITest.tenant,
+              vertx.getOrCreateContext())
               .onComplete(filterAR -> {
                 if (filterAR.succeeded()) {
                   List<FincSelectFilter> selectFilters = filterAR.result().getFincSelectFilters();
@@ -222,49 +211,12 @@ public class EZBHarvestJobITest {
     return result.future();
   }
 
-  private Future<String> getUpdatedEZBFile() {
-    Promise<String> result = Promise.promise();
-    SelectFilterDAO selectFilterDAO = new SelectFilterDAOImpl();
-
-    selectFilterDAO.getAll("label==\"EZB holdings\"", 0, 1, EZBHarvestJobITest.tenant, vertx.getOrCreateContext())
-        .onComplete(filterAr -> {
-          if (filterAr.succeeded()) {
-            List<FincSelectFilter> filters = filterAr.result().getFincSelectFilters();
-            if (filters.size() != 1) {
-              result.fail(String
-                  .format("Expected exactly 1 EZB holdings filter, but found %s", filters.size()));
-            } else {
-              List<FilterFile> filterFiles = filters.get(0).getFilterFiles();
-              List<FilterFile> ezbFiles = filterFiles.stream()
-                  .filter(filterFile -> filterFile.getLabel().equals("EZB file")).collect(
-                      Collectors.toList());
-              if (ezbFiles.size() != 1) {
-                result.fail(String
-                    .format("Expected exactly 1 EZB holdings file, but found %s", ezbFiles.size()));
-              } else {
-                String fileId = ezbFiles.get(0).getFileId();
-                getFile(fileId)
-                    .onComplete(fileAr -> {
-                      if (fileAr.succeeded()) {
-                        result.complete(fileAr.result());
-                      } else {
-                        result.fail(fileAr.cause());
-                      }
-                    });
-              }
-            }
-          } else {
-            result.fail(filterAr.cause());
-          }
-        });
-    return result.future();
-  }
-
   private Future<Metadata> getMetadataOfFilter() {
     Promise<Metadata> result = Promise.promise();
     SelectFilterDAO selectFilterDAO = new SelectFilterDAOImpl();
 
-    selectFilterDAO.getAll("label==\"EZB holdings\"", 0, 1, EZBHarvestJobITest.tenant, vertx.getOrCreateContext())
+    selectFilterDAO.getAll("label==\"EZB holdings\"", 0, 1, EZBHarvestJobWithFilterITest.tenant,
+        vertx.getOrCreateContext())
         .onComplete(filterAr -> {
           if (filterAr.succeeded()) {
             List<FincSelectFilter> filters = filterAr.result().getFincSelectFilters();
@@ -281,16 +233,17 @@ public class EZBHarvestJobITest {
     return result.future();
   }
 
-  private Future<String> getFile(String fileId) {
-    Promise<String> result = Promise.promise();
-    FileDAO fileDAO = new FileDAOImpl();
-    fileDAO.getById(fileId, vertx.getOrCreateContext())
-        .onComplete(ar -> {
+  private static Future<Void> insertFilter(String tenant) {
+    Promise<Void> result = Promise.promise();
+    FincSelectFilter filter = new FincSelectFilter()
+        .withId(UUID.randomUUID().toString())
+        .withLabel("EZB holdings")
+        .withType(Type.WHITELIST)
+        .withIsil(tenant);
+    PostgresClient.getInstance(vertx, tenant)
+        .save("filters", filter, ar -> {
           if (ar.succeeded()) {
-            String actualAsBase64 = ar.result().getData();
-            byte[] bytes = Base64.getDecoder().decode(actualAsBase64);
-            String s = new String(bytes, StandardCharsets.UTF_8);
-            result.complete(s);
+            result.complete();
           } else {
             result.fail(ar.cause());
           }
