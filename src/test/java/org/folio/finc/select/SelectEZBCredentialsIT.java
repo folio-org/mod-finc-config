@@ -32,13 +32,11 @@ public class SelectEZBCredentialsIT extends ApiTestBase {
     isilDiku = loadIsilDiku();
 
     credUBL = new Credential()
-        .withIsil(isilUBL.getIsil())
         .withPassword("pw")
         .withUser("user")
         .withLibId("ubl");
 
     credDiku = new Credential()
-        .withIsil(isilDiku.getIsil())
         .withPassword("pw")
         .withUser("user")
         .withLibId("diku");
@@ -52,7 +50,7 @@ public class SelectEZBCredentialsIT extends ApiTestBase {
         .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("Content-Type", ContentType.JSON)
         .header("Accept", ContentType.TEXT)
-        .delete(FINC_CONFIG_EZB_CREDENTIALS_ENDPOINT + "/" + credDiku.getIsil())
+        .delete(FINC_CONFIG_EZB_CREDENTIALS_ENDPOINT + "/" + isilDiku.getIsil())
         .then()
         .statusCode(204);
   }
@@ -68,7 +66,7 @@ public class SelectEZBCredentialsIT extends ApiTestBase {
         .put(FINC_SELECT_EZB_CREDENTIALS_ENDPOINT)
         .then()
         .statusCode(200)
-        .body("isil", Matchers.equalTo(credDiku.getIsil()))
+        .body("isil", Matchers.equalTo(isilDiku.getIsil()))
         .body("user", Matchers.equalTo(credDiku.getUser()));
 
     // GET
@@ -80,7 +78,7 @@ public class SelectEZBCredentialsIT extends ApiTestBase {
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
-        .body("isil", Matchers.equalTo(credDiku.getIsil()))
+        .body("isil", Matchers.equalTo(isilDiku.getIsil()))
         .body("user", Matchers.equalTo(credDiku.getUser()));
 
     // Change credential
@@ -92,7 +90,7 @@ public class SelectEZBCredentialsIT extends ApiTestBase {
         .put(FINC_SELECT_EZB_CREDENTIALS_ENDPOINT)
         .then()
         .statusCode(200)
-        .body("isil", Matchers.equalTo(credDiku.getIsil()))
+        .body("isil", Matchers.equalTo(isilDiku.getIsil()))
         .body("user", Matchers.equalTo("changed"));
 
     // GET
@@ -104,20 +102,7 @@ public class SelectEZBCredentialsIT extends ApiTestBase {
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200)
-        .body("isil", Matchers.equalTo(credDiku.getIsil()))
+        .body("isil", Matchers.equalTo(isilDiku.getIsil()))
         .body("user", Matchers.equalTo("changed"));
-
-    // try to put credential for other isil, should be rejected
-    // Change credential
-    given()
-        .body(Json.encode(credUBL))
-        .header("X-Okapi-Tenant", TENANT_DIKU)
-        .header("Content-Type", ContentType.JSON)
-        .header("Accept", ContentType.JSON)
-        .put(FINC_SELECT_EZB_CREDENTIALS_ENDPOINT)
-        .then()
-        .statusCode(400);
-
   }
-
 }

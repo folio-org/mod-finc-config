@@ -64,7 +64,7 @@ public class FincSelectEZBCredentialsAPI implements FincSelectEzbCredentials {
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
     isilDAO.getIsilForTenant(tenantId, vertxContext)
         .compose(isil -> {
-              if (!isil.equals(entity.getIsil())) {
+              if (entity.getIsil() != null && !isil.equals(entity.getIsil())) {
                 return Future.failedFuture(new EZBCredentialsException(
                     "Wrong isil specified for tenant."));
               } else {
