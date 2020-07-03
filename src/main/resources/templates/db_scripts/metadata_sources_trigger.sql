@@ -6,6 +6,8 @@ BEGIN
 END;
 $BODY$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS update_metadata_collections_on_update_source ON metadata_sources;
+
 CREATE TRIGGER update_metadata_collections_on_update_source
 AFTER UPDATE ON metadata_sources
 FOR EACH ROW
