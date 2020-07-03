@@ -213,6 +213,57 @@
       ]
     },
     {
+      "id": "finc-config/ezb-credentials",
+      "version": "1.0",
+      "handlers": [
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-config/ezb-credentials",
+          "permissionsRequired": [
+            "finc-config.ezb-credentials.collection.get"
+          ]
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-config/ezb-credentials/{isil}",
+          "permissionsRequired": [
+            "finc-config.ezb-credentials.item.get"
+          ]
+        },
+        {
+          "methods": [
+            "POST"
+          ],
+          "pathPattern": "/finc-config/ezb-credentials",
+          "permissionsRequired": [
+            "finc-config.ezb-credentials.item.post"
+          ]
+        },
+        {
+          "methods": [
+            "PUT"
+          ],
+          "pathPattern": "/finc-config/ezb-credentials/{isil}",
+          "permissionsRequired": [
+            "finc-config.ezb-credentials.item.put"
+          ]
+        },
+        {
+          "methods": [
+            "DELETE"
+          ],
+          "pathPattern": "/finc-config/ezb-credentials/{isil}",
+          "permissionsRequired": [
+            "finc-config.ezb-credentials.item.delete"
+          ]
+        }
+      ]
+    },
+    {
       "id": "finc-select/metadata-collections",
       "version": "1.0",
       "handlers": [
@@ -432,6 +483,39 @@
       ]
     },
     {
+      "id": "finc-select/ezb-credentials",
+      "version": "1.0",
+      "handlers": [
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-select/ezb-credentials",
+          "permissionsRequired": [
+            "finc-select.ezb-credentials.item.get"
+          ]
+        },
+        {
+          "methods": [
+            "PUT"
+          ],
+          "pathPattern": "/finc-select/ezb-credentials",
+          "permissionsRequired": [
+            "finc-select.ezb-credentials.item.put"
+          ]
+        },
+        {
+          "methods": [
+            "DELETE"
+          ],
+          "pathPattern": "/finc-select/ezb-credentials",
+          "permissionsRequired": [
+            "finc-select.ezb-credentials.item.delete"
+          ]
+        }
+      ]
+    },
+    {
       "id": "_tenant",
       "version": "1.2",
       "interfaceType": "system",
@@ -539,6 +623,31 @@
       "description": "Finc config: Get a single file"
     },
     {
+      "permissionName": "finc-config.ezb-credentials.collection.get",
+      "displayName": "finc config ezb-credentials collection get",
+      "description": "Finc config: Get collection of ezb credentials"
+    },
+    {
+      "permissionName": "finc-config.ezb-credentials.item.get",
+      "displayName": "finc config ezb-credentials item get",
+      "description": "Finc config: Get a single ezb credential"
+    },
+    {
+      "permissionName": "finc-config.ezb-credentials.item.post",
+      "displayName": "finc config ezb-credentials item post",
+      "description": "Finc config: Create a new ezb credential"
+    },
+    {
+      "permissionName": "finc-config.ezb-credentials.item.put",
+      "displayName": "finc config ezb-credentials item put",
+      "description": "Finc config: Update an existing ezb credential"
+    },
+    {
+      "permissionName": "finc-config.ezb-credentials.item.delete",
+      "displayName": "finc config ezb-credentials item delete",
+      "description": "Finc config: Delete an existing ezb credential"
+    },
+    {
       "permissionName": "finc-select.metadata-collections.collection.get",
       "displayName": "finc select metadata collections collection get",
       "description": "Finc select: Get a collection of metadata collections"
@@ -634,6 +743,21 @@
       "description": "Finc select: Create a new file"
     },
     {
+      "permissionName": "finc-select.ezb-credentials.item.get",
+      "displayName": "finc select ezb-credentials item get",
+      "description": "Finc select: Get a single ezb credential"
+    },
+    {
+      "permissionName": "finc-select.ezb-credentials.item.put",
+      "displayName": "finc select ezb-credentials item put",
+      "description": "Finc select: Create or update an ezb credential"
+    },
+    {
+      "permissionName": "finc-select.ezb-credentials.item.delete",
+      "displayName": "finc select ezb-credentials item delete",
+      "description": "Finc select: Delete an ezb credential"
+    },
+    {
       "permissionName": "finc-config.all",
       "displayName": "Finc config: All permissions",
       "description": "All permissions for finc config",
@@ -655,7 +779,12 @@
         "finc-config.isils.item.delete",
         "finc-config.filters.collection.get",
         "finc-config.filters.item.get",
-        "finc-config.files.item.get"
+        "finc-config.files.item.get",
+        "finc-config.ezb-credentials.collection.get",
+        "finc-config.ezb-credentials.item.get",
+        "finc-config.ezb-credentials.item.post",
+        "finc-config.ezb-credentials.item.put",
+        "finc-config.ezb-credentials.item.delete"
       ],
       "visible": true
     },
@@ -682,7 +811,10 @@
         "finc-select.filter-files.item.post",
         "finc-select.files.item.get",
         "finc-select.files.item.delete",
-        "finc-select.files.item.post"
+        "finc-select.files.item.post",
+        "finc-select.ezb-credentials.item.get",
+        "finc-select.ezb-credentials.item.put",
+        "finc-select.ezb-credentials.item.delete"
       ],
       "visible": true
     }
