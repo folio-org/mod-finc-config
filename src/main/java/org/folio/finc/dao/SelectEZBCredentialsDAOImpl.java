@@ -20,6 +20,11 @@ public class SelectEZBCredentialsDAOImpl implements SelectEZBCredentialsDAO {
   }
 
   @Override
+  public Future<Integer> deleteByIsil(String isil, Context ctx) {
+    return ezbCredentialsDAO.deleteByIsil(isil, ctx);
+  }
+
+  @Override
   public Future<Credential> upsert(Credential entity, Context ctx) {
     Promise<Credential> result = Promise.promise();
     ezbCredentialsDAO.getByIsil(entity.getIsil(), ctx)

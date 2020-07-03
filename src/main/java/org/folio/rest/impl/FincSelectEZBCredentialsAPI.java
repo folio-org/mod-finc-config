@@ -98,4 +98,25 @@ public class FincSelectEZBCredentialsAPI implements FincSelectEzbCredentials {
           }
         });
   }
+
+  @Override
+  @Validate
+  public void deleteFincSelectEzbCredentials(Map<String, String> okapiHeaders,
+      Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
+    String tenantId =
+        TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
+    isilDAO.getIsilForTenant(tenantId, vertxContext)
+        .compose(isil ->
+            selectEZBCredentialsDAO.deleteByIsil(isil, vertxContext)
+        )
+        .onComplete(ar -> {
+          if (ar.succeeded()) {
+            asyncResultHandler.handle(
+                Future.succeededFuture(DeleteFincSelectEzbCredentialsResponse.respond204()));
+          } else {
+            asyncResultHandler.handle(Future.succeededFuture(
+                DeleteFincSelectEzbCredentialsResponse.respond500WithTextPlain(ar.cause())));
+          }
+        });
+  }
 }

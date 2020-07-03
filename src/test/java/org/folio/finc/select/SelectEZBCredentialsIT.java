@@ -10,7 +10,6 @@ import org.folio.finc.ApiTestBase;
 import org.folio.rest.jaxrs.model.Credential;
 import org.folio.rest.jaxrs.model.Isil;
 import org.hamcrest.Matchers;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,38 +20,16 @@ public class SelectEZBCredentialsIT extends ApiTestBase {
 
   @Rule
   public Timeout timeout = Timeout.seconds(10);
-  private Credential credUBL;
   private Credential credDiku;
-  private Isil isilUBL;
   private Isil isilDiku;
 
   @Before
   public void init() {
-    isilUBL = loadIsilUbl();
     isilDiku = loadIsilDiku();
-
-    credUBL = new Credential()
-        .withPassword("pw")
-        .withUser("user")
-        .withLibId("ubl");
-
     credDiku = new Credential()
         .withPassword("pw")
         .withUser("user")
         .withLibId("diku");
-  }
-
-  @After
-  public void cleanup() {
-    // DELETE credentials
-    given()
-        .body(Json.encode(credDiku))
-        .header("X-Okapi-Tenant", TENANT_DIKU)
-        .header("Content-Type", ContentType.JSON)
-        .header("Accept", ContentType.TEXT)
-        .delete(FINC_CONFIG_EZB_CREDENTIALS_ENDPOINT + "/" + isilDiku.getIsil())
-        .then()
-        .statusCode(204);
   }
 
   @Test
@@ -104,5 +81,22 @@ public class SelectEZBCredentialsIT extends ApiTestBase {
         .statusCode(200)
         .body("isil", Matchers.equalTo(isilDiku.getIsil()))
         .body("user", Matchers.equalTo("changed"));
+
+    // DELETE
+    given()
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .delete(FINC_SELECT_EZB_CREDENTIALS_ENDPOINT)
+        .then()
+        .statusCode(204);
+
+    // GET
+    given()
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .header("Content-Type", ContentType.JSON)
+        .header("Accept", ContentType.JSON)
+        .get(FINC_SELECT_EZB_CREDENTIALS_ENDPOINT)
+        .then()
+        .contentType(ContentType.TEXT)
+        .statusCode(404);
   }
 }

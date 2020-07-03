@@ -16,5 +16,4 @@ public interface EZBCredentialsDAO {
 
   Future<Integer> deleteByIsil(String isil, Context vertxContext);
 
-
 }
