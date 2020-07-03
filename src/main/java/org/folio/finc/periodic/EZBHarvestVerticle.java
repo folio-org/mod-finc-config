@@ -44,6 +44,8 @@ public class EZBHarvestVerticle extends AbstractVerticle {
     String libId = config().getString("libId");
     String isil = config().getString("isil");
 
+    log.info("Will start ezb harvester verticle for isil {}", isil);
+
     Future<String> ezbFileFuture = ezbService.fetchEZBFile(user, password, libId, vertx);
     Future<FincSelectFilter> dbFilterFuture = fetchFilterFromDB(isil);
     CompositeFuture.all(ezbFileFuture, dbFilterFuture)

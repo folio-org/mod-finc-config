@@ -56,6 +56,9 @@ public class EZBHarvestJob implements Job {
           if (ar.succeeded()) {
             Credentials credentials = ar.result();
             List<JsonObject> configs = createConfigs(credentials, vertxContext.config());
+            if (configs.size() == 0) {
+              log.info("No ezb credentials in DB, thus will not start ezb harvester.");
+            }
             configs.forEach(c -> {
               Promise<Void> singleResult = Promise.promise();
               composedFutures.add(singleResult.future());
