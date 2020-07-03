@@ -43,10 +43,18 @@ public class FincSelectEZBCredentialsAPI implements FincSelectEzbCredentials {
         .onComplete(ar -> {
           if (ar.succeeded()) {
             Credential cred = ar.result();
-            asyncResultHandler.handle(
-                Future.succeededFuture(
-                    GetFincSelectEzbCredentialsResponse.respond200WithApplicationJson(
-                        cred.withId(null))));
+            if (cred == null) {
+              asyncResultHandler.handle(
+                  Future.succeededFuture(
+                      GetFincSelectEzbCredentialsResponse.respond404WithTextPlain("Not found")
+                  )
+              );
+            } else {
+              asyncResultHandler.handle(
+                  Future.succeededFuture(
+                      GetFincSelectEzbCredentialsResponse.respond200WithApplicationJson(
+                          cred.withId(null))));
+            }
           } else {
             asyncResultHandler.handle(
                 Future.succeededFuture(
