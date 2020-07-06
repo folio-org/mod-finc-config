@@ -1,5 +1,6 @@
 package org.folio.finc.periodic;
 
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
@@ -112,6 +113,54 @@ public class EZBHarvestJobWithFilterITest extends AbstractEZBHarvestJobTest {
     Date date = Date
         .from(LocalDate.of(1977, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC));
     insertEZBFile("foobar", fileId, date)
+        .onSuccess(aVoid -> {
+          Credential credential = new Credential().withUser("user").withPassword("password")
+              .withLibId("libId").withIsil(tenant);
+
+          PostgresClient.getInstance(vertx, tenant)
+              .save("ezb_credentials", credential, ar -> {
+                if (ar.succeeded()) {
+                  EZBHarvestJob job = new EZBHarvestJob();
+                  job.setEZBService(new EZBServiceMock());
+                  job.run(vertxContext)
+                      .onComplete(ar2 -> {
+                        if (ar2.succeeded()) {
+                          getUpdatedEZBFile().onComplete(a -> {
+                            if (a.succeeded()) {
+                              context.assertEquals(EZBServiceMock.EZB_FILE_CONTENT, a.result());
+                            } else {
+                              context.fail(a.cause());
+                            }
+                            async.countDown();
+                          });
+                        } else {
+                          context.fail();
+                          async.countDown();
+                        }
+                      });
+                } else {
+                  context.fail();
+                  async.countDown();
+                }
+              });
+        })
+        .onFailure(throwable -> {
+          context.fail(throwable);
+          async.countDown();
+        });
+  }
+
+  @Test
+  public void checkThatFilterFileIsUpdatedForMultiFiles(TestContext context) {
+    Async async = context.async(1);
+    String firstFileId = UUID.randomUUID().toString();
+    String secondFileId = UUID.randomUUID().toString();
+    Date date = Date
+        .from(LocalDate.of(1977, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC));
+
+    Future<Void> firstInsert = insertEZBFile("foo", firstFileId, date);
+    Future<Void> secondInsert = insertEZBFile("bar", secondFileId, date);
+    CompositeFuture.all(firstInsert, secondInsert)
         .onSuccess(aVoid -> {
           Credential credential = new Credential().withUser("user").withPassword("password")
               .withLibId("libId").withIsil(tenant);

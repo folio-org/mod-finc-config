@@ -99,4 +99,23 @@ public class SelectEZBCredentialsIT extends ApiTestBase {
         .contentType(ContentType.TEXT)
         .statusCode(404);
   }
+
+  @Test
+  public void checkThatUserCannotAddCredWithWrongIsil() {
+    Credential c = new Credential()
+        .withLibId("libId")
+        .withPassword("password")
+        .withUser("username")
+        .withIsil("foobar");
+
+    // PUT
+    given()
+        .body(Json.encode(c))
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .header("Content-Type", ContentType.JSON)
+        .header("Accept", ContentType.JSON)
+        .put(FINC_SELECT_EZB_CREDENTIALS_ENDPOINT)
+        .then()
+        .statusCode(400);
+  }
 }

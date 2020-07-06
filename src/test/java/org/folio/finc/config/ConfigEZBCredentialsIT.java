@@ -157,5 +157,39 @@ public class ConfigEZBCredentialsIT extends ApiTestBase {
         .statusCode(204);
   }
 
+  @Test
+  public void checkThatWeCannotPostCredsWithWrongIsil() {
+    // POST
+    given()
+        .body(Json.encode(credential))
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .header("Content-Type", ContentType.JSON)
+        .header("Accept", ContentType.JSON)
+        .post(FINC_CONFIG_EZB_CREDENTIALS_ENDPOINT)
+        .then()
+        .statusCode(201)
+        .body("isil", Matchers.equalTo(credential.getIsil()))
+        .body("user", Matchers.equalTo(credential.getUser()));
+
+    // PUT
+    given()
+        .body(Json.encode(credential))
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .header("Content-Type", ContentType.JSON)
+        .header("Accept", ContentType.TEXT)
+        .put(FINC_CONFIG_EZB_CREDENTIALS_ENDPOINT + "/" + "fake-isil")
+        .then()
+        .statusCode(400);
+
+    // DELETE
+    given()
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .header("Content-Type", ContentType.JSON)
+        .header("Accept", ContentType.TEXT)
+        .delete(FINC_CONFIG_EZB_CREDENTIALS_ENDPOINT + "/" + credential.getIsil())
+        .then()
+        .statusCode(204);
+  }
+
 
 }
