@@ -28,3 +28,9 @@ The management of filters is done by two endpoints: */finc-select/filters* and *
 */finc-select/filters* describes the filter. It has a *label* and a *type* which defines if this is a *blacklist* or a *whitelist* filter. It also has *filterFiles* which is an array holding information about associated files. The property *fileId* of *filerFiles* holds a reference (uuid) to the file which was uploaded before (see */finc-select/files*). *Filename* is the local's filename of the uploaded file.
 
 */finc-select/files* stores the actual binary file. A file is uploaded via HTTP POST to */finc-select/filter-files*, which returns the file's uuid. A single file can be downloaded via a HTTP GET */finc-select/filter-files/{id}*. Note, that you need to upload the binary file first, to get its id, which can then be used in the definition of a filter document.
+
+## Harvest EZB holding files
+
+This module can harvest holding files from the *Elektronische Zeitschriftenbibliothek (EZB)* periodically.
+
+The harvester will run each night at 1am automatically. It fetches the defined EZB credentials and will harvest the holding file for the libraries with defined credentials. Thus, to activate harvesting of holding files you need to define credentials for certain libraries.
