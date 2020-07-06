@@ -33,4 +33,10 @@ The management of filters is done by two endpoints: */finc-select/filters* and *
 
 This module can harvest holding files from the *Elektronische Zeitschriftenbibliothek (EZB)* periodically.
 
-The harvester will run each night at 1am automatically. It fetches the defined EZB credentials and will harvest the holding file for the libraries with defined credentials. Thus, to activate harvesting of holding files you need to define credentials for certain libraries.
+The harvester will run each night at 1am automatically. 
+In order to activate automatic harvesting for a certain tenant/library you need to define a filter called *EZB holdings* in finc-select. This filter needs to have a file called *EZB file*. In addition, EZB credentials need to be defined for the same tenant.
+
+With this, the harvesting works as follows: The harvester fetches the EZB credentials of each tenant and will harvest the holding file the tenants from the EZB. It will compare the downloaded holding file with the file called *EZB file* of the filter *EZB holdings*. If both files differ, the *EZB file* will be updated by the downloaded one. If the files are equal, nothing will be done.
+
+Thus, to activate harvesting of holding files you need to define ezb credentials and add a filter called *EZB holdings* with a file called *EZB file*.
+
