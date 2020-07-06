@@ -55,7 +55,7 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
         .getIsilForTenant(tenantId, vertxContext)
         .compose(
             isil -> selectMetadataCollectionsDAO.getAll(query, offset, limit, isil, vertxContext))
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 org.folio.rest.jaxrs.model.FincSelectMetadataCollections metadataCollections =
@@ -95,7 +95,7 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectMetadataCollectionsDAO.getById(id, isil, vertxContext))
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 asyncResultHandler.handle(
@@ -122,7 +122,7 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
       Context vertxContext) {
     selectMetadataCollectionsHelper
         .selectMetadataCollection(id, entity, okapiHeaders, vertxContext)
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 asyncResultHandler.handle(

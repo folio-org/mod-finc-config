@@ -34,7 +34,7 @@ public class FilterHelper {
 
     Future<FincSelectFilter> byId = selectFilterDAO.getById(filterId, isil, vertxContext);
     byId.compose(fincSelectFilter -> deleteFilesOfFilter(fincSelectFilter, isil, vertxContext))
-        .setHandler(
+        .onComplete(
             voidAsyncResult -> {
               if (voidAsyncResult.succeeded()) {
                 result.complete();
@@ -60,7 +60,7 @@ public class FilterHelper {
               .collect(Collectors.toList());
 
       CompositeFuture.all(deleteFutures)
-          .setHandler(
+          .onComplete(
               ar -> {
                 if (ar.succeeded()) {
                   logger.info(
@@ -95,7 +95,7 @@ public class FilterHelper {
 
     Promise<FincSelectFilter> result = Promise.promise();
     CompositeFuture.all(filesToDeleteFuture)
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 result.complete(filter.withFilterFiles(remainingFiles));

@@ -69,7 +69,7 @@ public class SelectMetadataCollectionsHelper {
             metadataCollection ->
                 this.metadataCollectionsDAO.update(
                     metadataCollection, mdCollectionId, vertxContext))
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 result.complete(true);
@@ -88,7 +88,7 @@ public class SelectMetadataCollectionsHelper {
 
     Promise<FincConfigMetadataCollection> result = Promise.promise();
     CompositeFuture.all(isilFuture, metadataCollectionFuture)
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 String isil = isilFuture.result();

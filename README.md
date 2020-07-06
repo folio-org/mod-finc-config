@@ -28,3 +28,15 @@ The management of filters is done by two endpoints: */finc-select/filters* and *
 */finc-select/filters* describes the filter. It has a *label* and a *type* which defines if this is a *blacklist* or a *whitelist* filter. It also has *filterFiles* which is an array holding information about associated files. The property *fileId* of *filerFiles* holds a reference (uuid) to the file which was uploaded before (see */finc-select/files*). *Filename* is the local's filename of the uploaded file.
 
 */finc-select/files* stores the actual binary file. A file is uploaded via HTTP POST to */finc-select/filter-files*, which returns the file's uuid. A single file can be downloaded via a HTTP GET */finc-select/filter-files/{id}*. Note, that you need to upload the binary file first, to get its id, which can then be used in the definition of a filter document.
+
+## Harvest EZB holding files
+
+This module can harvest holding files from the *Elektronische Zeitschriftenbibliothek (EZB)* periodically.
+
+The harvester will run each night at 1am automatically. 
+In order to activate automatic harvesting for a certain tenant/library you need to define a filter called *EZB holdings* in finc-select. This filter needs to have a file called *EZB file*. In addition, EZB credentials need to be defined for the same tenant.
+
+With this, the harvesting works as follows: The harvester fetches the EZB credentials of each tenant and will harvest the holding file the tenants from the EZB. It will compare the downloaded holding file with the file called *EZB file* of the filter *EZB holdings*. If both files differ, the *EZB file* will be updated by the downloaded one. If the files are equal, nothing will be done.
+
+Thus, to activate harvesting of holding files you need to define ezb credentials and add a filter called *EZB holdings* with a file called *EZB file*.
+

@@ -33,7 +33,7 @@ public class SelectMetadataSourcesDAOImpl implements SelectMetadataSourcesDAO {
     query = queryTranslator.translateQuery(query, isil);
     metadataSourcesDAO
         .getAll(query, offset, limit, vertxContext)
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 FincConfigMetadataSources fincConfigMetadataSources = ar.result();
@@ -58,7 +58,7 @@ public class SelectMetadataSourcesDAOImpl implements SelectMetadataSourcesDAO {
 
     metadataSourcesDAO
         .getById(id, vertxContext)
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 FincConfigMetadataSource fincConfigMetadataSource = ar.result();

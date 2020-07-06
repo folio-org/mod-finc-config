@@ -97,7 +97,7 @@ public class FilterHelperTest extends ApiTestBase {
 
     Async async = context.async();
     cut.deleteFilesOfFilter(filter.getId(), isilUBL.getIsil(), Vertx.vertx().getOrCreateContext())
-        .setHandler(ar -> {
+        .onComplete(ar -> {
           if (ar.succeeded()) {
             Criteria idCrit =
                 new Criteria()
@@ -187,7 +187,7 @@ public class FilterHelperTest extends ApiTestBase {
     filterFile2.setDelete(true);
     Async async = context.async();
     cut.removeFilesToDelete(filter, isilUBL.getIsil(), Vertx.vertx().getOrCreateContext())
-        .setHandler(ar -> {
+        .onComplete(ar -> {
           if (ar.succeeded()) {
             PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
                 .get(
@@ -225,7 +225,7 @@ public class FilterHelperTest extends ApiTestBase {
     // DELETE Filter
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
-        .delete(FINC_SELECT_FILTERS_ENDPOINT + "/" + fileId)
+        .delete(FINC_SELECT_FILTERS_ENDPOINT + "/" + filterId)
         .then()
         .statusCode(204);
   }

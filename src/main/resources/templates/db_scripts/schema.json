@@ -120,6 +120,25 @@
       ]
     },
     {
+      "tableName": "ezb_credentials",
+      "fromModuleVersion": "mod-finc-config-1.6.0-SNAPSHOT",
+      "withMetadata": true,
+      "fullTextIndex": [
+        {
+          "fieldName": "user",
+          "tOps": "ADD"
+        },
+        {
+          "fieldName": "libId",
+          "tOps": "ADD"
+        },
+        {
+          "fieldName": "isil",
+          "tOps": "ADD"
+        }
+      ]
+    },
+    {
       "tableName": "filter_to_collections",
       "fromModuleVersion": "mod-finc-config-1.6.0-SNAPSHOT",
       "withMetadata": true

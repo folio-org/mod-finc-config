@@ -23,7 +23,7 @@ public class FincConfigFilesAPI extends FincFileHandler implements FincConfigFil
   public void getFincConfigFilesById(String id, Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
     fileDAO.getById(id, vertxContext)
-        .setHandler(
+        .onComplete(
             ar ->
                 handleAsyncFileReponse(
                     ar,

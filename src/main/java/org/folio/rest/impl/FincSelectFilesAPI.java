@@ -45,7 +45,7 @@ public class FincSelectFilesAPI extends FincFileHandler implements FincSelectFil
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectFileDAO.getById(id, isil, vertxContext))
-        .setHandler(
+        .onComplete(
             ar ->
                 handleAsyncFileReponse(
                     ar,
@@ -85,7 +85,7 @@ public class FincSelectFilesAPI extends FincFileHandler implements FincSelectFil
               File file = new File().withData(base64Data).withId(uuid).withIsil(isil);
               return selectFileDAO.upsert(file, uuid, vertxContext);
             })
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 asyncResultHandler.handle(
@@ -113,7 +113,7 @@ public class FincSelectFilesAPI extends FincFileHandler implements FincSelectFil
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectFileDAO.deleteById(id, isil, vertxContext))
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 asyncResultHandler.handle(

@@ -53,7 +53,7 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
 
     metadataSourcesDAO
         .getAll(query, offset, limit, vertxContext)
-        .setHandler(
+        .onComplete(
             ar -> {
               if (ar.succeeded()) {
                 org.folio.rest.jaxrs.model.FincConfigMetadataSources result = ar.result();
@@ -89,7 +89,7 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
     Future<FincConfigMetadataSource> sourceWithName =
         AttributeNameAdder.resolveAndAddAttributeNames(entity, okapiHeaders, vertxContext);
 
-    sourceWithName.setHandler(
+    sourceWithName.onComplete(
         ar -> {
           if (ar.succeeded()) {
             okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
@@ -162,7 +162,7 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
     Future<FincConfigMetadataSource> sourceWithName =
         AttributeNameAdder.resolveAndAddAttributeNames(entity, okapiHeaders, vertxContext);
 
-    sourceWithName.setHandler(
+    sourceWithName.onComplete(
         ar -> {
           if (ar.succeeded()) {
             okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
