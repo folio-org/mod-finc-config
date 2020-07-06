@@ -10,6 +10,7 @@ import org.folio.finc.ApiTestBase;
 import org.folio.rest.jaxrs.model.Credential;
 import org.folio.rest.jaxrs.model.Isil;
 import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,6 +31,11 @@ public class SelectEZBCredentialsIT extends ApiTestBase {
         .withPassword("pw")
         .withUser("user")
         .withLibId("diku");
+  }
+
+  @After
+  public void cleanUp() {
+    deleteIsil(isilDiku.getId());
   }
 
   @Test
