@@ -20,12 +20,10 @@
       "description" : "Current status of metadata source",
       "enum": [
         "active",
-        "terminated",
+        "closed",
         "impossible",
-        "negotiation",
-        "wish",
-        "trial",
-        "technical implementation"
+        "implementation",
+        "wish"
       ]
     },
     "organization": {
