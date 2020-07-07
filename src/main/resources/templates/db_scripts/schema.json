@@ -17,7 +17,7 @@
     },
     {
       "run": "after",
-      "snippetPath": "migration/1.6.0/metadata_collections.sql",
+      "snippetPath": "migration/1.6.0/migrate_to_1_6_0.sql",
       "fromModuleVersion": "mod-finc-config-1.6.0-SNAPSHOT"
     }
   ],
