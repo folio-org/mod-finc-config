@@ -367,7 +367,7 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
         new FincSelectMetadataSource()
             .withId(UUID.randomUUID().toString())
             .withLabel("Metadata Source 1")
-            .withStatus(Status.TERMINATED)
+            .withStatus(Status.CLOSED)
             .withSourceId(1);
     // POST metadata source
     given()
