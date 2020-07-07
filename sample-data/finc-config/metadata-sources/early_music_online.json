@@ -25,9 +25,6 @@
         }
       ]
     },
-    "contracts": [
-        "http://contract2.de"
-    ],
     "lastProcessed": "2017-12-12",
     "tickets": [
       "http://redmine.de/456"

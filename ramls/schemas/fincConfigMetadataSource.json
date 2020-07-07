@@ -74,14 +74,6 @@
       "type": "string",
       "description": "General notes not fitting into the other fields"
     },
-    "contracts": {
-      "description": "Links to contracts in agreements/license app or link to file upload app",
-      "type": "array",
-      "minItems": 0,
-      "items": {
-        "type": "string"
-      }
-    },
     "lastProcessed": {
       "type": "string",
       "format": "date-time",

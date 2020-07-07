@@ -41,9 +41,6 @@
       },
       "indexingLevel": "bibliographic",
       "generalNotes": "Test licensing note",
-      "contracts": [
-          "http://contract1.de"
-      ],
       "lastProcessed": "2018-01-01",
       "tickets": [
         "http://redmine.de/123",
