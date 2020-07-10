@@ -161,6 +161,7 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
         new FincConfigMetadataCollection()
             .withId(UUID.randomUUID().toString())
             .withLabel("Solr Mega Collection restricted and permitted")
+            .withCollectionId("collID3")
             .withUsageRestricted(UsageRestricted.YES)
             .withSolrMegaCollections(Arrays.asList("Solr Mega Collection 01"))
             .withPermittedFor(Arrays.asList(isilUBL.getIsil()))
@@ -170,6 +171,7 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
         new FincConfigMetadataCollection()
             .withId(UUID.randomUUID().toString())
             .withLabel("Solr Mega Collection restricted and not permitted")
+            .withCollectionId("collID2")
             .withUsageRestricted(UsageRestricted.YES)
             .withSolrMegaCollections(Arrays.asList("Solr Mega Collection 01"))
             .withPermittedFor(Arrays.asList(isilDiku.getIsil()))
@@ -179,6 +181,7 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
         new FincConfigMetadataCollection()
             .withId(UUID.randomUUID().toString())
             .withLabel("Solr Mega Collection not restricted")
+            .withCollectionId("collID1")
             .withUsageRestricted(UsageRestricted.NO)
             .withSolrMegaCollections(Arrays.asList("Solr Mega Collection 01"))
             .withMdSource(mdSource);
