@@ -54,6 +54,14 @@
         {
           "fieldName": "usageRestricted",
           "tOps": "ADD"
+        },
+        {
+          "fieldName": "description",
+          "tOps": "ADD"
+        },
+        {
+          "fieldName": "collectionId",
+          "tOps": "ADD"
         }
       ]
     },
@@ -96,6 +104,10 @@
         },
         {
           "fieldName": "status",
+          "tOps": "ADD"
+        },
+        {
+          "fieldName": "description",
           "tOps": "ADD"
         }
       ]
