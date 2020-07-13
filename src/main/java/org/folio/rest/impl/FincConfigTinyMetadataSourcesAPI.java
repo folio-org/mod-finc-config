@@ -8,6 +8,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import java.util.Map;
+import javax.validation.constraints.Pattern;
 import javax.ws.rs.core.Response;
 import org.folio.finc.dao.MetadataSourcesTinyDAO;
 import org.folio.finc.dao.MetadataSourcesTinyDAOImpl;
@@ -30,11 +31,9 @@ public class FincConfigTinyMetadataSourcesAPI implements FincConfigTinyMetadataS
 
   @Override
   @Validate
-  public void getFincConfigTinyMetadataSources(
-      String lang,
+  public void getFincConfigTinyMetadataSources(@Pattern(regexp = "[a-zA-Z]{2}") String lang,
       Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {
+      Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
 
     metadataSourcesTinyDAO
         .getAll(vertxContext)
