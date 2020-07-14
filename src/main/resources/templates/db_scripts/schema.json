@@ -63,6 +63,14 @@
           "fieldName": "collectionId",
           "tOps": "ADD"
         }
+      ],
+      "ginIndex": [
+        {
+          "fieldName": "mdSource.id",
+          "tOps": "ADD",
+          "caseSensitive": false,
+          "removeAccents": true
+        }
       ]
     },
     {
