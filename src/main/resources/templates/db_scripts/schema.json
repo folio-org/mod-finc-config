@@ -66,6 +66,18 @@
       ],
       "index": [
         {
+          "fieldName": "selectedBy",
+          "tOps": "ADD",
+          "caseSensitive": false,
+          "removeAccents": true
+        },
+        {
+          "fieldName": "permittedFor",
+          "tOps": "ADD",
+          "caseSensitive": false,
+          "removeAccents": true
+        },
+        {
           "fieldName": "mdSource.id",
           "tOps": "ADD",
           "caseSensitive": false,
