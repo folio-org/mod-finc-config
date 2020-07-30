@@ -18,7 +18,6 @@
     "note": "Note for test publication"
   },
   "collectionId": "coe-123",
-  "facetLabel": "012.1 21st Century COE",
   "solrMegaCollections": [
     "21st Century COE Program"
   ],

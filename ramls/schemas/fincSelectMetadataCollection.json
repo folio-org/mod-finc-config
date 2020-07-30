@@ -92,10 +92,6 @@
       "type": "string",
       "description": "Id of the collection"
     },
-    "facetLabel": {
-      "type": "string",
-      "description": "Facet's label"
-    },
     "productIsil": {
       "type": "string",
       "description": "Isil of product"
