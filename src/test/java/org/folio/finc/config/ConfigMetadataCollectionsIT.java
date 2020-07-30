@@ -22,7 +22,8 @@ import org.junit.runner.RunWith;
 @RunWith(VertxUnitRunner.class)
 public class ConfigMetadataCollectionsIT extends ApiTestBase {
 
-  @Rule public Timeout timeout = Timeout.seconds(10);
+  @Rule
+  public Timeout timeout = Timeout.seconds(10);
   private FincConfigMetadataCollection metadataCollection;
   private FincConfigMetadataCollection metadataCollectionChanged;
 
@@ -37,7 +38,6 @@ public class ConfigMetadataCollectionsIT extends ApiTestBase {
             .withUsageRestricted(UsageRestricted.NO)
             .withMetadataAvailable(MetadataAvailable.YES)
             .withSolrMegaCollections(Arrays.asList("Solr Mega Collection Test"))
-            .withFacetLabel("012.1 Facet Label")
             .withCollectionId("collection-123")
             .withMdSource(mdSource);
 
@@ -70,8 +70,7 @@ public class ConfigMetadataCollectionsIT extends ApiTestBase {
         .statusCode(200)
         .body("id", equalTo(metadataCollection.getId()))
         .body("label", equalTo(metadataCollection.getLabel()))
-        .body("mdSource.id", equalTo(metadataCollection.getMdSource().getId()))
-        .body("facetLabel", equalTo(metadataCollection.getFacetLabel()));
+        .body("mdSource.id", equalTo(metadataCollection.getMdSource().getId()));
 
     // PUT
     given()
@@ -94,8 +93,7 @@ public class ConfigMetadataCollectionsIT extends ApiTestBase {
         .statusCode(200)
         .body("id", equalTo(metadataCollectionChanged.getId()))
         .body("label", equalTo(metadataCollectionChanged.getLabel()))
-        .body("mdSource.id", equalTo(metadataCollectionChanged.getMdSource().getId()))
-        .body("facetLabel", equalTo(metadataCollectionChanged.getFacetLabel()));
+        .body("mdSource.id", equalTo(metadataCollectionChanged.getMdSource().getId()));
 
     // DELETE
     given()
@@ -152,10 +150,7 @@ public class ConfigMetadataCollectionsIT extends ApiTestBase {
         .body("fincConfigMetadataCollections[0].label", equalTo(metadataCollection.getLabel()))
         .body(
             "fincConfigMetadataCollections[0].mdSource.id",
-            equalTo(metadataCollectionChanged.getMdSource().getId()))
-        .body(
-            "fincConfigMetadataCollections[0].facetLabel",
-            equalTo(metadataCollectionChanged.getFacetLabel()));
+            equalTo(metadataCollectionChanged.getMdSource().getId()));
 
     String cql2 = "?query=(label=\"FOO*\")";
     given()
@@ -183,10 +178,7 @@ public class ConfigMetadataCollectionsIT extends ApiTestBase {
             "fincConfigMetadataCollections[0].label", equalTo(metadataCollectionChanged.getLabel()))
         .body(
             "fincConfigMetadataCollections[0].mdSource.id",
-            equalTo(metadataCollectionChanged.getMdSource().getId()))
-        .body(
-            "fincConfigMetadataCollections[0].facetLabel",
-            equalTo(metadataCollectionChanged.getFacetLabel()));
+            equalTo(metadataCollectionChanged.getMdSource().getId()));
 
     // DELETE
     given()
