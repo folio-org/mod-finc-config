@@ -27,8 +27,10 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
 
   private final Select unselect = new Select().withSelect(false);
   private final Select select = new Select().withSelect(true);
-  @Rule public Timeout timeout = Timeout.seconds(10);
+  @Rule
+  public Timeout timeout = Timeout.seconds(10);
   private FincConfigMetadataCollection metadataCollectionPermitted;
+  private FincConfigMetadataCollection metadataCollectionPermittedNotSelected;
   private FincConfigMetadataCollection metadataCollectionForbidden;
   private FincConfigMetadataCollection metadataCollectionNotRestricted;
   private Isil isilUBL;
@@ -47,6 +49,16 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
             .withUsageRestricted(UsageRestricted.YES)
             .withPermittedFor(Arrays.asList(isilUBL.getIsil(), isilDiku.getIsil()))
             .withSelectedBy(Arrays.asList(isilUBL.getIsil()))
+            .withSolrMegaCollections(Arrays.asList("21st Century COE Program"))
+            .withDescription("This is a test metadata collection permitted");
+    metadataCollectionPermittedNotSelected =
+        new FincConfigMetadataCollection()
+            .withId(UUID.randomUUID().toString())
+            .withLabel("Metadata Collection Permitted")
+            .withCollectionId("col1")
+            .withUsageRestricted(UsageRestricted.YES)
+            .withPermittedFor(Arrays.asList(isilUBL.getIsil(), isilDiku.getIsil()))
+            .withSelectedBy(Arrays.asList(isilUBL.getIsil() + "-Foo"))
             .withSolrMegaCollections(Arrays.asList("21st Century COE Program"))
             .withDescription("This is a test metadata collection permitted");
     metadataCollectionForbidden =
@@ -182,6 +194,42 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
             FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT
                 + "/"
                 + metadataCollectionNotRestricted.getId())
+        .then()
+        .statusCode(204);
+  }
+
+  @Test
+  public void checkThatNotSelectedIsNotReturned() {
+    // POST
+    given()
+        .body(Json.encode(metadataCollectionPermittedNotSelected))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .post(FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT)
+        .then()
+        .statusCode(201)
+        .body("id", equalTo(metadataCollectionPermittedNotSelected.getId()))
+        .body("label", equalTo(metadataCollectionPermittedNotSelected.getLabel()))
+        .body("description", equalTo(metadataCollectionPermittedNotSelected.getDescription()));
+
+    // GET
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT + "?query=(selected=yes AND permitted=yes)")
+        .then()
+        .contentType(ContentType.JSON)
+        .statusCode(200)
+        .body("fincSelectMetadataCollections.size()", equalTo(0));
+
+    // DELETE
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete(
+            FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT + "/" + metadataCollectionPermittedNotSelected
+                .getId())
         .then()
         .statusCode(204);
   }
