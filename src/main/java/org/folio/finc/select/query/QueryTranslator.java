@@ -62,11 +62,11 @@ public abstract class QueryTranslator {
   }
 
   private String selectedBy(String isil) {
-    return String.format("selectedBy = \"%s\"", isil);
+    return String.format("selectedBy == \"*\\\"%s\\\"*\"", isil);
   }
 
   private String permittedFor(String isil) {
-    return String.format("permittedFor = \"%s\"", isil);
+    return String.format("permittedFor == \"*\\\"%s\\\"*\"", isil);
   }
 
   protected String addUsageRestrictedNoIfUsagePermitted(String query) {
