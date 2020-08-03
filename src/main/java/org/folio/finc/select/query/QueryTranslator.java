@@ -6,6 +6,14 @@ import java.util.Deque;
 import java.util.function.UnaryOperator;
 import org.folio.finc.select.exception.FincSelectInvalidQueryException;
 
+/**
+ * Translates query from finc-select to finc-config.
+ *
+ * <p>E.g., in finc-select a tenant can query for selected metadata-collections by a query string
+ * similar to "selected=yes". However, as the selected information is stored in the DB as
+ * "selectedBy=[ISIL-1, ISISL-2]", the query needs to be translated to be used against this DB
+ * structure.
+ */
 public abstract class QueryTranslator {
 
   private static final String PERMITTED = "permitted";
@@ -49,8 +57,7 @@ public abstract class QueryTranslator {
   }
 
   private String processPermittedQuery(String query, String isil) {
-    return doTranslate(
-        query, PERMITTED, isil, this::permittedFor);
+    return doTranslate(query, PERMITTED, isil, this::permittedFor);
   }
 
   private String processRemainingQuery(String query) {
@@ -107,7 +114,7 @@ public abstract class QueryTranslator {
 
   public String[] splitSortBy(String query) {
     if (query == null) {
-      return new String[]{"", ""};
+      return new String[] {"", ""};
     }
     int sortbyIndex = query.toLowerCase().indexOf("sortby");
     String sortBy = "";
@@ -115,7 +122,7 @@ public abstract class QueryTranslator {
       sortBy = " " + query.substring(sortbyIndex);
       query = query.substring(0, sortbyIndex);
     }
-    return new String[]{query, sortBy};
+    return new String[] {query, sortBy};
   }
 
   private String balanceBrackets(String query) {
@@ -150,8 +157,5 @@ public abstract class QueryTranslator {
   }
 
   abstract String doTranslate(
-      String query,
-      String key,
-      String isil,
-      UnaryOperator<String> replaceQueryFunc);
+      String query, String key, String isil, UnaryOperator<String> replaceQueryFunc);
 }

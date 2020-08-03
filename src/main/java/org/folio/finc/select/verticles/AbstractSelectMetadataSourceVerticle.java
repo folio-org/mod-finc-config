@@ -17,6 +17,11 @@ import org.folio.rest.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * {@link io.vertx.core.Verticle} to select resp. unselect all metadata collections of a single
+ * metadata source. The actual behavior (select/unselect) is implemented by overriding the {@link
+ * #select(List, String)} method.
+ */
 public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerticle {
 
   private static final Logger logger =
@@ -50,6 +55,14 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
         .compose(compositeFuture -> updateSelectedBy(mdSourceId));
   }
 
+  /**
+   * Fetches {@link FincConfigMetadataCollection}s from the DB that are permitted. Permitted means
+   * usageRestricted is set to no or the isil is listed in the permittedFor array.
+   *
+   * @param mdSourceId ID of metadata source
+   * @param isil The current isil
+   * @return
+   */
   private Future<List<FincConfigMetadataCollection>> fetchPermittedCollections(
       String mdSourceId, String isil) {
 
@@ -106,6 +119,11 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
   abstract List<FincConfigMetadataCollection> select(
       List<FincConfigMetadataCollection> metadataCollections, String isil);
 
+  /**
+   * Fetches the isil that is assigned to the tenant
+   * @param tenantId ID of tenant
+   * @return
+   */
   private Future<String> fetchIsil(String tenantId) {
     Promise<String> result = Promise.promise();
     Criteria tenantCrit =

@@ -47,7 +47,7 @@ public class FincSelectFilesAPI extends FincFileHandler implements FincSelectFil
         .compose(isil -> selectFileDAO.getById(id, isil, vertxContext))
         .onComplete(
             ar ->
-                handleAsyncFileReponse(
+                handleAsyncFileResponse(
                     ar,
                     GetFincSelectFilesByIdResponse::respond200WithApplicationOctetStream,
                     GetFincSelectFilesByIdResponse::respond404WithTextPlain,

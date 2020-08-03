@@ -10,7 +10,7 @@ import org.folio.rest.tools.utils.BinaryOutStream;
 
 public abstract class FincFileHandler {
 
-  protected void handleAsyncFileReponse(AsyncResult<File> ar,
+  protected void handleAsyncFileResponse(AsyncResult<File> ar,
       Function<BinaryOutStream, ResponseDelegate> func200,
       Function<String, ResponseDelegate> func404, Function<Throwable, ResponseDelegate> func500,
       io.vertx.core.Handler<io.vertx.core.AsyncResult<javax.ws.rs.core.Response>> asyncResultHandler) {
