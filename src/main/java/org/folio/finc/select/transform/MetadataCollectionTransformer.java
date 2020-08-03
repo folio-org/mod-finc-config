@@ -1,4 +1,4 @@
-package org.folio.finc.select.isil.filter;
+package org.folio.finc.select.transform;
 
 import io.vertx.core.json.jackson.DatabindCodec;
 import java.util.List;
@@ -8,11 +8,11 @@ import org.folio.rest.jaxrs.model.FincSelectMetadataCollection;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollection.Permitted;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollection.Selected;
 
-public class MetadataCollectionIsilFilter
-    implements IsilFilter<FincSelectMetadataCollection, FincConfigMetadataCollection> {
+public class MetadataCollectionTransformer
+    implements Transformer<FincSelectMetadataCollection, FincConfigMetadataCollection> {
 
   @Override
-  public FincSelectMetadataCollection filterForIsil(
+  public FincSelectMetadataCollection transformEntry(
       FincConfigMetadataCollection entry, String isil) {
     List<String> selectedBy = entry.getSelectedBy();
     Selected selected = selectedBy.contains(isil) ? Selected.YES : Selected.NO;

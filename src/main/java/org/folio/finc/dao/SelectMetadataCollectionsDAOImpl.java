@@ -4,8 +4,8 @@ import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import java.util.List;
-import org.folio.finc.select.isil.filter.IsilFilter;
-import org.folio.finc.select.isil.filter.MetadataCollectionIsilFilter;
+import org.folio.finc.select.transform.Transformer;
+import org.folio.finc.select.transform.MetadataCollectionTransformer;
 import org.folio.finc.select.query.MetadataCollectionsQueryTranslator;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollection;
@@ -13,13 +13,13 @@ import org.folio.rest.jaxrs.model.FincSelectMetadataCollections;
 
 public class SelectMetadataCollectionsDAOImpl implements SelectMetadataCollectionsDAO {
 
-  private final IsilFilter<FincSelectMetadataCollection, FincConfigMetadataCollection> isilFilter;
+  private final Transformer<FincSelectMetadataCollection, FincConfigMetadataCollection> transformer;
   private final MetadataCollectionsDAO metadataCollectionsDAO;
   private final MetadataCollectionsQueryTranslator queryTranslator;
 
   public SelectMetadataCollectionsDAOImpl() {
     super();
-    this.isilFilter = new MetadataCollectionIsilFilter();
+    this.transformer = new MetadataCollectionTransformer();
     this.metadataCollectionsDAO = new MetadataCollectionsDAOImpl();
     this.queryTranslator = new MetadataCollectionsQueryTranslator();
   }
@@ -43,7 +43,7 @@ public class SelectMetadataCollectionsDAOImpl implements SelectMetadataCollectio
                     ar.result().getFincConfigMetadataCollections();
 
                 List<FincSelectMetadataCollection> transformedCollections =
-                    isilFilter.filterForIsil(fincConfigMetadataCollections, isil);
+                    transformer.transformCollection(fincConfigMetadataCollections, isil);
 
                 collectionsCollection.setFincSelectMetadataCollections(transformedCollections);
                 collectionsCollection.setTotalRecords(ar.result().getTotalRecords());
@@ -67,7 +67,7 @@ public class SelectMetadataCollectionsDAOImpl implements SelectMetadataCollectio
             ar -> {
               if (ar.succeeded()) {
                 FincSelectMetadataCollection fincSelectMetadataCollection =
-                    isilFilter.filterForIsil(ar.result(), isil);
+                    transformer.transformEntry(ar.result(), isil);
                 result.complete(fincSelectMetadataCollection);
               } else {
                 result.fail("Cannot get finc select metadata collection by id. " + ar.cause());
