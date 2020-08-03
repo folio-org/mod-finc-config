@@ -25,7 +25,7 @@ public class FincConfigFilesAPI extends FincFileHandler implements FincConfigFil
     fileDAO.getById(id, vertxContext)
         .onComplete(
             ar ->
-                handleAsyncFileReponse(
+                handleAsyncFileResponse(
                     ar,
                     GetFincConfigFilesByIdResponse::respond200WithApplicationOctetStream,
                     GetFincConfigFilesByIdResponse::respond404WithTextPlain,

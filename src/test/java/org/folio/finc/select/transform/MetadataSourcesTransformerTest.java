@@ -1,4 +1,4 @@
-package org.folio.finc.select.isil.filter;
+package org.folio.finc.select.transform;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,18 +11,18 @@ import org.folio.rest.jaxrs.model.SelectedBy;
 import org.junit.Before;
 import org.junit.Test;
 
-public class MetadataSourcesIsilFilterTest {
+public class MetadataSourcesTransformerTest {
 
   private static final String SOURCE_1 = "Source 1";
   private static final String SOURCE_2 = "Source 2";
   private static final String DE_14 = "DE-14";
   private static final String DE_15 = "DE-15";
 
-  private IsilFilter<FincSelectMetadataSource, FincConfigMetadataSource> isilFilter;
+  private Transformer<FincSelectMetadataSource, FincConfigMetadataSource> transformer;
 
   @Before
   public void setUp() {
-    isilFilter = new MetadataSourcesIsilFilter();
+    transformer = new MetadataSourcesTransformer();
   }
 
   @Test
@@ -49,7 +49,7 @@ public class MetadataSourcesIsilFilterTest {
     sources.add(source1);
     sources.add(source2);
 
-    List<FincSelectMetadataSource> transformed = isilFilter.filterForIsil(sources, DE_15);
+    List<FincSelectMetadataSource> transformed = transformer.transformCollection(sources, DE_15);
     transformed.stream()
         .forEach(
             mdSource -> {

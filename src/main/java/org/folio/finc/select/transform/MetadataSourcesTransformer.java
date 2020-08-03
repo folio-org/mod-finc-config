@@ -1,4 +1,4 @@
-package org.folio.finc.select.isil.filter;
+package org.folio.finc.select.transform;
 
 import io.vertx.core.json.jackson.DatabindCodec;
 import java.util.List;
@@ -8,11 +8,11 @@ import org.folio.rest.jaxrs.model.FincSelectMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource.Selected;
 import org.folio.rest.jaxrs.model.SelectedBy;
 
-public class MetadataSourcesIsilFilter
-    implements IsilFilter<FincSelectMetadataSource, FincConfigMetadataSource> {
+public class MetadataSourcesTransformer
+    implements Transformer<FincSelectMetadataSource, FincConfigMetadataSource> {
 
   @Override
-  public FincSelectMetadataSource filterForIsil(FincConfigMetadataSource entry, String isil) {
+  public FincSelectMetadataSource transformEntry(FincConfigMetadataSource entry, String isil) {
     List<SelectedBy> selectedBy = entry.getSelectedBy();
     List<SelectedBy> selectedByIsil =
         selectedBy.stream().filter(sb -> sb.getIsil().equals(isil)).collect(Collectors.toList());

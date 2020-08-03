@@ -21,6 +21,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.SchedulerException;
 
+/** A {@Link Job} to harvest EZB holding files automatically */
 public class EZBHarvestJob implements Job {
 
   private static final Logger log = LoggerFactory.getLogger(EZBHarvestJob.class);
@@ -51,59 +52,70 @@ public class EZBHarvestJob implements Job {
   public Future<Void> run(Context vertxContext) {
     Promise<Void> result = Promise.promise();
     List<Future> composedFutures = new ArrayList<>();
-    ezbCredentialsDAO.getAll(null, 0, 1000, vertxContext)
-        .onComplete(ar -> {
-          if (ar.succeeded()) {
-            Credentials credentials = ar.result();
-            List<JsonObject> configs = createConfigs(credentials, vertxContext.config());
-            if (configs.size() == 0) {
-              log.info("No ezb credentials in DB, thus will not start ezb harvester.");
-            }
-            configs.forEach(c -> {
-              Promise<Void> singleResult = Promise.promise();
-              composedFutures.add(singleResult.future());
-              EZBHarvestVerticle verticle = new EZBHarvestVerticle(ezbService);
-              vertxContext.owner().deployVerticle(
-                  verticle,
-                  new DeploymentOptions().setConfig(c).setWorker(true),
-                  stringAsyncResult -> {
-                    if (stringAsyncResult.failed()) {
-                      log.error(
-                          String.format(
-                              "Failed to deploy ezb verticle: %s",
-                              stringAsyncResult.cause().getMessage()),
-                          stringAsyncResult.cause());
-                      singleResult.fail(stringAsyncResult.cause());
-                    } else {
-                      singleResult.complete();
-                    }
-                  });
-            });
-            CompositeFuture.all(composedFutures).onComplete(comFutAR -> {
-              if (comFutAR.succeeded()) {
-                result.complete();
+    //   For each tenant there is an ezb credential entry holding the credentials to fetch the
+    // tenant's holding files.
+    ezbCredentialsDAO
+        .getAll(null, 0, 1000, vertxContext)
+        .onComplete(
+            ar -> {
+              if (ar.succeeded()) {
+                Credentials credentials = ar.result();
+                List<JsonObject> configs = createConfigs(credentials, vertxContext.config());
+                if (configs.size() == 0) {
+                  log.info("No ezb credentials in DB, thus will not start ezb harvester.");
+                }
+                configs.forEach(
+                    c -> {
+                      Promise<Void> singleResult = Promise.promise();
+                      composedFutures.add(singleResult.future());
+                      EZBHarvestVerticle verticle = new EZBHarvestVerticle(ezbService);
+                      vertxContext
+                          .owner()
+                          .deployVerticle(
+                              verticle,
+                              new DeploymentOptions().setConfig(c).setWorker(true),
+                              stringAsyncResult -> {
+                                if (stringAsyncResult.failed()) {
+                                  log.error(
+                                      String.format(
+                                          "Failed to deploy ezb verticle: %s",
+                                          stringAsyncResult.cause().getMessage()),
+                                      stringAsyncResult.cause());
+                                  singleResult.fail(stringAsyncResult.cause());
+                                } else {
+                                  singleResult.complete();
+                                }
+                              });
+                    });
+                CompositeFuture.all(composedFutures)
+                    .onComplete(
+                        comFutAR -> {
+                          if (comFutAR.succeeded()) {
+                            result.complete();
+                          } else {
+                            result.fail(comFutAR.cause());
+                          }
+                        });
               } else {
-                result.fail(comFutAR.cause());
+                log.error("Error getting ezb credentials", ar.cause());
+                result.fail(ar.cause());
               }
             });
-          } else {
-            log.error("Error getting ezb credentials", ar.cause());
-            result.fail(ar.cause());
-          }
-        });
     return result.future();
   }
 
   private List<JsonObject> createConfigs(Credentials creds, JsonObject vertxConfig) {
     Gson gson = new Gson();
-    return creds.getCredentials().stream().map(c -> {
-      JsonObject cfg = gson
-          .fromJson(gson.toJson(vertxConfig), JsonObject.class);
-      cfg.put("isil", c.getIsil());
-      cfg.put("user", c.getUser());
-      cfg.put("password", c.getPassword());
-      cfg.put("libId", c.getLibId());
-      return cfg;
-    }).collect(Collectors.toList());
+    return creds.getCredentials().stream()
+        .map(
+            c -> {
+              JsonObject cfg = gson.fromJson(gson.toJson(vertxConfig), JsonObject.class);
+              cfg.put("isil", c.getIsil());
+              cfg.put("user", c.getUser());
+              cfg.put("password", c.getPassword());
+              cfg.put("libId", c.getLibId());
+              return cfg;
+            })
+        .collect(Collectors.toList());
   }
 }

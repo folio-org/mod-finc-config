@@ -4,8 +4,8 @@ import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import java.util.List;
-import org.folio.finc.select.isil.filter.IsilFilter;
-import org.folio.finc.select.isil.filter.MetadataSourcesIsilFilter;
+import org.folio.finc.select.transform.Transformer;
+import org.folio.finc.select.transform.MetadataSourcesTransformer;
 import org.folio.finc.select.query.MetadataSourcesQueryTranslator;
 import org.folio.finc.select.query.QueryTranslator;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
@@ -16,13 +16,13 @@ import org.folio.rest.jaxrs.model.FincSelectMetadataSources;
 public class SelectMetadataSourcesDAOImpl implements SelectMetadataSourcesDAO {
 
   private final MetadataSourcesDAO metadataSourcesDAO;
-  private final IsilFilter<FincSelectMetadataSource, FincConfigMetadataSource> isilFilter;
+  private final Transformer<FincSelectMetadataSource, FincConfigMetadataSource> transformer;
   private final QueryTranslator queryTranslator;
 
   public SelectMetadataSourcesDAOImpl() {
     super();
     this.metadataSourcesDAO = new MetadataSourcesDAOImpl();
-    this.isilFilter = new MetadataSourcesIsilFilter();
+    this.transformer = new MetadataSourcesTransformer();
     this.queryTranslator = new MetadataSourcesQueryTranslator();
   }
 
@@ -39,7 +39,7 @@ public class SelectMetadataSourcesDAOImpl implements SelectMetadataSourcesDAO {
                 FincConfigMetadataSources fincConfigMetadataSources = ar.result();
                 FincSelectMetadataSources sourcesCollection = new FincSelectMetadataSources();
                 List<FincSelectMetadataSource> transformedSources =
-                    isilFilter.filterForIsil(
+                    transformer.transformCollection(
                         fincConfigMetadataSources.getFincConfigMetadataSources(), isil);
                 sourcesCollection.setFincSelectMetadataSources(transformedSources);
                 sourcesCollection.setTotalRecords(fincConfigMetadataSources.getTotalRecords());
@@ -66,7 +66,7 @@ public class SelectMetadataSourcesDAOImpl implements SelectMetadataSourcesDAO {
                   result.complete(null);
                 } else {
                   FincSelectMetadataSource fincSelectMetadataSource =
-                      isilFilter.filterForIsil(fincConfigMetadataSource, isil);
+                      transformer.transformEntry(fincConfigMetadataSource, isil);
                   result.complete(fincSelectMetadataSource);
                 }
               } else {
