@@ -34,8 +34,7 @@ import org.junit.runner.RunWith;
 public class FilterHelperTest extends ApiTestBase {
 
   private static final String TEST_CONTENT = "This is the test content!!!!";
-  @Rule
-  public Timeout timeout = Timeout.seconds(10);
+  @Rule public Timeout timeout = Timeout.seconds(10);
   private FilterHelper cut;
   private Isil isilUBL;
   private Isil isilDiku;
@@ -97,38 +96,36 @@ public class FilterHelperTest extends ApiTestBase {
 
     Async async = context.async();
     cut.deleteFilesOfFilter(filter.getId(), isilUBL.getIsil(), Vertx.vertx().getOrCreateContext())
-        .onComplete(ar -> {
-          if (ar.succeeded()) {
-            Criteria idCrit =
-                new Criteria()
-                    .addField("'id'")
-                    .setJSONB(true)
-                    .setOperation("=")
-                    .setVal(id);
-            Criterion criterion = new Criterion(idCrit);
-            PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
-                .get(
-                    "files",
-                    File.class,
-                    criterion,
-                    true,
-                    true,
-                    arDB -> {
-                      if (arDB.succeeded()) {
-                        if (arDB.result() != null) {
-                          context.assertEquals(0, arDB.result().getResults().size());
-                        } else {
-                          context.fail("Cannot get files.");
-                        }
-                        async.complete();
-                      } else {
-                        context.fail(ar.cause().toString());
-                      }
-                    });
-          } else {
-            context.fail("Failed deleting files. " + ar.cause());
-          }
-        });
+        .onComplete(
+            ar -> {
+              if (ar.succeeded()) {
+                Criteria idCrit =
+                    new Criteria().addField("'id'").setJSONB(true).setOperation("=").setVal(id);
+                Criterion criterion = new Criterion(idCrit);
+                PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
+                    .get(
+                        "files",
+                        File.class,
+                        criterion,
+                        true,
+                        true,
+                        arDB -> {
+                          if (arDB.succeeded()) {
+                            if (arDB.result() != null) {
+                              context.assertEquals(0, arDB.result().getResults().size());
+                            } else {
+                              context.fail("Cannot get files.");
+                            }
+                            async.complete();
+                          } else {
+                            context.fail(ar.cause().toString());
+                          }
+                        });
+              } else {
+                context.fail("Failed deleting files. " + ar.cause());
+              }
+            });
+    async.await();
 
     // DELETE Filter
     given()
@@ -187,31 +184,32 @@ public class FilterHelperTest extends ApiTestBase {
     filterFile2.setDelete(true);
     Async async = context.async();
     cut.removeFilesToDelete(filter, isilUBL.getIsil(), Vertx.vertx().getOrCreateContext())
-        .onComplete(ar -> {
-          if (ar.succeeded()) {
-            PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
-                .get(
-                    "files",
-                    File.class,
-                    true,
-                    true,
-                    arDB -> {
-                      if (arDB.succeeded()) {
-                        if (arDB.result() != null) {
-                          context.assertEquals(1, arDB.result().getResults().size());
-                        } else {
-                          context.fail("Cannot get files.");
-                        }
-                        async.complete();
-                      } else {
-                        context.fail(ar.cause().toString());
-                      }
-                      cleanUp(id1, filter.getId());
-                    });
-          } else {
-            context.fail("Failed deleting files.");
-          }
-        });
+        .onComplete(
+            ar -> {
+              if (ar.succeeded()) {
+                PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
+                    .get(
+                        "files",
+                        File.class,
+                        true,
+                        true,
+                        arDB -> {
+                          if (arDB.succeeded()) {
+                            if (arDB.result() != null) {
+                              context.assertEquals(1, arDB.result().getResults().size());
+                            } else {
+                              context.fail("Cannot get files.");
+                            }
+                            async.complete();
+                          } else {
+                            context.fail(ar.cause().toString());
+                          }
+                          cleanUp(id1, filter.getId());
+                        });
+              } else {
+                context.fail("Failed deleting files.");
+              }
+            });
   }
 
   private void cleanUp(String fileId, String filterId) {

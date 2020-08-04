@@ -145,8 +145,7 @@ public class SelectFilterDAOImpl implements SelectFilterDAO {
   }
 
   @Override
-  public Future<FincSelectFilter> update(
-      FincSelectFilter entity, String id, Context vertxContext) {
+  public Future<FincSelectFilter> update(FincSelectFilter entity, String id, Context vertxContext) {
     Promise<FincSelectFilter> result = Promise.promise();
     PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
         .update(
