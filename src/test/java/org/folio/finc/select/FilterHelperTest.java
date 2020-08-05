@@ -48,7 +48,7 @@ public class FilterHelperTest extends ApiTestBase {
 
     filter =
         new FincSelectFilter()
-            .withLabel("Holdings 1")
+            .withLabel("Holdings 3")
             .withId(UUID.randomUUID().toString())
             .withType(Type.WHITELIST);
 
