@@ -128,14 +128,6 @@
         "no"
       ]
     },
-    "filters": {
-      "type": "array",
-      "description": "Filters associated to this metadata collection",
-      "minItems": 0,
-      "items": {
-        "type": "string"
-      }
-    },
     "generalNotes": {
       "type": "string",
       "description": "Some notes"

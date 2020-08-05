@@ -33,15 +33,23 @@ public class FilterHelper {
     Promise<Void> result = Promise.promise();
 
     Future<FincSelectFilter> byId = selectFilterDAO.getById(filterId, isil, vertxContext);
-    byId.compose(fincSelectFilter -> deleteFilesOfFilter(fincSelectFilter, isil, vertxContext))
-        .onComplete(
-            voidAsyncResult -> {
-              if (voidAsyncResult.succeeded()) {
-                result.complete();
-              } else {
-                result.fail(voidAsyncResult.cause());
-              }
-            });
+    byId.onSuccess(
+        fincSelectFilter -> {
+          if (fincSelectFilter == null) {
+            result.fail("Cannot find filter with id " + filterId);
+          } else {
+            deleteFilesOfFilter(fincSelectFilter, isil, vertxContext)
+                .onComplete(
+                    voidAsyncResult -> {
+                      if (voidAsyncResult.succeeded()) {
+                        result.complete();
+                      } else {
+                        result.fail(voidAsyncResult.cause());
+                      }
+                    });
+          }
+        });
+    byId.onFailure(t -> result.fail("Cannot delete files of filter with id " + t));
     return result.future();
   }
 
@@ -55,8 +63,9 @@ public class FilterHelper {
     } else {
       List<Future> deleteFutures =
           filterFiles.stream()
-              .map(filterFile -> selectFileDAO
-                  .deleteById(filterFile.getFileId(), isil, vertxContext))
+              .map(
+                  filterFile ->
+                      selectFileDAO.deleteById(filterFile.getFileId(), isil, vertxContext))
               .collect(Collectors.toList());
 
       CompositeFuture.all(deleteFutures)
