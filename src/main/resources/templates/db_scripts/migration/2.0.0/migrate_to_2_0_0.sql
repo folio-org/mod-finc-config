@@ -5,7 +5,7 @@ SET     jsonb = jsonb - 'filters'
 WHERE   jsonb->'filters' IS NOT NULL;
 
 UPDATE  ${myuniversity}_${mymodule}.metadata_collections
-SET     jsonb = jsonb || '{"collectionId": "n/a"}'::jsonb
+SET     jsonb = jsonb || jsonb_build_object('collectionId', 'n/a - ' || random())
 WHERE   jsonb->'collectionId' IS NULL;
 
 UPDATE  ${myuniversity}_${mymodule}.metadata_collections
