@@ -74,9 +74,9 @@
           "type": "string",
           "description": "Indicator if publication is permitted",
           "enum": [
-            "Yes",
-            "No",
-            "Undetermined"
+            "yes",
+            "no",
+            "undetermined"
           ]
         },
         "note": {
