@@ -251,7 +251,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
 
     isilDAO
         .getIsilForTenant(tenantId, vertxContext)
-        .compose(isil -> filterToCollectionsDAO.getById(id, isil, vertxContext))
+        .compose(isil -> filterToCollectionsDAO.getByIdAndIsil(id, isil, vertxContext))
         .onComplete(
             reply -> {
               if (reply.succeeded()) {
@@ -325,7 +325,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
         .compose(
             isil -> {
               entity.setIsil(isil);
-              return filterToCollectionsDAO.getById(id, isil, vertxContext);
+              return filterToCollectionsDAO.getByIdAndIsil(id, isil, vertxContext);
             })
         .compose(
             fincSelectFilterCollections -> {

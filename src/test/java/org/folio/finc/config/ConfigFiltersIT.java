@@ -7,10 +7,12 @@ import com.jayway.restassured.http.ContentType;
 import io.vertx.core.json.Json;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import java.util.Arrays;
 import java.util.UUID;
 import org.folio.finc.ApiTestBase;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.jaxrs.model.FincSelectFilter.Type;
+import org.folio.rest.jaxrs.model.FincSelectFilterToCollections;
 import org.folio.rest.jaxrs.model.Isil;
 import org.junit.After;
 import org.junit.Before;
@@ -59,10 +61,10 @@ public class ConfigFiltersIT extends ApiTestBase {
     // POST
     given()
         .body(Json.encode(filterUBL))
-        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("content-type", ContentType.JSON)
         .header("accept", ContentType.JSON)
-        .post(FINC_SELECT_FILTERS_ENDPOINT)
+        .post(FINC_CONFIG_FILTERS_ENDPOINT)
         .then()
         .statusCode(201)
         .body("id", equalTo(filterUBL.getId()))
@@ -75,7 +77,7 @@ public class ConfigFiltersIT extends ApiTestBase {
         .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("content-type", ContentType.JSON)
         .header("accept", ContentType.JSON)
-        .post(FINC_SELECT_FILTERS_ENDPOINT)
+        .post(FINC_CONFIG_FILTERS_ENDPOINT)
         .then()
         .statusCode(201)
         .body("id", equalTo(filterDIKU.getId()))
@@ -119,48 +121,103 @@ public class ConfigFiltersIT extends ApiTestBase {
         .body("label", equalTo(filterDIKU.getLabel()))
         .body("type", equalTo(filterDIKU.getType().value()));
 
-    // DELETE filters
+    // PUT filter diku
+    filterDIKU.setLabel("CHANGED");
     given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .delete(FINC_SELECT_FILTERS_ENDPOINT + "/" + filterUBL.getId())
-        .then()
-        .statusCode(204);
-
-    given()
-        .header("X-Okapi-Tenant", TENANT_DIKU)
-        .delete(FINC_SELECT_FILTERS_ENDPOINT + "/" + filterDIKU.getId())
-        .then()
-        .statusCode(204);
-
-  }
-
-  @Test
-  public void checkUnimplementedEndpoints() {
-    given()
-        .header("X-Okapi-Tenant", TENANT_DIKU)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
-        .body(Json.encode(filterUBL))
-        .post(FINC_CONFIG_FILTERS_ENDPOINT)
-        .then()
-        .contentType(ContentType.JSON)
-        .statusCode(501);
-
-    given()
+        .body(Json.encode(filterDIKU))
         .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("content-type", ContentType.JSON)
         .header("accept", ContentType.TEXT)
-        .body(Json.encode(filterUBL))
-        .put(FINC_CONFIG_FILTERS_ENDPOINT + "/" + filterUBL.getId())
+        .put(FINC_CONFIG_FILTERS_ENDPOINT + "/" + filterDIKU.getId())
         .then()
-        .contentType(ContentType.JSON)
-        .statusCode(501);
+        .statusCode(204);
 
+    // DELETE filters
     given()
         .header("X-Okapi-Tenant", TENANT_DIKU)
         .delete(FINC_CONFIG_FILTERS_ENDPOINT + "/" + filterUBL.getId())
         .then()
-        .statusCode(501);
+        .statusCode(204);
+
+    given()
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .delete(FINC_CONFIG_FILTERS_ENDPOINT + "/" + filterDIKU.getId())
+        .then()
+        .statusCode(204);
   }
+
+  @Test
+  public void checkThatWeCanCreateFiltersToCollectionAssociation() {
+    filterDIKU.setId(UUID.randomUUID().toString());
+    FincSelectFilterToCollections filterToCollections =
+        new FincSelectFilterToCollections()
+            .withId(filterDIKU.getId())
+            .withCollectionIds(
+                Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
+    // POST filter
+    given()
+        .body(Json.encode(filterDIKU))
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .post(FINC_CONFIG_FILTERS_ENDPOINT)
+        .then()
+        .statusCode(201)
+        .body("id", equalTo(filterDIKU.getId()))
+        .body("label", equalTo(filterDIKU.getLabel()))
+        .body("type", equalTo(filterDIKU.getType().value()));
+
+    // PUT filter_to_collection
+    given()
+        .body(Json.encode(filterToCollections))
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .put(FINC_CONFIG_FILTERS_ENDPOINT + "/" + filterDIKU.getId() + "/collections")
+        .then()
+        .statusCode(200)
+        .body("collectionIds.size()", equalTo(2))
+        .body("collectionIds", equalTo(filterToCollections.getCollectionIds()))
+        .body("collectionsCount", equalTo(filterToCollections.getCollectionIds().size()));
+
+    // Get filter_to_collection
+    given()
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_CONFIG_FILTERS_ENDPOINT + "/" + filterDIKU.getId() + "/collections")
+        .then()
+        .contentType(ContentType.JSON)
+        .statusCode(200)
+        .body("collectionIds.size()", equalTo(2))
+        .body("collectionIds", equalTo(filterToCollections.getCollectionIds()))
+        .body("collectionsCount", equalTo(filterToCollections.getCollectionIds().size()));
+
+    // PUT filter_to_collection in order to update
+    filterToCollections.setCollectionIds(
+        Arrays.asList(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()));
+    given()
+        .body(Json.encode(filterToCollections))
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .put(FINC_CONFIG_FILTERS_ENDPOINT + "/" + filterDIKU.getId() + "/collections")
+        .then()
+        .statusCode(200)
+        .body("collectionIds.size()", equalTo(3))
+        .body("collectionIds", equalTo(filterToCollections.getCollectionIds()))
+        .body("collectionsCount", equalTo(filterToCollections.getCollectionIds().size()));
+
+    // DELETE filter
+    given()
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .delete(FINC_CONFIG_FILTERS_ENDPOINT + "/" + filterDIKU.getId())
+        .then()
+        .statusCode(204);
+    }
+
 
 }
