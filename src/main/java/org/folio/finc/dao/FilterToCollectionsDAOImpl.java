@@ -18,9 +18,8 @@ public class FilterToCollectionsDAOImpl implements FilterToCollectionsDAO {
   private static final String TABLE_NAME = "filter_to_collections";
 
   @Override
-  public Future<FincSelectFilterToCollections> getById(
+  public Future<FincSelectFilterToCollections> getByIdAndIsil(
       String filterId, String isil, Context vertxContext) {
-    Promise<FincSelectFilterToCollections> result = Promise.promise();
     Criteria filterIDCrit =
         new Criteria().addField("'id'").setOperation("=").setVal(filterId).setJSONB(true);
     Criteria isilCrit =
@@ -28,6 +27,24 @@ public class FilterToCollectionsDAOImpl implements FilterToCollectionsDAO {
     Criterion criterion = new Criterion();
     criterion.addCriterion(filterIDCrit);
     criterion.addCriterion(isilCrit);
+
+    return getByCriterion(criterion, vertxContext);
+  }
+
+  @Override
+  public Future<FincSelectFilterToCollections> getById(String filterId, Context vertxContext) {
+    Criteria filterIDCrit =
+        new Criteria().addField("'id'").setOperation("=").setVal(filterId).setJSONB(true);
+    Criterion criterion = new Criterion();
+    criterion.addCriterion(filterIDCrit);
+
+    return getByCriterion(criterion, vertxContext);
+  }
+
+  @Override
+  public Future<FincSelectFilterToCollections> getByCriterion(
+      Criterion criterion, Context vertxContext) {
+    Promise<FincSelectFilterToCollections> result = Promise.promise();
 
     PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
         .get(
@@ -42,7 +59,7 @@ public class FilterToCollectionsDAOImpl implements FilterToCollectionsDAO {
                 if (!filterToCollections.isEmpty()) {
                   result.complete(filterToCollections.get(0));
                 } else {
-                  result.complete();
+                  result.complete(null);
                 }
               } else {
                 result.fail("Cannot get filters to collections. " + reply.cause());
@@ -59,6 +76,7 @@ public class FilterToCollectionsDAOImpl implements FilterToCollectionsDAO {
     if (entity.getId() == null) {
       result.fail("FincSelectFilterCollection must have an id");
     } else {
+      entity.setCollectionsCount(entity.getCollectionIds().size());
       PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
           .upsert(
               TABLE_NAME,
