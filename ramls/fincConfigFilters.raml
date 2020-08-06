@@ -40,7 +40,8 @@ resourceTypes:
     ]
     description: Get all filters
   post:
-    description: Not implemented.
+    is: [validate]
+    description: Post new filter
   /{id}:
     type:
       collection-item:
@@ -49,9 +50,9 @@ resourceTypes:
     get:
       description: Get one finc select filter identified by id
     put:
-      description: Not implemented.
+      description: Put a filter identified by id
     delete:
-      description: Not implemented.
+      description: Delete a filter identified by id
     /collections:
       get:
         description: Get collections the current filter is assigned to
@@ -72,3 +73,25 @@ resourceTypes:
             body:
               text/plain:
                 example: "Internal server error"
+      put:
+        description: Add collections to this filter
+        body:
+          application/json:
+            type: fincSelectFilterToCollections
+        responses:
+          200:
+            description: The added collections
+            body:
+              application/json:
+                type: fincSelectFilterToCollections
+                example: !include examples/fincSelectFilterToMetadataCollections.sample
+          400:
+            description: Bad request
+            body:
+              text/plain:
+                example: Bad request
+          500:
+            description: Internal server error
+            body:
+              text/plain:
+                example: Internal server error
