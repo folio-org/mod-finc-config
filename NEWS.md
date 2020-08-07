@@ -1,3 +1,20 @@
+# 2.0.0
+* Add endpoints to manage association of filters and collections (UIFC-147, UIFC-149)
+* Bugfix: finc-select > collections: Usage permitted filter does not work properly (UIFC-159)
+* Add record las updated info to entities (UIFC-155)
+* Add filters and files endpoint to finc-config (UIFC-169)
+* Upgrade to RMB v30 (UIFC-168)
+* Automatically harvest EZB files as filter files for tenants (UIFC-176)
+* Delete field "Contracts" from metadata-sources (UIFC-185)
+* Update metadata sources implementation status values/filter (UIFC-183)
+* Collection id of metadata-collections is mandatory (UIFC-188)
+* Enable field search on description for sources & collections (UIFC-172)
+* Alphabetical sorting tiny metadata-sources (UIFC-178)
+* Improve estimation of number of records (UIFC-180)
+* Remove field "facet label" from metadata-collections (UIFC-196)
+* Bugfix: Selected filter does not work as expected (UIFC-190)
+* Field "collection id" of metadata-collections is unique (UIFC-192)
+
 ## 1.5.0
 * Filters contain IDs of associated metadata collections (UIFC-136)
 * Resolve and keep updated name of associated metadata source (UIFC-126)

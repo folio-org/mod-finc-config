@@ -70,7 +70,7 @@ CREATE OR REPLACE FUNCTION update_selected_state(
 $BODY$
 DECLARE selected jsonb;
 BEGIN
-  SELECT calc_selected_state_as_json($1) INTO selected;
+  SELECT calc_selected_state_as_json($1::text) INTO selected;
   IF selected IS NOT NULL THEN
     UPDATE metadata_sources SET jsonb = jsonb_set(jsonb, '{selectedBy}', selected, TRUE) WHERE jsonb->>'id' = $1;
   END IF;
@@ -83,7 +83,7 @@ CREATE OR REPLACE FUNCTION update_sources_selected_by_on_update() RETURNS TRIGGE
 $BODY$
 DECLARE selected jsonb;
 BEGIN
-  SELECT calc_selected_state_as_json(NEW.jsonb->'mdSource'->>'id') INTO selected;
+  SELECT calc_selected_state_as_json(NEW.jsonb->'mdSource'->>'id'::text) INTO selected;
   IF selected IS NOT NULL THEN
     UPDATE metadata_sources SET jsonb = jsonb_set(jsonb, '{selectedBy}', selected, TRUE) WHERE jsonb->>'id' = NEW.jsonb->'mdSource'->>'id';
   END IF;
@@ -95,7 +95,7 @@ CREATE OR REPLACE FUNCTION update_sources_selected_by_on_delete() RETURNS TRIGGE
 $BODY$
 DECLARE selected jsonb;
 BEGIN
-  SELECT calc_selected_state_as_json(OLD.jsonb->'mdSource'->>'id') INTO selected;
+  SELECT calc_selected_state_as_json(OLD.jsonb->'mdSource'->>'id'::text) INTO selected;
   UPDATE metadata_sources SET jsonb = jsonb_set(jsonb, '{selectedBy}', selected, TRUE) WHERE jsonb->>'id' = OLD.jsonb->'mdSource'->>'id';
   RETURN OLD;
 END;
