@@ -74,12 +74,9 @@
           "type": "string",
           "description": "Indicator if publication is permitted",
           "enum": [
-            "permitted (interpreted)",
-            "permitted (explicit)",
-            "permitted (explicit) under conditions",
-            "prohibited (interpreted)",
-            "prohibited (explicit)",
-            "silent"
+            "yes",
+            "no",
+            "undetermined"
           ]
         },
         "note": {
