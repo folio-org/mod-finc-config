@@ -188,11 +188,47 @@
         },
         {
           "methods": [
+            "PUT"
+          ],
+          "pathPattern": "/finc-config/filters/{id}",
+          "permissionsRequired": [
+            "finc-config.filters.item.put"
+          ]
+        },
+        {
+          "methods": [
+            "DELETE"
+          ],
+          "pathPattern": "/finc-config/filters/{id}",
+          "permissionsRequired": [
+            "finc-config.filters.item.delete"
+          ]
+        },
+        {
+          "methods": [
+            "POST"
+          ],
+          "pathPattern": "/finc-config/filters",
+          "permissionsRequired": [
+            "finc-config.filters.item.post"
+          ]
+        },
+        {
+          "methods": [
             "GET"
           ],
           "pathPattern": "/finc-config/filters/{id}/collections",
           "permissionsRequired": [
             "finc-config.filters.item.get"
+          ]
+        },
+        {
+          "methods": [
+            "PUT"
+          ],
+          "pathPattern": "/finc-config/filters/{id}/collections",
+          "permissionsRequired": [
+            "finc-config.filters.item.put"
           ]
         }
       ]
@@ -618,6 +654,21 @@
       "description": "Finc config: Get a single filter"
     },
     {
+      "permissionName": "finc-config.filters.item.put",
+      "displayName": "finc config filters item put",
+      "description": "Finc config: Update a single filter"
+    },
+    {
+      "permissionName": "finc-config.filters.item.delete",
+      "displayName": "finc config filters item delete",
+      "description": "Finc config: Delete a single filter"
+    },
+    {
+      "permissionName": "finc-config.filters.item.post",
+      "displayName": "finc config filters item post",
+      "description": "Finc config: Create a new filter"
+    },
+    {
       "permissionName": "finc-config.files.item.get",
       "displayName": "finc config files item get",
       "description": "Finc config: Get a single file"
@@ -780,6 +831,9 @@
         "finc-config.filters.collection.get",
         "finc-config.filters.item.get",
         "finc-config.files.item.get",
+        "finc-config.filters.item.put",
+        "finc-config.filters.item.delete",
+        "finc-config.filters.item.post",
         "finc-config.ezb-credentials.collection.get",
         "finc-config.ezb-credentials.item.get",
         "finc-config.ezb-credentials.item.post",
