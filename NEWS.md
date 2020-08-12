@@ -1,4 +1,7 @@
-# 2.0.0
+## 2.0.1
+* Bugfix: Add missing finc-config/filters endpoints to ModuleDescriptor 
+
+## 2.0.0
 * Add endpoints to manage association of filters and collections (UIFC-147, UIFC-149)
 * Bugfix: finc-select > collections: Usage permitted filter does not work properly (UIFC-159)
 * Add record las updated info to entities (UIFC-155)
