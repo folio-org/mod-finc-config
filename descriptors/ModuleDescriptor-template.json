@@ -245,6 +245,24 @@
           "permissionsRequired": [
             "finc-config.files.item.get"
           ]
+        },
+        {
+          "methods": [
+            "DELETE"
+          ],
+          "pathPattern": "/finc-config/files/{id}",
+          "permissionsRequired": [
+            "finc-config.files.item.delete"
+          ]
+        },
+        {
+          "methods": [
+            "POST"
+          ],
+          "pathPattern": "/finc-config/files",
+          "permissionsRequired": [
+            "finc-config.files.item.post"
+          ]
         }
       ]
     },
@@ -674,6 +692,16 @@
       "description": "Finc config: Get a single file"
     },
     {
+      "permissionName": "finc-config.files.item.delete",
+      "displayName": "finc config files item delete",
+      "description": "Finc config: Delete a single file"
+    },
+    {
+      "permissionName": "finc-config.files.item.post",
+      "displayName": "finc config files item post",
+      "description": "Finc config: Post a single file"
+    },
+    {
       "permissionName": "finc-config.ezb-credentials.collection.get",
       "displayName": "finc config ezb-credentials collection get",
       "description": "Finc config: Get collection of ezb credentials"
@@ -830,10 +858,12 @@
         "finc-config.isils.item.delete",
         "finc-config.filters.collection.get",
         "finc-config.filters.item.get",
-        "finc-config.files.item.get",
         "finc-config.filters.item.put",
         "finc-config.filters.item.delete",
         "finc-config.filters.item.post",
+        "finc-config.files.item.get",
+        "finc-config.files.item.delete",
+        "finc-config.files.item.post",
         "finc-config.ezb-credentials.collection.get",
         "finc-config.ezb-credentials.item.get",
         "finc-config.ezb-credentials.item.post",

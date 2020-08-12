@@ -11,4 +11,7 @@ public interface FileDAO {
 
   Future<File> getByCriterion(Criterion criterion, Context vertxContext);
 
+  Future<File> upsert(File entity, String id, Context vertxContext);
+
+  Future<Integer> deleteById(String id, Context vertxContext);
 }

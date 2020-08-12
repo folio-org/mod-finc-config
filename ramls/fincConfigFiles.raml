@@ -18,6 +18,26 @@ resourceTypes:
 
 /finc-config/files:
   displayName: Finc config files
+  post:
+    queryParameters:
+      isil:
+        type: string
+        required: true
+        description: The isil this file is assigned to.
+    description: Upload/update a finc select file.
+    body:
+      application/octet-stream:
+    responses:
+      200:
+        description: Uploading the file was successful. Returns uuid of uploaded file. This uuid will be referenced in 'fincSelectFilterFile' as value of the property 'file'.
+        body:
+          text/plain:
+      404:
+        body:
+          text/plain:
+      500:
+        body:
+          text/plain:
   /{id}:
     get:
       description: Get file by id
@@ -32,3 +52,17 @@ resourceTypes:
           description: Server Error
           body:
             text/plain:
+    delete:
+      description: Delete a file identified by id
+      responses:
+        204:
+          description: "Delete succeeded"
+        400:
+          description: "Bad request"
+          body:
+            text/plain:
+        500:
+          description: "Internal server error"
+          body:
+            text/plain:
+              example: "Internal server error, contact administrator"
