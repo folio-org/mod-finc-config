@@ -17,6 +17,11 @@
     },
     {
       "run": "after",
+      "snippetPath": "filters_trigger.sql",
+      "fromModuleVersion": "mod-finc-config-2.1.0"
+    },
+    {
+      "run": "after",
       "snippetPath": "migration/2.0.0/migrate_to_2_0_0.sql",
       "fromModuleVersion": "mod-finc-config-2.0.0"
     }
