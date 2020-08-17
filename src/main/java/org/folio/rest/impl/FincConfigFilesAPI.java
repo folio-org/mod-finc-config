@@ -35,7 +35,7 @@ public class FincConfigFilesAPI extends FincFileHandler implements FincConfigFil
       Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
     if (isil == null) {
       asyncResultHandler.handle(Future.succeededFuture(PostFincConfigFilesResponse
-          .respond404WithTextPlain("Isil must be set as query parameter.")));
+          .respond400WithTextPlain("Isil must be set as query parameter.")));
       return;
     }
 
