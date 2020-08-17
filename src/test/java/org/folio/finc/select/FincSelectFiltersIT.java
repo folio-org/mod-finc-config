@@ -228,6 +228,15 @@ public class FincSelectFiltersIT extends ApiTestBase {
         .delete(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter1.getId())
         .then()
         .statusCode(204);
+
+    // Get filter_to_collection: Check that it is deleted together with the filter
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter1.getId() + "/collections")
+        .then()
+        .statusCode(404);
   }
 
   @Test
