@@ -47,4 +47,37 @@ public class FileDAOImpl implements FileDAO {
             });
     return result.future();
   }
+
+  @Override
+  public Future<File> upsert(File entity, String id, Context vertxContext) {
+    Promise<File> result = Promise.promise();
+    PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
+        .upsert(
+            TABLE_NAME,
+            id,
+            entity,
+            asyncResult -> {
+              if (asyncResult.succeeded()) {
+                result.complete(entity);
+              } else {
+                result.fail("Cannot upsert file: " + asyncResult.cause());
+              }
+            });
+    return result.future();
+  }
+
+  @Override
+  public Future<Integer> deleteById(String id, Context vertxContext) {
+    Promise<Integer> result = Promise.promise();
+    PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
+        .delete(TABLE_NAME, id, reply -> {
+          if (reply.succeeded()) {
+            result.complete(reply.result().rowCount());
+          } else {
+            result.fail(reply.cause());
+          }
+        });
+    return result.future();
+  }
+
 }

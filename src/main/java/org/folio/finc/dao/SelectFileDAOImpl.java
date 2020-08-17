@@ -23,20 +23,7 @@ public class SelectFileDAOImpl implements SelectFileDAO {
 
   @Override
   public Future<File> upsert(File entity, String id, Context vertxContext) {
-    Promise<File> result = Promise.promise();
-    PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
-        .upsert(
-            TABLE_NAME,
-            id,
-            entity,
-            asyncResult -> {
-              if (asyncResult.succeeded()) {
-                result.complete(entity);
-              } else {
-                result.fail("Cannot upsert file: " + asyncResult.cause());
-              }
-            });
-    return result.future();
+    return fileDAO.upsert(entity, id, vertxContext);
   }
 
   @Override
