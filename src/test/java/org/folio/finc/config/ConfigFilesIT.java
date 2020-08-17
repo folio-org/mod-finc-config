@@ -20,8 +20,7 @@ import org.junit.runner.RunWith;
 public class ConfigFilesIT extends ApiTestBase {
 
   private static final String TEST_CONTENT = "This is the test content!!!!";
-  @Rule
-  public Timeout timeout = Timeout.seconds(10);
+  @Rule public Timeout timeout = Timeout.seconds(10);
   private Isil isilUbl;
   private Isil isilDiku;
 
@@ -98,4 +97,15 @@ public class ConfigFilesIT extends ApiTestBase {
         .statusCode(204);
   }
 
+  @Test
+  public void checkThatWeCannotPostWithMissingIsil() {
+    // POST File
+    given()
+        .body(TEST_CONTENT.getBytes())
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.BINARY)
+        .post(FINC_CONFIG_FILES_ENDPOINT)
+        .then()
+        .statusCode(400);
+  }
 }
