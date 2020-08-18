@@ -4,16 +4,34 @@
   "title": "Contact",
   "description": "Contact schema",
   "properties": {
-    "name": {
+    "type": {
       "type": "string",
-      "description": "The name"
+      "description": "The contact's type. This indicates if the contact originates from the users module or the organizations module.",
+      "enum": [
+        "user",
+        "contact"
+      ]
+    },
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "description": "The contact's name (lastName, firstName)",
+      "type": "string"
     },
     "role": {
       "type": "string",
-      "description": "The contact's role"
+      "description": "The contact's role",
+      "enum": [
+        "subject specialist",
+        "librarian",
+        "technical",
+        "vendor"
+      ]
     }
   },
   "required": [
+    "type",
     "name",
     "role"
   ]

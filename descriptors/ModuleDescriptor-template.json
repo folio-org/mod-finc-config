@@ -4,7 +4,7 @@
   "provides": [
     {
       "id": "finc-config/metadata-sources",
-      "version": "2.0",
+      "version": "3.0",
       "handlers": [
         {
           "methods": [
@@ -361,7 +361,7 @@
     },
     {
       "id": "finc-select/metadata-sources",
-      "version": "2.0",
+      "version": "3.0",
       "handlers": [
         {
           "methods": [

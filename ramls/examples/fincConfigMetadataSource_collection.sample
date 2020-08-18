@@ -7,45 +7,25 @@
       "solrShard": "UBL main",
       "lastProcessed": "2018-06-14",
       "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
-      "organization": {
-        "id": "uuid-4564",
-        "name": "Cambridge University Press"
-      },
       "tickets": [
         "http://redmine.de/123",
         "http://redmine.de/456"
       ],
       "status": "implementation",
-      "contacts": {
-        "internal": [
-          {
-            "id": "uuid-4321",
-            "name": "Erika Mustermann",
-            "role": "metadata",
-            "isInternal": "1"
-          },
-          {
-            "id": "uuid-4322",
-            "name": "Max Mustermann",
-            "role": "technical",
-            "isInternal": "1"
-          }
-        ],
-        "external": [
-          {
-            "id": "uuid-4323",
-            "name": "John Doe",
-            "role": "management",
-            "isInternal": "0"
-          },
-          {
-            "id": "uuid-4324",
-            "name": "Jane Doe",
-            "role": "technical",
-            "isInternal": "0"
-          }
-        ]
-      }
+      "contacts": [
+        {
+          "type": "user",
+          "id": "fcfaca0b-12e7-467e-b503-d44a44d60a62",
+          "name": "Doe, John",
+          "role": "librarian"
+        },
+        {
+          "type": "contact",
+          "id": "01771c0a-a890-4488-b5e9-366aa697bd93",
+          "name": "Doe, Jane",
+          "role": "vendor"
+        }
+      ],
     },
     {
       "id": "8ac1e1cf-5128-46b9-b57b-52bbfca7261b",
@@ -63,22 +43,20 @@
         "http://redmine.de/456"
       ],
       "status": "implementation",
-      "contacts": {
-        "internal": [
-          {
-            "id": "uuid-4321",
-            "name": "Evelyn Weiser",
-            "role": "metadata",
-            "isInternal": "1"
-          },
-          {
-            "id": "uuid-4322",
-            "name": "Martin Czygan",
-            "role": "technical",
-            "isInternal": "1"
-          }
-        ]
-      }
+      "contacts": [
+        {
+          "type": "user",
+          "id": "fcfaca0b-12e7-467e-b503-d44a44d60a62",
+          "name": "Doe, John",
+          "role": "librarian"
+        },
+        {
+          "type": "contact",
+          "id": "01771c0a-a890-4488-b5e9-366aa697bd93",
+          "name": "Doe, Jane",
+          "role": "vendor"
+        }
+      ],
     }
   ],
   "totalRecords": 2

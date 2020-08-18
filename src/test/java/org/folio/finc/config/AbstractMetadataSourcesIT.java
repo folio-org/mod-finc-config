@@ -5,8 +5,12 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import java.util.Collections;
 import java.util.UUID;
 import org.folio.finc.ApiTestBase;
+import org.folio.rest.jaxrs.model.Contact;
+import org.folio.rest.jaxrs.model.Contact.Role;
+import org.folio.rest.jaxrs.model.Contact.Type;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource.SolrShard;
 import org.folio.rest.jaxrs.model.Organization;
@@ -27,6 +31,12 @@ public abstract class AbstractMetadataSourcesIT extends ApiTestBase {
 
   @Before
   public void init() {
+    Contact c =
+        new Contact()
+            .withId(UUID.randomUUID().toString())
+            .withName("Doe, Jane")
+            .withRole(Role.LIBRARIAN)
+            .withType(Type.USER);
     metadataSource1 =
         new FincConfigMetadataSource()
             .withId(UUID.randomUUID().toString())
@@ -35,7 +45,8 @@ public abstract class AbstractMetadataSourcesIT extends ApiTestBase {
             .withStatus(FincConfigMetadataSource.Status.ACTIVE)
             .withSolrShard(SolrShard.UBL_MAIN)
             .withSourceId(1)
-            .withAccessUrl("http://access.url");
+            .withAccessUrl("http://access.url")
+            .withContacts(Collections.singletonList(c));
 
     metadataSource2 =
         new FincConfigMetadataSource()

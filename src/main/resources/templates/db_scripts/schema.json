@@ -105,7 +105,7 @@
     },
     {
       "tableName": "metadata_sources",
-      "fromModuleVersion": "mod-finc-config-2.0.0",
+      "fromModuleVersion": "mod-finc-config-3.0.0",
       "customSnippetPath": "migration/metadata_sources.sql",
       "withMetadata": true,
       "fullTextIndex": [
@@ -136,6 +136,11 @@
         {
           "fieldName": "description",
           "tOps": "ADD"
+        },
+        {
+          "fieldName": "contacts",
+          "tOps": "ADD",
+          "arraySubfield": "name"
         }
       ]
     },

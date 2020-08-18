@@ -41,27 +41,12 @@
       }
     },
     "contacts": {
-      "type": "object",
-      "description": "Internal and external contact persons",
-      "properties": {
-        "internal": {
-          "type": "array",
-          "description": "Internal contact persons",
-          "minItems": 0,
-          "items": {
-            "type": "object",
-            "$ref": "contact.json"
-          }
-        },
-        "external": {
-          "type": "array",
-          "description": "External contact persons",
-          "minItems": 0,
-          "items": {
-            "type": "object",
-            "$ref": "contact.json"
-          }
-        }
+      "type": "array",
+      "description": "List of contacts",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "$ref": "contact.json"
       }
     },
     "indexingLevel": {
