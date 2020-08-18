@@ -318,6 +318,21 @@
       ]
     },
     {
+      "id": "finc-config/contacts",
+      "version": "1.0",
+      "handlers": [
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/finc-config/contacts",
+          "permissionsRequired": [
+            "finc-config.metadata-sources.collection.get"
+          ]
+        }
+      ]
+    },
+    {
       "id": "finc-select/metadata-collections",
       "version": "2.0",
       "handlers": [

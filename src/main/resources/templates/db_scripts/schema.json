@@ -3,7 +3,7 @@
     {
       "run": "after",
       "snippetPath": "views.sql",
-      "fromModuleVersion": "mod-finc-config-1.0"
+      "fromModuleVersion": "mod-finc-config-3.0.0"
     },
     {
       "run": "after",
