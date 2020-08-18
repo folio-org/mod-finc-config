@@ -5,7 +5,7 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.UUID;
 import org.folio.finc.ApiTestBase;
 import org.folio.rest.jaxrs.model.Contact;
@@ -31,12 +31,18 @@ public abstract class AbstractMetadataSourcesIT extends ApiTestBase {
 
   @Before
   public void init() {
-    Contact c =
+    Contact c1 =
         new Contact()
             .withId(UUID.randomUUID().toString())
             .withName("Doe, Jane")
             .withRole(Role.LIBRARIAN)
             .withType(Type.USER);
+    Contact c2 =
+        new Contact()
+            .withId(UUID.randomUUID().toString())
+            .withName("Eod, John")
+            .withRole(Role.VENDOR)
+            .withType(Type.CONTACT);
     metadataSource1 =
         new FincConfigMetadataSource()
             .withId(UUID.randomUUID().toString())
@@ -46,7 +52,7 @@ public abstract class AbstractMetadataSourcesIT extends ApiTestBase {
             .withSolrShard(SolrShard.UBL_MAIN)
             .withSourceId(1)
             .withAccessUrl("http://access.url")
-            .withContacts(Collections.singletonList(c));
+            .withContacts(Arrays.asList(c1, c2));
 
     metadataSource2 =
         new FincConfigMetadataSource()
