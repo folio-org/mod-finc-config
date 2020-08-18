@@ -33,13 +33,13 @@ public abstract class AbstractMetadataSourcesIT extends ApiTestBase {
   public void init() {
     Contact c1 =
         new Contact()
-            .withId(UUID.randomUUID().toString())
+            .withExternalId(UUID.randomUUID().toString())
             .withName("Doe, Jane")
             .withRole(Role.LIBRARIAN)
             .withType(Type.USER);
     Contact c2 =
         new Contact()
-            .withId(UUID.randomUUID().toString())
+            .withExternalId(UUID.randomUUID().toString())
             .withName("Eod, John")
             .withRole(Role.VENDOR)
             .withType(Type.CONTACT);
