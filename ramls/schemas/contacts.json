@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "description": "Collection of contacts of metadata sources in finc app",
+  "properties": {
+    "contacts": {
+      "type": "array",
+      "description": "List of contacts",
+      "id": "contacts",
+      "items": {
+        "type": "object",
+        "$ref": "contact.json"
+      }
+    },
+    "totalRecords": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "contacts",
+    "totalRecords"
+  ]
+}

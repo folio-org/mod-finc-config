@@ -5,40 +5,20 @@
       "label": "Cambridge University Press Journals",
       "description": "This is a test metadata source",
       "status": "active",
-      "organization": {
-        "id": "uuid-1234",
-        "name": "Test organization"
-      },
-      "contacts": {
-        "internal": [
-          {
-            "id": "uuid-4321",
-            "name": "Erika Mustermann",
-            "role": "metadata",
-            "isInternal": "1"
-          },
-          {
-            "id": "uuid-4322",
-            "name": "Max Mustermann",
-            "role": "technical",
-            "isInternal": "1"
-          }
-        ],
-        "external": [
-          {
-            "id": "uuid-4323",
-            "name": "John Doe",
-            "role": "management",
-            "isInternal": "0"
-          },
-          {
-            "id": "uuid-4324",
-            "name": "Jane Doe",
-            "role": "technical",
-            "isInternal": "0"
-          }
-        ]
-      },
+      "contacts": [
+        {
+          "type": "user",
+          "externalId": "fcfaca0b-12e7-467e-b503-d44a44d60a62",
+          "name": "Doe, John",
+          "role": "librarian"
+        },
+        {
+          "type": "contact",
+          "externalId": "01771c0a-a890-4488-b5e9-366aa697bd93",
+          "name": "Doe, Jane",
+          "role": "vendor"
+        }
+      ],
       "indexingLevel": "bibliographic",
       "generalNotes": "Test licensing note",
       "lastProcessed": "2018-01-01",

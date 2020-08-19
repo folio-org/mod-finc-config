@@ -10,8 +10,11 @@ import java.util.List;
 import org.folio.cql2pgjson.CQL2PgJSON;
 import org.folio.cql2pgjson.exception.FieldException;
 import org.folio.rest.impl.FincConfigMetadataSourcesAPI;
+import org.folio.rest.jaxrs.model.Contact;
+import org.folio.rest.jaxrs.model.Contacts;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSources;
+import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.Criteria.Limit;
 import org.folio.rest.persist.Criteria.Offset;
 import org.folio.rest.persist.PgExceptionUtil;
@@ -24,6 +27,7 @@ public class MetadataSourcesDAOImpl implements MetadataSourcesDAO {
   private static final Logger logger = LoggerFactory.getLogger(MetadataSourcesDAOImpl.class);
 
   private static final String TABLE_NAME = "metadata_sources";
+  private static final String TABLE_NAME_CONTACTS = "metadata_sources_contacts";
 
   private CQLWrapper getCQL(String query, int limit, int offset) throws FieldException {
     CQL2PgJSON cql2PgJSON =
@@ -92,6 +96,30 @@ public class MetadataSourcesDAOImpl implements MetadataSourcesDAO {
               }
             });
 
+    return result.future();
+  }
+
+  @Override
+  public Future<Contacts> getContacts(Context vertxContext) {
+    Promise<Contacts> result = Promise.promise();
+
+    PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
+        .get(
+            TABLE_NAME_CONTACTS,
+            Contact.class,
+            new Criterion(),
+            true,
+            reply -> {
+              if (reply.succeeded()) {
+                List<Contact> results = reply.result().getResults();
+                Contacts contacts = new Contacts();
+                contacts.setContacts(results);
+                contacts.setTotalRecords(results.size());
+                result.complete(contacts);
+              } else {
+                result.fail(reply.cause());
+              }
+            });
     return result.future();
   }
 }

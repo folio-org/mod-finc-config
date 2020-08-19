@@ -24,6 +24,7 @@ public class ApiTestBase {
   protected static final String FINC_SELECT_METADATA_SOURCES_ENDPOINT = "/finc-select/metadata-sources";
   protected static final String FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT = "/finc-config/metadata-collections";
   protected static final String FINC_CONFIG_METADATA_SOURCES_ENDPOINT = "/finc-config/metadata-sources";
+  protected static final String FINC_CONFIG_CONTACTS_ENDPOINT = "/finc-config/contacts";
   protected static final String FINC_CONFIG_TINY_METADATA_SOURCES_ENDPOINT = "/finc-config/tiny-metadata-sources";
   protected static final String FINC_CONFIG_FILTERS_ENDPOINT = "/finc-config/filters";
   protected static final String FINC_CONFIG_FILES_ENDPOINT = "/finc-config/files";

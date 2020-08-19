@@ -12,6 +12,8 @@ types:
   fincConfigMetadataSources: !include schemas/fincConfigMetadataSources.json
   tinyMetadataSource: !include schemas/tinyMetadataSource.json
   tinyMetadataSources: !include schemas/tinyMetadataSources.json
+  contact: !include schemas/contact.json
+  contacts: !include schemas/contacts.json
   errors: !include ./raml-util/schemas/errors.schema
 
 traits:
@@ -63,4 +65,12 @@ resourceTypes:
       schemaItem: tinyMetadataSource
   get:
     description: Get all tiny metadata sources
-
+/finc-config/contacts:
+  type:
+    collection:
+      exampleCollection: !include examples/contact_collection.sample
+      exampleItem: !include examples/contact.sample
+      schemaCollection: contacts
+      schemaItem: contact
+  get:
+    description: Get all contacts defined in metadata sources

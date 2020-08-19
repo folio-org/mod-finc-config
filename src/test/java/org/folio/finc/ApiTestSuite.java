@@ -14,6 +14,7 @@ import java.util.concurrent.TimeoutException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.folio.finc.config.ConfigContactsIT;
 import org.folio.finc.config.ConfigEZBCredentialsIT;
 import org.folio.finc.config.ConfigFilesIT;
 import org.folio.finc.config.ConfigFiltersIT;
@@ -44,6 +45,7 @@ import org.junit.runners.Suite;
     ConfigMetadataSourcesIT.class,
     ConfigFiltersIT.class,
     ConfigFilesIT.class,
+    ConfigContactsIT.class,
     FincSelectFilesIT.class,
     FincSelectFiltersIT.class,
     IsilsIT.class,

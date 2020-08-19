@@ -1,0 +1,17 @@
+{
+  "contacts": [
+    {
+      "type": "user",
+      "externalId": "fcfaca0b-12e7-467e-b503-d44a44d60a62",
+      "name": "Doe, John",
+      "role": "librarian"
+    },
+    {
+      "type": "contact",
+      "externalId": "01771c0a-a890-4488-b5e9-366aa697bd93",
+      "name": "Doe, Jane",
+      "role": "vendor"
+    }
+  ],
+  "totalRecords": 2
+}

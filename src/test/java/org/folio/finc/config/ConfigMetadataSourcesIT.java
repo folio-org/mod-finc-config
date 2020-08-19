@@ -166,6 +166,21 @@ public class ConfigMetadataSourcesIT extends AbstractMetadataSourcesIT {
             "fincConfigMetadataSources[0].solrShard",
             equalTo(metadataSource1.getSolrShard().value()));
 
+    String cqlContact = "?query=(contacts =/@name Doe* )";
+    given()
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .header("x-okapi-url", mockedOkapiUrl)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_CONFIG_METADATA_SOURCES_ENDPOINT + cqlContact)
+        .then()
+        .contentType(ContentType.JSON)
+        .statusCode(200)
+        .body("fincConfigMetadataSources.size()", equalTo(1))
+        .body("fincConfigMetadataSources[0].id", equalTo(metadataSource1.getId()))
+        .body("fincConfigMetadataSources[0].label", equalTo(metadataSource1.getLabel()))
+        .body("fincConfigMetadataSources[0].status", equalTo(metadataSource1.getStatus().value()));
+
     // DELETE
     given()
         .header("X-Okapi-Tenant", TENANT_DIKU)

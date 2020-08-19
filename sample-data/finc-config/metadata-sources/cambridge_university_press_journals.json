@@ -1,61 +1,45 @@
 {
-    "id": "6dd325f8-b1d5-4568-a0d7-aecf6b8d6697",
-    "label": "Cambridge University Press Journals",
-    "description": "This is a test metadata source",
-    "status": "active",
-    "organization": {
-      "id": "uuid-1234",
-      "name": "Test organization"
+  "id": "6dd325f8-b1d5-4568-a0d7-aecf6b8d6697",
+  "label": "Cambridge University Press Journals",
+  "description": "This is a test metadata source",
+  "status": "active",
+  "organization": {
+    "id": "uuid-1234",
+    "name": "Test organization"
+  },
+  "contacts": [
+    {
+      "type": "user",
+      "externalId": "fcfaca0b-12e7-467e-b503-d44a44d60a62",
+      "name": "Doe, John",
+      "role": "librarian"
     },
-    "contacts": {
-      "internal": [
-        {
-          "id": "uuid-4321",
-          "name": "Erika Mustermann",
-          "role": "metadata",
-          "isInternal": "1"
-        },
-        {
-          "id": "uuid-4322",
-          "name": "Max Mustermann",
-          "role": "technical",
-          "isInternal": "1"
-        }
-      ],
-      "external": [
-        {
-          "id": "uuid-4323",
-          "name": "John Doe",
-          "role": "management",
-          "isInternal": "0"
-        },
-        {
-          "id": "uuid-4324",
-          "name": "Jane Doe",
-          "role": "technical",
-          "isInternal": "0"
-        }
-      ]
-    },
-    "indexingLevel": "bibliographic",
-    "generalNotes": "Test licensing note",
-    "lastProcessed": "2018-01-01",
-    "tickets": [
-      "http://redmine.de/123",
-      "http://redmine.de/456"
-    ],
-    "accessUrl": "http://access.url",
-    "sourceId": 1,
-    "solrShard": "UBL main",
-    "deliveryMethods": [
-        "API Download"
-    ],
-    "formats": [
-      "csv"
-    ],
-    "updateRhythm": "monthly",
-    "inferiorTo": [
-      "uuid-789",
-      "uuid-123"
-    ]
+    {
+      "type": "contact",
+      "externalId": "01771c0a-a890-4488-b5e9-366aa697bd93",
+      "name": "Doe, Jane",
+      "role": "vendor"
+    }
+  ],
+  "indexingLevel": "bibliographic",
+  "generalNotes": "Test licensing note",
+  "lastProcessed": "2018-01-01",
+  "tickets": [
+    "http://redmine.de/123",
+    "http://redmine.de/456"
+  ],
+  "accessUrl": "http://access.url",
+  "sourceId": 1,
+  "solrShard": "UBL main",
+  "deliveryMethods": [
+    "API Download"
+  ],
+  "formats": [
+    "csv"
+  ],
+  "updateRhythm": "monthly",
+  "inferiorTo": [
+    "uuid-789",
+    "uuid-123"
+  ]
 }
