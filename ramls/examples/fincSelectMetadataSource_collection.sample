@@ -8,13 +8,13 @@
       "contacts": [
         {
           "type": "user",
-          "id": "fcfaca0b-12e7-467e-b503-d44a44d60a62",
+          "externalId": "fcfaca0b-12e7-467e-b503-d44a44d60a62",
           "name": "Doe, John",
           "role": "librarian"
         },
         {
           "type": "contact",
-          "id": "01771c0a-a890-4488-b5e9-366aa697bd93",
+          "externalId": "01771c0a-a890-4488-b5e9-366aa697bd93",
           "name": "Doe, Jane",
           "role": "vendor"
         }
