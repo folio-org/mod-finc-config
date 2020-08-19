@@ -13,7 +13,8 @@
       ]
     },
     "externalId": {
-      "type": "string"
+      "type": "string",
+      "description": "The external id of this contact in the module specified by the type (users or organizations module)."
     },
     "name": {
       "description": "The contact's name (lastName, firstName)",
