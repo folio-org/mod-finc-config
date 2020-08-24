@@ -196,9 +196,9 @@ public class SelectFilterDAOImpl implements SelectFilterDAO {
     query = queryAndSortBy[0];
     String sortBy = queryAndSortBy[1];
     if (query == null || "".equals(query)) {
-      return "isil=\"" + isil + "\"";
+      return "isil==\"" + isil + "\"";
     } else {
-      return query + " AND isil=\"" + isil + "\"" + sortBy;
+      return query + " AND isil==\"" + isil + "\"" + sortBy;
     }
   }
 
