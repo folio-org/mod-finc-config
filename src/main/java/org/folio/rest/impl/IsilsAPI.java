@@ -13,6 +13,8 @@ import java.util.Map;
 import javax.ws.rs.core.Response;
 import org.folio.cql2pgjson.CQL2PgJSON;
 import org.folio.cql2pgjson.exception.FieldException;
+import org.folio.finc.dao.IsilDAO;
+import org.folio.finc.dao.IsilDAOImpl;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.Isil;
@@ -31,9 +33,11 @@ public class IsilsAPI implements FincConfigIsils {
   private static final String TABLE_NAME = "isils";
   private final Messages messages = Messages.getInstance();
   private final Logger logger = LoggerFactory.getLogger(IsilsAPI.class);
+  private IsilDAO isilDAO;
 
   public IsilsAPI(Vertx vertx, String tenantId) {
     PostgresClient.getInstance(vertx);
+    isilDAO = new IsilDAOImpl();
   }
 
   private CQLWrapper getCQL(String query, int limit, int offset) throws FieldException {
@@ -153,13 +157,29 @@ public class IsilsAPI implements FincConfigIsils {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
-    PgUtil.post(
-        TABLE_NAME,
-        entity,
-        okapiHeaders,
-        vertxContext,
-        PostFincConfigIsilsResponse.class,
-        asyncResultHandler);
+
+    String tenant = entity.getTenant();
+    isilDAO.getIsilForTenant(tenant, vertxContext)
+        .onSuccess(isil -> {
+          if (isil == null) {
+            PgUtil.post(
+                TABLE_NAME,
+                entity,
+                okapiHeaders,
+                vertxContext,
+                PostFincConfigIsilsResponse.class,
+                asyncResultHandler);
+          } else {
+            asyncResultHandler.handle(Future.succeededFuture(PostFincConfigIsilsResponse
+                .respond400WithTextPlain(
+                    "Tenant already has an isil. Only one isil per tenant allowed.")));
+          }
+        })
+        .onFailure(throwable ->
+            asyncResultHandler.handle(Future.succeededFuture(PostFincConfigIsilsResponse
+                .respond500WithTextPlain(
+                    throwable)))
+        );
   }
 
   @Override
@@ -209,13 +229,29 @@ public class IsilsAPI implements FincConfigIsils {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
-    PgUtil.put(
-        TABLE_NAME,
-        entity,
-        id,
-        okapiHeaders,
-        vertxContext,
-        PutFincConfigIsilsByIdResponse.class,
-        asyncResultHandler);
+
+    String tenant = entity.getTenant();
+    isilDAO.getIsilForTenant(tenant, vertxContext)
+        .onSuccess(isil -> {
+          if (isil == null) {
+            PgUtil.put(
+                TABLE_NAME,
+                entity,
+                id,
+                okapiHeaders,
+                vertxContext,
+                PutFincConfigIsilsByIdResponse.class,
+                asyncResultHandler);
+          } else {
+            asyncResultHandler.handle(Future.succeededFuture(PostFincConfigIsilsResponse
+                .respond400WithTextPlain(
+                    "Tenant already has an isil. Only one isil per tenant allowed.")));
+          }
+        })
+        .onFailure(throwable ->
+            asyncResultHandler.handle(Future.succeededFuture(PostFincConfigIsilsResponse
+                .respond500WithTextPlain(
+                    throwable)))
+        );
   }
 }
