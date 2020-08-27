@@ -87,7 +87,7 @@ public class IsilsIT extends ApiTestBase {
         .body(Json.encode(isilChanged))
         .header("X-Okapi-Tenant", TENANT_UBL)
         .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
+        .header("accept", ContentType.TEXT)
         .put(ISILS_API_ENDPOINT + "/" + isilUBL.getId())
         .then()
         .statusCode(400);
