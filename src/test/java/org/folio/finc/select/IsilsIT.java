@@ -1,6 +1,7 @@
 package org.folio.finc.select;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
 import com.jayway.restassured.http.ContentType;
@@ -91,5 +92,39 @@ public class IsilsIT extends ApiTestBase {
         .put(ISILS_API_ENDPOINT + "/" + isilUBL.getId())
         .then()
         .statusCode(400);
+  }
+
+  @Test
+  public void testCanPut() {
+
+    final String newLibrary = "FooBar";
+
+    Isil isilChanged = new Isil()
+        .withIsil(isilUBL.getIsil())
+        .withTenant(isilUBL.getTenant())
+        .withLibrary(newLibrary)
+        .withId(isilUBL.getId());
+
+    // PUT
+    given()
+        .body(Json.encode(isilChanged))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.TEXT)
+        .put(ISILS_API_ENDPOINT + "/" + isilUBL.getId())
+        .then()
+        .statusCode(204);
+
+    // GET
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(ISILS_API_ENDPOINT + "/" + isilUBL.getId())
+        .then()
+        .contentType(ContentType.JSON)
+        .statusCode(200)
+        .body("id", equalTo(isilUBL.getId()))
+        .body("library", equalTo(newLibrary));
   }
 }

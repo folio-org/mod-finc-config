@@ -33,7 +33,7 @@ public class IsilsAPI implements FincConfigIsils {
   private static final String TABLE_NAME = "isils";
   private final Messages messages = Messages.getInstance();
   private final Logger logger = LoggerFactory.getLogger(IsilsAPI.class);
-  private IsilDAO isilDAO;
+  private final IsilDAO isilDAO;
 
   public IsilsAPI(Vertx vertx, String tenantId) {
     PostgresClient.getInstance(vertx);
@@ -233,7 +233,7 @@ public class IsilsAPI implements FincConfigIsils {
     String tenant = entity.getTenant();
     isilDAO.getIsilForTenant(tenant, vertxContext)
         .onSuccess(isil -> {
-          if (isil == null) {
+          if (isilIsValid(isil, entity.getIsil())) {
             PgUtil.put(
                 TABLE_NAME,
                 entity,
@@ -254,4 +254,12 @@ public class IsilsAPI implements FincConfigIsils {
                     throwable)))
         );
   }
+
+  private boolean isilIsValid(String isilForTenant, String isilFromRequestes) {
+    if (isilForTenant == null) {
+      return true;
+    }
+    return isilForTenant.equals(isilFromRequestes);
+  }
+
 }
