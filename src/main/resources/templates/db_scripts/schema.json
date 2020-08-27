@@ -140,7 +140,8 @@
         {
           "fieldName": "contacts",
           "tOps": "ADD",
-          "arraySubfield": "name"
+          "arraySubfield": "name",
+          "arrayModifiers": ["externalId"]
         }
       ]
     },
