@@ -22,7 +22,7 @@ FROM    (
                     WHEN jsonb->'lod'->>'publication' = 'prohibited (interpreted)' THEN 'no'
                     WHEN jsonb->'lod'->>'publication' = 'prohibited (explicit)' THEN 'no'
                     WHEN jsonb->'lod'->>'publication' = 'silent' THEN 'undetermined'
-                    ELSE 'other'
+                    ELSE 'undetermined'
               END   AS value
       FROM    ${myuniversity}_${mymodule}.metadata_collections
       WHERE   jsonb->'lod'->>'publication' IS NOT NULL
