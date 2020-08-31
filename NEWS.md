@@ -1,3 +1,6 @@
+# 2.1.2
+* Bugfix: Migrate unknown publication value to undetermined
+
 # 2.1.1
 * Bugfix migration script
 
