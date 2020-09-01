@@ -24,12 +24,17 @@
       "run": "after",
       "snippetPath": "migration/2.0.0/migrate_to_2_0_0.sql",
       "fromModuleVersion": "mod-finc-config-2.0.0"
+    },
+    {
+      "run": "after",
+      "snippetPath": "migration/3.0.0/migrate_to_3_0_0.sql",
+      "fromModuleVersion": "mod-finc-config-3.0.0"
     }
   ],
   "tables": [
     {
       "tableName": "metadata_collections",
-      "fromModuleVersion": "mod-finc-config-2.0.0",
+      "fromModuleVersion": "mod-finc-config-3.0.0",
       "withMetadata": true,
       "fullTextIndex": [
         {
@@ -63,6 +68,10 @@
         {
           "fieldName": "description",
           "tOps": "ADD"
+        },
+        {
+          "fieldName": "collectionId",
+          "tOps": "ADD"
         }
       ],
       "index": [
@@ -80,6 +89,20 @@
         },
         {
           "fieldName": "mdSource.id",
+          "tOps": "ADD",
+          "caseSensitive": false,
+          "removeAccents": true
+        }
+      ],
+      "ginIndex": [
+        {
+          "fieldName": "selectedBy",
+          "tOps": "ADD",
+          "caseSensitive": false,
+          "removeAccents": true
+        },
+        {
+          "fieldName": "permittedFor",
           "tOps": "ADD",
           "caseSensitive": false,
           "removeAccents": true
@@ -147,7 +170,7 @@
     },
     {
       "tableName": "filters",
-      "fromModuleVersion": "mod-finc-config-2.0.0",
+      "fromModuleVersion": "mod-finc-config-3.0.0",
       "withMetadata": true,
       "fullTextIndex": [
         {
@@ -160,6 +183,12 @@
         },
         {
           "fieldName": "type",
+          "tOps": "ADD"
+        }
+      ],
+      "likeIndex": [
+        {
+          "fieldName": "isil",
           "tOps": "ADD"
         }
       ]
