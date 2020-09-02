@@ -1,3 +1,12 @@
+# 3.0.0
+* Restructure contacts of metadata-sources (UIFC-181)
+
+# 2.1.2
+* Bugfix: Migrate unknown publication value to undetermined
+
+# 2.1.1
+* Bugfix migration script
+
 # 2.1.0
 * Add POST and DELETE to finc-config/files (UIFC-203)
 * Bugfix: FilterToCollections not removed when deleting filter (UIFC-204)
