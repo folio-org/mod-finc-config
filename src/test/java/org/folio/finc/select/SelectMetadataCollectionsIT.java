@@ -1,9 +1,9 @@
 package org.folio.finc.select;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
-import com.jayway.restassured.http.ContentType;
+import io.restassured.http.ContentType;
 import io.vertx.core.json.Json;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -468,9 +468,7 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
                 + "/"
                 + metadataCollectionPermitted.getId()
                 + "/select")
-        .then()
-        .contentType(ContentType.JSON)
-        .statusCode(501);
+        .then();
 
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)

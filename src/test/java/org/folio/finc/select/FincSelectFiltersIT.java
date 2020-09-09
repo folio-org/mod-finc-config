@@ -1,11 +1,11 @@
 package org.folio.finc.select;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
 
-import com.jayway.restassured.http.ContentType;
+import io.restassured.http.ContentType;
 import io.vertx.core.json.Json;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;

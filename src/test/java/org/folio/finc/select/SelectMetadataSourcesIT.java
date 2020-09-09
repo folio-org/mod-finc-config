@@ -1,11 +1,11 @@
 package org.folio.finc.select;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.jayway.restassured.http.ContentType;
+import io.restassured.http.ContentType;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.junit.Timeout;
@@ -380,7 +380,6 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
         .body(Json.encode(mdSource))
         .post(FINC_SELECT_METADATA_SOURCES_ENDPOINT)
         .then()
-        .contentType(ContentType.JSON)
         .statusCode(501);
 
     // DELETE metadata source
@@ -409,7 +408,6 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
         .header("accept", ContentType.JSON)
         .get(FINC_SELECT_METADATA_SOURCES_ENDPOINT + "/uuid-1234/collections")
         .then()
-        .contentType(ContentType.JSON)
         .statusCode(501);
 
     // getFincSelectMetadataSourcesCollectionsSelectAllById
@@ -419,7 +417,6 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
         .header("accept", ContentType.JSON)
         .get(FINC_SELECT_METADATA_SOURCES_ENDPOINT + "/uuid-1234/collections/select-all")
         .then()
-        .contentType(ContentType.JSON)
         .statusCode(501);
 
     // deleteFincSelectMetadataSourcesCollectionsSelectAllById
