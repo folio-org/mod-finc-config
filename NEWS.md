@@ -1,3 +1,7 @@
+# 4.0.0
+* Upgrade to RAML Module Builder 31.x
+* Upgrade module to JDK 11 (UIFC-211)
+
 # 3.0.0
 * Restructure contacts of metadata-sources (UIFC-181)
 
