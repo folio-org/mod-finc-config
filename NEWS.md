@@ -1,3 +1,6 @@
+# 4.0.1
+* Upgrade to RMB 31.1.5 and Vert.x 3.9.4 (UIFC-223)
+
 # 4.0.0
 * Upgrade to RAML Module Builder 31.x
 * Upgrade module to JDK 11 (UIFC-211)
