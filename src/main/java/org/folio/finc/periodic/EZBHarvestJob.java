@@ -1,30 +1,31 @@
 package org.folio.finc.periodic;
 
 import com.google.gson.Gson;
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.finc.dao.EZBCredentialsDAO;
 import org.folio.finc.dao.EZBCredentialsDAOImpl;
 import org.folio.finc.periodic.ezb.EZBService;
 import org.folio.finc.periodic.ezb.EZBServiceImpl;
+import org.folio.okapi.common.GenericCompositeFuture;
 import org.folio.rest.jaxrs.model.Credentials;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.SchedulerException;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /** A {@Link Job} to harvest EZB holding files automatically */
 public class EZBHarvestJob implements Job {
 
-  private static final Logger log = LoggerFactory.getLogger(EZBHarvestJob.class);
+  private static final Logger log = LogManager.getLogger(EZBHarvestJob.class);
   private final EZBCredentialsDAO ezbCredentialsDAO = new EZBCredentialsDAOImpl();
   private EZBService ezbService;
 
@@ -73,7 +74,7 @@ public class EZBHarvestJob implements Job {
                           .owner()
                           .deployVerticle(
                               verticle,
-                              new DeploymentOptions().setConfig(c).setWorker(true),
+                              new DeploymentOptions().setConfig(c),
                               stringAsyncResult -> {
                                 if (stringAsyncResult.failed()) {
                                   log.error(
@@ -87,7 +88,7 @@ public class EZBHarvestJob implements Job {
                                 }
                               });
                     });
-                CompositeFuture.all(composedFutures)
+                GenericCompositeFuture.all(composedFutures)
                     .onComplete(
                         comFutAR -> {
                           if (comFutAR.succeeded()) {

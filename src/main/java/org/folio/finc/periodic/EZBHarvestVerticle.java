@@ -1,34 +1,31 @@
 package org.folio.finc.periodic;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.finc.dao.SelectFileDAO;
 import org.folio.finc.dao.SelectFileDAOImpl;
 import org.folio.finc.dao.SelectFilterDAO;
 import org.folio.finc.dao.SelectFilterDAOImpl;
 import org.folio.finc.model.File;
 import org.folio.finc.periodic.ezb.EZBService;
+import org.folio.okapi.common.GenericCompositeFuture;
 import org.folio.rest.jaxrs.model.FilterFile;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.jaxrs.model.FincSelectFilters;
 import org.folio.rest.jaxrs.model.Metadata;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /** A {@link io.vertx.core.Verticle} to fetch EZB holding files for a single tenant. */
 public class EZBHarvestVerticle extends AbstractVerticle {
 
   public static final String LABEL_EZB_FILE = "EZB file";
   public static final String LABEL_EZB_HOLDINGS = "EZB holdings";
-  private static final Logger log = LoggerFactory.getLogger(EZBHarvestVerticle.class);
+  private static final Logger log = LogManager.getLogger(EZBHarvestVerticle.class);
   private final SelectFilterDAO selectFilterDAO = new SelectFilterDAOImpl();
   private final SelectFileDAO selectFileDAO = new SelectFileDAOImpl();
   private final EZBService ezbService;
@@ -49,7 +46,7 @@ public class EZBHarvestVerticle extends AbstractVerticle {
 
     Future<String> ezbFileFuture = ezbService.fetchEZBFile(user, password, libId, vertx);
     Future<FincSelectFilter> dbFilterFuture = fetchFilterFromDB(isil);
-    CompositeFuture.all(ezbFileFuture, dbFilterFuture)
+    GenericCompositeFuture.all(Arrays.asList(ezbFileFuture, dbFilterFuture))
         .compose(
             compositeFuture ->
                 updateEZBFileOfFilter(dbFilterFuture.result(), ezbFileFuture.result(), isil))
@@ -264,7 +261,7 @@ public class EZBHarvestVerticle extends AbstractVerticle {
             .map(id -> selectFileDAO.deleteById(id, isil, vertx.getOrCreateContext()))
             .collect(Collectors.toList());
 
-    CompositeFuture.all(deleteFileFutures)
+    GenericCompositeFuture.all(deleteFileFutures)
         .onComplete(
             ar -> {
               if (ar.succeeded()) {

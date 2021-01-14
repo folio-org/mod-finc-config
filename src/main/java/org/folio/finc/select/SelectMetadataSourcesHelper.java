@@ -1,17 +1,9 @@
 package org.folio.finc.select;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Context;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import java.util.Map;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.finc.select.verticles.AbstractSelectMetadataSourceVerticle;
 import org.folio.finc.select.verticles.factory.SelectMetadataSourceVerticleFactory;
 import org.folio.rest.RestVerticle;
@@ -20,9 +12,13 @@ import org.folio.rest.jaxrs.resource.FincSelectMetadataSources.PutFincSelectMeta
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.TenantTool;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.Map;
+
 /** Helper class to select/unselect metadata sources for finc-select. */
 public class SelectMetadataSourcesHelper {
-  private final Logger logger = LoggerFactory.getLogger(SelectMetadataSourcesHelper.class);
+  private final Logger logger = LogManager.getLogger(SelectMetadataSourcesHelper.class);
 
   public SelectMetadataSourcesHelper(Vertx vertx, String tenantId) {
     PostgresClient.getInstance(vertx);
@@ -71,7 +67,7 @@ public class SelectMetadataSourcesHelper {
     cfg.put("metadataSourceId", metadataSourceId);
     vertx.deployVerticle(
         verticle,
-        new DeploymentOptions().setConfig(cfg).setWorker(true),
+        new DeploymentOptions().setConfig(cfg),
         stringAsyncResult -> {
           if (stringAsyncResult.failed()) {
             logger.error(

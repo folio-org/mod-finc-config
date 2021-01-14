@@ -9,7 +9,7 @@ documentation:
     content: <b>finc-config</b>
 
 types:
-  tenantAttributes: !include ./raml-util/schemas/moduleInfo.schema
+  tenantAttributes: !include ./raml-util/schemas/tenantAttributes.schema
   errors: !include ./raml-util/schemas/errors.schema
   error.schema: !include ./raml-util/schemas/error.schema
   parameters.schema: !include ./raml-util/schemas/parameters.schema
@@ -35,33 +35,6 @@ traits:
         description: "Bad request"
         body:
           text/plain:
-      500:
-        description: "Internal server error"
-        body:
-          text/plain:
-            example: "Internal server error, contact administrator"
-  delete:
-    description: Delete a tenant
-    responses:
-      204:
-        description: "Delete succeeded"
-      400:
-        description: "Bad request"
-        body:
-          text/plain:
-      500:
-        description: "Internal server error"
-        body:
-          text/plain:
-            example: "Internal server error, contact administrator"
-  get:
-    description: Does tenant id already exist
-    responses:
-      200:
-        description: "true or false indicator"
-        body:
-          text/plain:
-            example: "Text....."
       500:
         description: "Internal server error"
         body:

@@ -1,6 +1,5 @@
 package org.folio.finc.periodic;
 
-
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -29,76 +28,85 @@ public abstract class AbstractEZBHarvestJobTest {
   static Context vertxContext;
   static final String tenant = "finc";
 
-  @Rule
-  public Timeout timeout = Timeout.seconds(10);
+  @Rule public Timeout timeout = Timeout.seconds(10);
 
   protected Future<FincSelectFilters> getEZBFilter() {
     SelectFilterDAO selectFilterDAO = new SelectFilterDAOImpl();
-    return selectFilterDAO
-        .getAll("label==\"EZB holdings\"", 0, 1, EZBHarvestJobWithFilterITest.tenant,
-            vertx.getOrCreateContext());
+    return selectFilterDAO.getAll(
+        "label==\"EZB holdings\"",
+        0,
+        1,
+        EZBHarvestJobWithFilterITest.tenant,
+        vertx.getOrCreateContext());
   }
 
   protected Future<String> getUpdatedEZBFile() {
     Promise<String> result = Promise.promise();
     getEZBFilter()
-        .onComplete(filterAr -> {
-          if (filterAr.succeeded()) {
-            List<FincSelectFilter> filters = filterAr.result().getFincSelectFilters();
-            if (filters.size() != 1) {
-              result.fail(String
-                  .format("Expected exactly 1 EZB holdings filter, but found %s", filters.size()));
-            } else {
-              List<FilterFile> filterFiles = filters.get(0).getFilterFiles();
-              List<FilterFile> ezbFiles = filterFiles.stream()
-                  .filter(filterFile -> filterFile.getLabel().equals("EZB file")).collect(
-                      Collectors.toList());
-              if (ezbFiles.size() != 1) {
-                result.fail(String
-                    .format("Expected exactly 1 EZB holdings file, but found %s", ezbFiles.size()));
+        .onComplete(
+            filterAr -> {
+              if (filterAr.succeeded()) {
+                List<FincSelectFilter> filters = filterAr.result().getFincSelectFilters();
+                if (filters.size() != 1) {
+                  result.fail(
+                      String.format(
+                          "Expected exactly 1 EZB holdings filter, but found %s", filters.size()));
+                } else {
+                  List<FilterFile> filterFiles = filters.get(0).getFilterFiles();
+                  List<FilterFile> ezbFiles =
+                      filterFiles.stream()
+                          .filter(filterFile -> filterFile.getLabel().equals("EZB file"))
+                          .collect(Collectors.toList());
+                  if (ezbFiles.size() != 1) {
+                    result.fail(
+                        String.format(
+                            "Expected exactly 1 EZB holdings file, but found %s", ezbFiles.size()));
+                  } else {
+                    String fileId = ezbFiles.get(0).getFileId();
+                    getFile(fileId)
+                        .onComplete(
+                            fileAr -> {
+                              if (fileAr.succeeded()) {
+                                result.complete(fileAr.result());
+                              } else {
+                                result.fail(fileAr.cause());
+                              }
+                            });
+                  }
+                }
               } else {
-                String fileId = ezbFiles.get(0).getFileId();
-                getFile(fileId)
-                    .onComplete(fileAr -> {
-                      if (fileAr.succeeded()) {
-                        result.complete(fileAr.result());
-                      } else {
-                        result.fail(fileAr.cause());
-                      }
-                    });
+                result.fail(filterAr.cause());
               }
-            }
-          } else {
-            result.fail(filterAr.cause());
-          }
-        });
+            });
     return result.future();
   }
 
   private Future<String> getFile(String fileId) {
     Promise<String> result = Promise.promise();
     FileDAO fileDAO = new FileDAOImpl();
-    fileDAO.getById(fileId, vertx.getOrCreateContext())
-        .onComplete(ar -> {
-          if (ar.succeeded()) {
-            String actualAsBase64 = ar.result().getData();
-            byte[] bytes = Base64.getDecoder().decode(actualAsBase64);
-            String s = new String(bytes, StandardCharsets.UTF_8);
-            result.complete(s);
-          } else {
-            result.fail(ar.cause());
-          }
-        });
+    fileDAO
+        .getById(fileId, vertx.getOrCreateContext())
+        .onComplete(
+            ar -> {
+              if (ar.succeeded()) {
+                String actualAsBase64 = ar.result().getData();
+                byte[] bytes = Base64.getDecoder().decode(actualAsBase64);
+                String s = new String(bytes, StandardCharsets.UTF_8);
+                result.complete(s);
+              } else {
+                result.fail(ar.cause());
+              }
+            });
     return result.future();
   }
 
   protected Future<List<String>> createSchema(String tenant) {
     Promise<List<String>> createSchema = Promise.promise();
     try {
-      String sqlFile = new TenantAPI().sqlFile(tenant, false, null, null);
+      String[] sqlFile = new TenantAPI().sqlFile(tenant, false, null, null);
       PostgresClient.getInstance(vertx)
           .runSQLFile(
-              sqlFile,
+              String.join("\n", sqlFile),
               true,
               ar -> {
                 if (ar.succeeded()) {
@@ -119,20 +127,23 @@ public abstract class AbstractEZBHarvestJobTest {
 
   protected Future<Void> insertIsil(String tenant) {
     Promise<Void> result = Promise.promise();
-    Isil isil = new Isil()
-        .withId(UUID.randomUUID().toString())
-        .withIsil(tenant)
-        .withTenant(tenant)
-        .withLibrary(tenant);
+    Isil isil =
+        new Isil()
+            .withId(UUID.randomUUID().toString())
+            .withIsil(tenant)
+            .withTenant(tenant)
+            .withLibrary(tenant);
     PostgresClient.getInstance(vertx, tenant)
-        .save("isils", isil, ar -> {
-          if (ar.succeeded()) {
-            result.complete();
-          } else {
-            result.fail(ar.cause());
-          }
-        });
+        .save(
+            "isils",
+            isil,
+            ar -> {
+              if (ar.succeeded()) {
+                result.complete();
+              } else {
+                result.fail(ar.cause());
+              }
+            });
     return result.future();
   }
-
 }

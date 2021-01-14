@@ -4,18 +4,20 @@ import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.WebClient;
-import java.util.Map;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.okapi.common.XOkapiHeaders;
+
+import java.util.Map;
 
 public class OrgaizationNameResolver {
 
-  private static final Logger logger = LoggerFactory.getLogger(OrgaizationNameResolver.class);
+  private static final Logger logger = LogManager.getLogger(OrgaizationNameResolver.class);
 
   private static final String ORGANIZATION_ENDPOINT = "/organizations-storage/organizations/";
 
@@ -37,7 +39,7 @@ public class OrgaizationNameResolver {
         ObjectUtils.firstNonNull(
                 okapiHeaders.get(XOkapiHeaders.URL_TO), okapiHeaders.get(XOkapiHeaders.URL))
             + endpoint;
-    HttpRequest<Buffer> request = webClient.getAbs(url);
+    HttpRequest<Buffer> request = webClient.requestAbs(HttpMethod.GET, url);
 
     okapiHeaders.forEach(request::putHeader);
     request.putHeader("accept", "application/json");

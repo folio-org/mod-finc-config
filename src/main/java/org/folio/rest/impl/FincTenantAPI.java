@@ -1,16 +1,16 @@
+/*
 package org.folio.rest.impl;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import java.util.Map;
-import javax.ws.rs.core.Response;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.jaxrs.resource.FincTenant;
-import org.folio.rest.jaxrs.resource.Tenant.DeleteTenantResponse;
 import org.folio.rest.utils.Constants;
+
+import javax.ws.rs.core.Response;
+import java.util.Map;
 
 public class FincTenantAPI implements FincTenant {
 
@@ -31,7 +31,7 @@ public class FincTenantAPI implements FincTenant {
     this.tenantAPI.postTenant(entity, okapiHeaders, asyncResultHandler, vertxContext);
   }
 
-  @Override
+ @Override
   @Validate
   public void deleteFincTenant(
       Map<String, String> okapiHeaders,
@@ -59,4 +59,6 @@ public class FincTenantAPI implements FincTenant {
       Context vertxContext) {
     this.tenantAPI.getTenant(okapiHeaders, asyncResultHandler, vertxContext);
   }
+
 }
+*/

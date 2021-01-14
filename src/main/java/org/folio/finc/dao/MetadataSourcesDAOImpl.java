@@ -3,10 +3,8 @@ package org.folio.finc.dao;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import java.util.Collections;
-import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.cql2pgjson.CQL2PgJSON;
 import org.folio.cql2pgjson.exception.FieldException;
 import org.folio.rest.impl.FincConfigMetadataSourcesAPI;
@@ -22,9 +20,12 @@ import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.utils.Constants;
 
+import java.util.Collections;
+import java.util.List;
+
 public class MetadataSourcesDAOImpl implements MetadataSourcesDAO {
 
-  private static final Logger logger = LoggerFactory.getLogger(MetadataSourcesDAOImpl.class);
+  private static final Logger logger = LogManager.getLogger(MetadataSourcesDAOImpl.class);
 
   private static final String TABLE_NAME = "metadata_sources";
   private static final String TABLE_NAME_CONTACTS = "metadata_sources_contacts";

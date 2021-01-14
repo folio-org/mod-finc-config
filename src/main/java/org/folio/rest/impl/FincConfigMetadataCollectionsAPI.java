@@ -1,17 +1,8 @@
 package org.folio.rest.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Context;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import javax.ws.rs.core.Response;
+import io.vertx.core.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.cql2pgjson.CQL2PgJSON;
 import org.folio.cql2pgjson.exception.FieldException;
 import org.folio.finc.dao.MetadataSourcesDAO;
@@ -32,6 +23,11 @@ import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
 import org.folio.rest.utils.Constants;
 
+import javax.ws.rs.core.Response;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 /**
  * ATTENTION: API works tenant agnostic. Thus, don't use 'x-okapi-tenant' header, but {@value
  * Constants#MODULE_TENANT} as tenant.
@@ -40,7 +36,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
 
   private static final String TABLE_NAME = "metadata_collections";
   private final Messages messages = Messages.getInstance();
-  private final Logger logger = LoggerFactory.getLogger(FincConfigMetadataCollectionsAPI.class);
+  private final Logger logger = LogManager.getLogger(FincConfigMetadataCollectionsAPI.class);
 
   private MetadataSourcesDAO metadataSourcesDAO;
 

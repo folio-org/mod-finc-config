@@ -9,12 +9,6 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import org.folio.finc.ApiTestSuite;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
@@ -29,14 +23,20 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 @RunWith(VertxUnitRunner.class)
 public class SelectMetadataSourcesHelperTest {
 
   private static final String TENANT_UBL = "ubl";
   private static Vertx vertx;
   private static SelectMetadataSourcesHelper cut;
-  @Rule
-  public Timeout timeout = Timeout.seconds(10);
+  @Rule public Timeout timeout = Timeout.seconds(10);
 
   @BeforeClass
   public static void setUp(TestContext context)
@@ -59,7 +59,7 @@ public class SelectMetadataSourcesHelperTest {
     RestAssured.defaultParser = Parser.JSON;
 
     DeploymentOptions options =
-        new DeploymentOptions().setConfig(new JsonObject().put("http.port", port)).setWorker(true);
+        new DeploymentOptions().setConfig(new JsonObject().put("http.port", port));
 
     startVerticle(options);
     prepareTenants();

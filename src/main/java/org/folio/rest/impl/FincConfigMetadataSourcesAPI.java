@@ -1,14 +1,8 @@
 package org.folio.rest.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Context;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import java.util.Map;
-import javax.ws.rs.core.Response;
+import io.vertx.core.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.cql2pgjson.exception.FieldException;
 import org.folio.finc.dao.MetadataSourcesDAO;
 import org.folio.finc.dao.MetadataSourcesDAOImpl;
@@ -22,6 +16,9 @@ import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.utils.AttributeNameAdder;
 import org.folio.rest.utils.Constants;
 
+import javax.ws.rs.core.Response;
+import java.util.Map;
+
 /**
  * ATTENTION: API works tenant agnostic. Thus, don't use 'x-okapi-tenant' header, but {@value
  * Constants#MODULE_TENANT} as tenant.
@@ -29,7 +26,7 @@ import org.folio.rest.utils.Constants;
 public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
 
   public static final String TABLE_NAME = "metadata_sources";
-  private final Logger logger = LoggerFactory.getLogger(FincConfigMetadataSourcesAPI.class);
+  private final Logger logger = LogManager.getLogger(FincConfigMetadataSourcesAPI.class);
 
   private final MetadataSourcesDAO metadataSourcesDAO;
 

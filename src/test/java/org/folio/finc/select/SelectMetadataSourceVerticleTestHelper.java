@@ -5,28 +5,29 @@ import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
-import org.folio.rest.jaxrs.model.FincConfigMetadataCollections;
-import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
-import org.folio.rest.jaxrs.model.FincConfigMetadataSources;
-import org.folio.rest.jaxrs.model.Isil;
-import org.folio.rest.jaxrs.model.Isils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.folio.finc.ApiTestSuite;
+import org.folio.okapi.common.XOkapiHeaders;
+import org.folio.rest.impl.TenantReferenceApi;
+import org.folio.rest.jaxrs.model.*;
 import org.folio.rest.persist.PgExceptionUtil;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.utils.Constants;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class SelectMetadataSourceVerticleTestHelper {
 
-  private static final Logger logger =
-      LoggerFactory.getLogger(SelectMetadataSourceVerticleTest.class);
+  private static final Logger logger = LogManager.getLogger(SelectMetadataSourceVerticleTest.class);
+  private static final String TENANT_UBL = "ubl";
 
   static FincConfigMetadataSource metadataSource1;
   static FincConfigMetadataSource metadataSource2;
@@ -114,8 +115,9 @@ public class SelectMetadataSourceVerticleTestHelper {
                       logger.info("Loaded isils");
                       async.countDown();
                     } else {
-                      context.fail("Could not load isils. " + PgExceptionUtil
-                          .getMessage(asyncResult.cause()));
+                      context.fail(
+                          "Could not load isils. "
+                              + PgExceptionUtil.getMessage(asyncResult.cause()));
                     }
                   });
 
@@ -171,5 +173,65 @@ public class SelectMetadataSourceVerticleTestHelper {
           }
         });
     return result.future();
+  }
+
+  public Future<Void> postUBLTenant(int port, Vertx vertx) {
+    Promise<Void> result = Promise.promise();
+    try {
+
+      Map<String, String> headers = new HashMap<>();
+      headers.put(XOkapiHeaders.TENANT, TENANT_UBL);
+      headers.put(XOkapiHeaders.URL, "http://localhost:" + port);
+      new TenantReferenceApi()
+          .postTenant(
+              new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
+              headers,
+              res -> {
+                if (res.result().getStatus() == 201) {
+                  result.complete();
+                } else {
+                  result.fail(
+                      String.format(
+                          "Tenantloading returned %s %s",
+                          res.result().getStatus(),
+                          res.result().getStatusInfo().getReasonPhrase()));
+                }
+              },
+              vertx.getOrCreateContext());
+
+    } catch (Exception e) {
+      result.fail(e);
+    }
+    return result.future();
+  }
+
+  public Future<Void> postFincTenant(int port, Vertx vertx, TestContext context) {
+    Promise<Void> promise = Promise.promise();
+    try {
+      Map<String, String> headers = new HashMap<>();
+      headers.put(XOkapiHeaders.TENANT, Constants.MODULE_TENANT);
+      headers.put(XOkapiHeaders.URL, "http://localhost:" + port);
+      new TenantReferenceApi()
+          .postTenant(
+              new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
+              headers,
+              res -> {
+                if (res.result().getStatus() == 201) {
+                  Future<Void> future = writeDataToDB(context, vertx);
+                  future.onSuccess(promise::complete);
+                  future.onFailure(promise::fail);
+                } else {
+                  promise.fail(
+                      String.format(
+                          "Tenantloading returned %s %s",
+                          res.result().getStatus(),
+                          res.result().getStatusInfo().getReasonPhrase()));
+                }
+              },
+              vertx.getOrCreateContext());
+    } catch (Exception e) {
+      promise.fail(e);
+    }
+    return promise.future();
   }
 }

@@ -3,13 +3,10 @@ package org.folio.finc.dao;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.cql2pgjson.CQL2PgJSON;
 import org.folio.cql2pgjson.exception.FieldException;
 import org.folio.finc.select.query.MetadataCollectionsQueryTranslator;
@@ -25,12 +22,16 @@ import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.utils.Constants;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
 public class SelectFilterDAOImpl implements SelectFilterDAO {
 
   private static final String ID_FIELD = "id";
   private static final String TABLE_NAME = "filters";
 
-  private final Logger logger = LoggerFactory.getLogger(SelectFilterDAOImpl.class);
+  private final Logger logger = LogManager.getLogger(SelectFilterDAOImpl.class);
 
   private final QueryTranslator queryTranslator;
 

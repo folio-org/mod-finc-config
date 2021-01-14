@@ -1,21 +1,18 @@
 package org.folio.finc.select.verticles;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.CompositeFuture;
-import io.vertx.core.Context;
-import io.vertx.core.Future;
-import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
-import java.util.List;
-import java.util.stream.Collectors;
+import io.vertx.core.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.folio.okapi.common.GenericCompositeFuture;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.utils.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * {@link io.vertx.core.Verticle} to select resp. unselect all metadata collections of a single
@@ -25,7 +22,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerticle {
 
   private static final Logger logger =
-      LoggerFactory.getLogger(AbstractSelectMetadataSourceVerticle.class);
+      LogManager.getLogger(AbstractSelectMetadataSourceVerticle.class);
 
   private static final String METADATA_COLLECTIONS_TABLE = "metadata_collections";
   private static final String ISILS_TABLE = "isils";
@@ -112,7 +109,7 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
             isil -> {
               List<FincConfigMetadataCollection> selected = select(metadataCollections, isil);
               List<Future> futures = saveCollections(selected);
-              return CompositeFuture.join(futures);
+              return GenericCompositeFuture.join(futures);
             });
   }
 
@@ -121,6 +118,7 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
 
   /**
    * Fetches the isil that is assigned to the tenant
+   *
    * @param tenantId ID of tenant
    * @return
    */

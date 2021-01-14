@@ -8,9 +8,13 @@ import java.util.Map;
 import javax.ws.rs.core.Response;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.TenantAttributes;
+import org.folio.rest.jaxrs.model.TenantJob;
 import org.folio.rest.tools.utils.TenantLoading;
+import org.folio.rest.utils.Constants;
 
 public class TenantReferenceApi extends TenantAPI {
+
+  private static final String X_OKAPI_TENANT = "x-okapi-tenant";
 
   @Override
   @Validate
@@ -19,7 +23,17 @@ public class TenantReferenceApi extends TenantAPI {
       Map<String, String> headers,
       Handler<AsyncResult<Response>> handlers,
       Context context) {
-    super.postTenant(
+
+    if (Boolean.TRUE.equals(entity.getPurge())
+        && !Constants.MODULE_TENANT.equals(headers.get(X_OKAPI_TENANT))) {
+      handlers.handle(
+          Future.succeededFuture(
+              PostTenantResponse.respond400WithTextPlain(
+                  String.format("Cannot purge tenant %s", headers.get(X_OKAPI_TENANT)))));
+    }
+
+    headers.put(X_OKAPI_TENANT, Constants.MODULE_TENANT);
+    super.postTenantSync(
         entity,
         headers,
         ar -> {
@@ -49,7 +63,8 @@ public class TenantReferenceApi extends TenantAPI {
                     }
                     handlers.handle(
                         Future.succeededFuture(
-                            PostTenantResponse.respond201WithApplicationJson("")));
+                            PostTenantResponse.respond201WithApplicationJson(
+                                new TenantJob(), PostTenantResponse.headersFor201())));
                   });
         },
         context);
