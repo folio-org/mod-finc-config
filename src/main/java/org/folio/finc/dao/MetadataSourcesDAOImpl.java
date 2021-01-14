@@ -52,7 +52,7 @@ public class MetadataSourcesDAOImpl implements MetadataSourcesDAO {
     try {
       cql = getCQL(query, limit, offset);
     } catch (FieldException e) {
-      logger.error("Error while processing CQL " + PgExceptionUtil.getMessage(e));
+      logger.error("Error while processing CQL {}", PgExceptionUtil.getMessage(e));
       result.fail(e);
     }
 

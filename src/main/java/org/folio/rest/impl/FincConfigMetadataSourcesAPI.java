@@ -114,7 +114,7 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    logger.debug("Getting single metadata source by id: " + id);
+    logger.debug("Getting single metadata source by id: {}", id);
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
     PgUtil.getById(
         TABLE_NAME,
@@ -134,7 +134,7 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    logger.debug("Delete metadata source: " + id);
+    logger.debug("Delete metadata source: {}", id);
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
     PgUtil.deleteById(
         TABLE_NAME,
@@ -154,7 +154,7 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    logger.debug("Update metadata source: " + id);
+    logger.debug("Update metadata source: {}", id);
 
     Future<FincConfigMetadataSource> sourceWithName =
         AttributeNameAdder.resolveAndAddAttributeNames(entity, okapiHeaders, vertxContext);

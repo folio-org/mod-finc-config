@@ -50,13 +50,12 @@ public class OrgaizationNameResolver {
             if (ar.result().statusCode() == 200) {
               JsonObject orgaJson = ar.result().bodyAsJsonObject();
               String orgaName = orgaJson.getString("name");
-              logger.info("Found organization name " + orgaName + " for id " + organizationId);
+              logger.info("Found organization name {} for id {} ", orgaName, organizationId);
               result.complete(orgaName);
             } else {
               logger.warn(
-                  "Failure while looking for organization name for id "
-                      + organizationId
-                      + ". Will proceed without setting orga name.",
+                  "Failure while looking for organization name for id {}. Will proceed without setting orga name. {}",
+                  organizationId,
                   ar.cause());
               result.complete();
             }

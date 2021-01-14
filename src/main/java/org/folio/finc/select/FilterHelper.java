@@ -74,14 +74,11 @@ public class FilterHelper {
               ar -> {
                 if (ar.succeeded()) {
                   logger.info(
-                      "Associated files of filter " + filter.getId() + " deleted successfully.");
+                          String.format("Associated files of filter %s deleted successfully.",  filter.getId()));
                   result.complete();
                 } else {
                   logger.error(
-                      "Error while deleting files of filter "
-                          + filter.getId()
-                          + ". \n"
-                          + PgExceptionUtil.getMessage(ar.cause()));
+                          String.format("Error while deleting files of filter %s. %n %s", filter.getId(), PgExceptionUtil.getMessage(ar.cause())));
                   result.fail(ar.cause());
                 }
               });

@@ -101,7 +101,7 @@ public class IsilsAPI implements FincConfigIsils {
                         }
                       });
             } catch (IllegalStateException e) {
-              logger.debug("IllegalStateException: " + e.getLocalizedMessage());
+              logger.debug("IllegalStateException: {}", e.getLocalizedMessage());
               asyncResultHandler.handle(
                   Future.succeededFuture(
                       GetFincConfigIsilsResponse.respond400WithTextPlain(
@@ -112,7 +112,7 @@ public class IsilsAPI implements FincConfigIsils {
                 cause = cause.getCause();
               }
               logger.debug(
-                  "Got error " + cause.getClass().getSimpleName() + ": " + e.getLocalizedMessage());
+                  "Got error {}: {}", cause.getClass().getSimpleName(), e.getLocalizedMessage());
               if (cause.getClass().getSimpleName().contains("CQLParseException")) {
                 logger.debug("BAD CQL");
                 asyncResultHandler.handle(

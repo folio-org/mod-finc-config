@@ -52,7 +52,7 @@ public class SelectFilterDAOImpl implements SelectFilterDAO {
     try {
       cql = getCQL(query, limit, offset, isil);
     } catch (FieldException e) {
-      logger.error("Error while processing CQL " + PgExceptionUtil.getMessage(e));
+      logger.error("Error while processing CQL {}", PgExceptionUtil.getMessage(e));
       result.fail("Cannot get filters. Error while processing CQL: " + e);
     }
 

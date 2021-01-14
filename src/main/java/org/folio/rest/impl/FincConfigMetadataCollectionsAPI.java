@@ -114,7 +114,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
                         }
                       });
             } catch (IllegalStateException e) {
-              logger.debug("IllegalStateException: " + e.getLocalizedMessage());
+              logger.debug(String.format("IllegalStateException: %s", e.getLocalizedMessage()));
               asyncResultHandler.handle(
                   Future.succeededFuture(
                       GetFincConfigMetadataCollectionsResponse.respond400WithTextPlain(
@@ -125,7 +125,9 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
                 cause = cause.getCause();
               }
               logger.debug(
-                  "Got error " + cause.getClass().getSimpleName() + ": " + e.getLocalizedMessage());
+                  String.format(
+                      "Got error %s: %s",
+                      cause.getClass().getSimpleName(), e.getLocalizedMessage()));
               if (cause.getClass().getSimpleName().contains("CQLParseException")) {
                 logger.debug("BAD CQL");
                 asyncResultHandler.handle(
@@ -198,7 +200,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    logger.debug("Getting single metadata collection by id: " + id);
+    logger.debug("Getting single metadata collection by id: {}", id);
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
     PgUtil.getById(
         TABLE_NAME,
@@ -218,7 +220,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    logger.debug("Delete metadata collection: " + id);
+    logger.debug("Delete metadata collection: {}", id);
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
     PgUtil.deleteById(
         TABLE_NAME,
@@ -238,7 +240,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    logger.debug("Update metadata collection: " + id);
+    logger.debug("Update metadata collection: {}", id);
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
 
     this.addMdSourceNameTo(entity, vertxContext)
@@ -280,7 +282,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
                     entitiesMDSource.setName(mdSource.getLabel());
                     result.complete(entity.withMdSource(entitiesMDSource));
                   } else {
-                    logger.info("No metadata source found for id " + entitiesMDSource.getId());
+                    logger.info("No metadata source found for id {}", entitiesMDSource.getId());
                     result.complete(entity);
                   }
                 } else {
