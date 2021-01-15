@@ -11,6 +11,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -35,34 +38,35 @@ import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    ConfigMetadataCollectionsIT.class,
-    ConfigMetadataSourcesIT.class,
-    ConfigFiltersIT.class,
-    ConfigFilesIT.class,
-    ConfigContactsIT.class,
-    FincSelectFilesIT.class,
-    FincSelectFiltersIT.class,
-    IsilsIT.class,
-    SelectMetadataCollectionsIT.class,
-    SelectMetadataSourcesIT.class,
-    TinyMetadataSourcesIT.class,
-    FilterHelperTest.class,
-    ConfigMetadataCollectionsIT.class,
-    ConfigMetadataSourcesIT.class,
-    FincSelectFilesIT.class,
-    FincSelectFiltersIT.class,
-    IsilsIT.class,
-    SelectMetadataCollectionsIT.class,
-    SelectMetadataSourcesIT.class,
-    TinyMetadataSourcesIT.class,
-    ConfigEZBCredentialsIT.class,
-    SelectEZBCredentialsIT.class
+  ConfigMetadataCollectionsIT.class,
+  ConfigMetadataSourcesIT.class,
+  ConfigFiltersIT.class,
+  ConfigFilesIT.class,
+  ConfigContactsIT.class,
+  FincSelectFilesIT.class,
+  FincSelectFiltersIT.class,
+  IsilsIT.class,
+  SelectMetadataCollectionsIT.class,
+  SelectMetadataSourcesIT.class,
+  TinyMetadataSourcesIT.class,
+  FilterHelperTest.class,
+  ConfigMetadataCollectionsIT.class,
+  ConfigMetadataSourcesIT.class,
+  FincSelectFilesIT.class,
+  FincSelectFiltersIT.class,
+  IsilsIT.class,
+  SelectMetadataCollectionsIT.class,
+  SelectMetadataSourcesIT.class,
+  TinyMetadataSourcesIT.class,
+  ConfigEZBCredentialsIT.class,
+  SelectEZBCredentialsIT.class
 })
 public class ApiTestSuite {
 
@@ -145,6 +149,17 @@ public class ApiTestSuite {
   }
 
   private static void prepareTenants() {
+
+    /*int port = RestAssured.port;
+    TenantUtil tenantUtil = new TenantUtil();
+    tenantUtil
+        .postFincTenant(port, vertx, context)
+        .onSuccess(
+            unused ->
+                tenantUtil
+                    .postDikuTenant(port, vertx)
+                    .onSuccess(unused1 -> tenantUtil.postUBLTenant(port, vertx)));*/
+
     String url = RestAssured.baseURI + ":" + RestAssured.port;
     try {
       CompletableFuture fincFuture = new CompletableFuture();

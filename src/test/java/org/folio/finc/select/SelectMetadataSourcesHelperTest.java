@@ -10,6 +10,7 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.finc.ApiTestSuite;
+import org.folio.finc.TenantUtil;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.Select;
@@ -131,7 +132,7 @@ public class SelectMetadataSourcesHelperTest {
 
     Async async = context.async();
     cut.selectAllCollectionsOfMetadataSource(
-        SelectMetadataSourceVerticleTestHelper.getMetadataSource2().getId(),
+        TenantUtil.getMetadataSource2().getId(),
         select,
         header,
         ar -> {

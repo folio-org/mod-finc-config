@@ -1,4 +1,4 @@
-package org.folio.finc.select;
+package org.folio.finc;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -9,7 +9,7 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.folio.finc.ApiTestSuite;
+import org.folio.finc.select.SelectMetadataSourceVerticleTest;
 import org.folio.okapi.common.XOkapiHeaders;
 import org.folio.rest.impl.TenantReferenceApi;
 import org.folio.rest.jaxrs.model.*;
@@ -24,10 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SelectMetadataSourceVerticleTestHelper {
+public class TenantUtil {
 
   private static final Logger logger = LogManager.getLogger(SelectMetadataSourceVerticleTest.class);
   private static final String TENANT_UBL = "ubl";
+  private static final String TENANT_DIKU = "diku";
 
   static FincConfigMetadataSource metadataSource1;
   static FincConfigMetadataSource metadataSource2;
@@ -175,12 +176,12 @@ public class SelectMetadataSourceVerticleTestHelper {
     return result.future();
   }
 
-  public Future<Void> postUBLTenant(int port, Vertx vertx) {
+  private Future<Void> postTenant(String tenant, int port, Vertx vertx) {
     Promise<Void> result = Promise.promise();
     try {
 
       Map<String, String> headers = new HashMap<>();
-      headers.put(XOkapiHeaders.TENANT, TENANT_UBL);
+      headers.put(XOkapiHeaders.TENANT, tenant);
       headers.put(XOkapiHeaders.URL, "http://localhost:" + port);
       new TenantReferenceApi()
           .postTenant(
@@ -203,6 +204,14 @@ public class SelectMetadataSourceVerticleTestHelper {
       result.fail(e);
     }
     return result.future();
+  }
+
+  public Future<Void> postDikuTenant(int port, Vertx vertx) {
+    return postTenant(TENANT_DIKU, port, vertx);
+  }
+
+  public Future<Void> postUBLTenant(int port, Vertx vertx) {
+    return postTenant(TENANT_UBL, port, vertx);
   }
 
   public Future<Void> postFincTenant(int port, Vertx vertx, TestContext context) {
