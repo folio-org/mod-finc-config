@@ -53,12 +53,10 @@ public class EZBHarvestVerticle extends AbstractVerticle {
         .onComplete(
             ar -> {
               if (ar.succeeded()) {
-                log.info(String.format("Successfully executed ezb updater for %s", isil));
+                log.info("Successfully executed ezb updater for {}", isil);
                 startFuture.complete();
               } else {
-                log.error(
-                    String.format(
-                        "Error while updating ezb file for isil %s: %s", isil, ar.cause()));
+                log.error("Error while updating ezb file for isil {}: {}", isil, ar.cause());
                 startFuture.fail(ar.cause());
               }
             });
@@ -104,7 +102,7 @@ public class EZBHarvestVerticle extends AbstractVerticle {
       FincSelectFilter filter, String ezbFileString, String isil) {
     if (filter == null) {
       // we have no filter, so we do not need to update its file
-      log.info(String.format("No ezb filter found for isil %s. Will do nothing.", isil));
+      log.info("No ezb filter found for isil {}. Will do nothing.", isil);
       return Future.succeededFuture();
     }
 

@@ -114,7 +114,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
                         }
                       });
             } catch (IllegalStateException e) {
-              logger.debug(String.format("IllegalStateException: %s", e.getLocalizedMessage()));
+              logger.debug("IllegalStateException: {}", e.getLocalizedMessage());
               asyncResultHandler.handle(
                   Future.succeededFuture(
                       GetFincConfigMetadataCollectionsResponse.respond400WithTextPlain(

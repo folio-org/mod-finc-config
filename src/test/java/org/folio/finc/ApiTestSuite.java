@@ -135,16 +135,6 @@ public class ApiTestSuite {
 
   private static void prepareTenants() {
 
-    /*int port = RestAssured.port;
-    TenantUtil tenantUtil = new TenantUtil();
-    tenantUtil
-        .postFincTenant(port, vertx, context)
-        .onSuccess(
-            unused ->
-                tenantUtil
-                    .postDikuTenant(port, vertx)
-                    .onSuccess(unused1 -> tenantUtil.postUBLTenant(port, vertx)));*/
-
     String url = RestAssured.baseURI + ":" + RestAssured.port;
     try {
       CompletableFuture fincFuture = new CompletableFuture();
