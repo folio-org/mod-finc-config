@@ -34,12 +34,10 @@ public class UnselectMetadataSourceVerticleTest {
   private static int port;
   private static UnselectMetadataSourceVerticle cut;
   @Rule public Timeout timeout = Timeout.seconds(10);
-  private static TenantUtil tenantUtil;
 
   @BeforeClass
   public static void setUp(TestContext context)
       throws InterruptedException, ExecutionException, TimeoutException {
-    tenantUtil = new TenantUtil();
     vertx = Vertx.vertx();
     try {
       PostgresClient.setIsEmbedded(true);
@@ -94,8 +92,8 @@ public class UnselectMetadataSourceVerticleTest {
                 tenantUtil
                     .postUBLTenant(port, vertx)
                     .onSuccess(unused1 -> async.complete())
-                    .onFailure(t -> context.fail(t)))
-        .onFailure(t -> context.fail(t));
+                    .onFailure(context::fail))
+        .onFailure(context::fail);
     async.await();
   }
 

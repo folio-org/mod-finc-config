@@ -89,8 +89,8 @@ public class SelectMetadataSourceVerticleTest {
                                 tenantUtil
                                         .postUBLTenant(port, vertx)
                                         .onSuccess(unused1 -> async.complete())
-                                        .onFailure(t -> context.fail(t)))
-                .onFailure(t -> context.fail(t));
+                                        .onFailure(context::fail))
+                .onFailure(context::fail);
         async.await();
     }
 

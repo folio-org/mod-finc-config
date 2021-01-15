@@ -146,13 +146,13 @@ public class ApiTestSuite {
       TenantClient tenantClientUbl = new TenantClient(url, TENANT_UBL, TENANT_UBL);
       tenantClientFinc.postTenant(
           new TenantAttributes().withModuleTo(getModuleVersion()),
-          postTenantRes -> fincFuture.complete(postTenantRes));
+              fincFuture::complete);
       tenantClientDiku.postTenant(
           new TenantAttributes().withModuleTo(getModuleVersion()),
-          postTenantRes -> dikuFuture.complete(postTenantRes));
+              dikuFuture::complete);
       tenantClientUbl.postTenant(
           new TenantAttributes().withModuleTo(getModuleVersion()),
-          postTenantRes -> ublFuture.complete(postTenantRes));
+              ublFuture::complete);
       fincFuture.get(30, TimeUnit.SECONDS);
       dikuFuture.get(30, TimeUnit.SECONDS);
       ublFuture.get(30, TimeUnit.SECONDS);

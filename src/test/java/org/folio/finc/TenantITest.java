@@ -89,7 +89,7 @@ public class TenantITest {
   }
 
   @Before
-  public void prepareTenants(TestContext context) throws InterruptedException {
+  public void prepareTenants(TestContext context) {
     Async async = context.async();
     TenantUtil tenantUtil = new TenantUtil();
     tenantUtil
@@ -101,7 +101,7 @@ public class TenantITest {
                 tenantUtil
                     .postDikuTenant(port, vertx)
                     .onSuccess(unused1 -> async.complete())
-                    .onFailure(throwable -> context.fail(throwable)))
+                    .onFailure(context::fail))
         .onFailure(context::fail);
     async.awaitSuccess();
   }
