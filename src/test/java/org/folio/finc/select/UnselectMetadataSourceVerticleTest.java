@@ -85,11 +85,18 @@ public class UnselectMetadataSourceVerticleTest {
   }
 
   private static void prepareTenants(TestContext context) {
-    TenantUtil tenantUtil =
-        new TenantUtil();
+    Async async = context.async();
+    TenantUtil tenantUtil = new TenantUtil();
     tenantUtil
         .postFincTenant(port, vertx, context)
-        .onSuccess(unused -> tenantUtil.postUBLTenant(port, vertx));
+        .onSuccess(
+            unused ->
+                tenantUtil
+                    .postUBLTenant(port, vertx)
+                    .onSuccess(unused1 -> async.complete())
+                    .onFailure(t -> context.fail(t)))
+        .onFailure(t -> context.fail(t));
+    async.await();
   }
 
   @AfterClass
@@ -112,8 +119,7 @@ public class UnselectMetadataSourceVerticleTest {
   public void before() throws InterruptedException, ExecutionException, TimeoutException {
     JsonObject cfg2 = vertx.getOrCreateContext().config();
     cfg2.put("tenantId", TENANT_UBL);
-    cfg2.put(
-        "metadataSourceId", TenantUtil.getMetadataSource2().getId());
+    cfg2.put("metadataSourceId", TenantUtil.getMetadataSource2().getId());
     cfg2.put("testing", true);
 
     CompletableFuture<String> deploymentComplete = new CompletableFuture<>();
@@ -133,8 +139,7 @@ public class UnselectMetadataSourceVerticleTest {
   @Test
   public void testSuccessfulUnSelect(TestContext context) {
     Async async = context.async();
-    cut.selectAllCollections(
-            TenantUtil.getMetadataSource1().getId(), TENANT_UBL)
+    cut.selectAllCollections(TenantUtil.getMetadataSource1().getId(), TENANT_UBL)
         .onComplete(
             aVoid -> {
               if (aVoid.succeeded()) {
@@ -144,9 +149,7 @@ public class UnselectMetadataSourceVerticleTest {
                           .addField("'label'")
                           .setJSONB(true)
                           .setOperation("=")
-                          .setVal(
-                              TenantUtil.getMetadataCollection1()
-                                  .getLabel());
+                          .setVal(TenantUtil.getMetadataCollection1().getLabel());
                   Criterion criterion = new Criterion(labelCrit);
                   PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
                       .get(

@@ -79,13 +79,20 @@ public class SelectMetadataSourceVerticleTest {
     deploymentComplete.get(30, TimeUnit.SECONDS);
   }
 
-  private static void prepareTenants(TestContext context) {
-    TenantUtil tenantUtil =
-        new TenantUtil();
-    tenantUtil
-        .postFincTenant(port, vertx, context)
-        .onSuccess(unused -> tenantUtil.postUBLTenant(port, vertx));
-  }
+    private static void prepareTenants(TestContext context) {
+        Async async = context.async();
+        TenantUtil tenantUtil = new TenantUtil();
+        tenantUtil
+                .postFincTenant(port, vertx, context)
+                .onSuccess(
+                        unused ->
+                                tenantUtil
+                                        .postUBLTenant(port, vertx)
+                                        .onSuccess(unused1 -> async.complete())
+                                        .onFailure(t -> context.fail(t)))
+                .onFailure(t -> context.fail(t));
+        async.await();
+    }
 
   @AfterClass
   public static void teardown() throws InterruptedException, ExecutionException, TimeoutException {
