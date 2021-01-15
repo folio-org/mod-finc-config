@@ -7,6 +7,7 @@ import io.restassured.parsing.Parser;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -17,10 +18,7 @@ import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
@@ -47,8 +45,8 @@ public class TenantITest {
   private static Vertx vertx;
   private static int port;
 
-  @Before
-  public void setUp(TestContext context)
+  @BeforeClass
+  public static void setUp(TestContext context)
       throws InterruptedException, ExecutionException, TimeoutException {
     vertx = Vertx.vertx();
     try {
@@ -68,7 +66,7 @@ public class TenantITest {
     DeploymentOptions options =
         new DeploymentOptions().setConfig(new JsonObject().put("http.port", port));
     startVerticle(options);
-    prepareTenants(context);
+    // prepareTenants(context);
   }
 
   private static void startVerticle(DeploymentOptions options)
@@ -90,18 +88,26 @@ public class TenantITest {
     deploymentComplete.get(30, TimeUnit.SECONDS);
   }
 
-  private static void prepareTenants(TestContext context) {
+  @Before
+  public void prepareTenants(TestContext context) throws InterruptedException {
+    Async async = context.async();
     TenantUtil tenantUtil = new TenantUtil();
     tenantUtil
         .postFincTenant(port, vertx, context)
         .onSuccess(unused -> tenantUtil.postUBLTenant(port, vertx))
         .onFailure(context::fail)
-        .onSuccess(unused -> tenantUtil.postDikuTenant(port, vertx))
+        .onSuccess(
+            unused ->
+                tenantUtil
+                    .postDikuTenant(port, vertx)
+                    .onSuccess(unused1 -> async.complete())
+                    .onFailure(throwable -> context.fail(throwable)))
         .onFailure(context::fail);
+    async.awaitSuccess();
   }
 
-  @After
-  public void teardown() throws InterruptedException, ExecutionException, TimeoutException {
+  @AfterClass
+  public static void teardown() throws InterruptedException, ExecutionException, TimeoutException {
     RestAssured.reset();
     CompletableFuture<String> undeploymentComplete = new CompletableFuture<>();
     vertx.close(
