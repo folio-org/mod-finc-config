@@ -52,7 +52,6 @@ public class TenantReferenceApi extends TenantAPI {
       return;
     }
 
-    headerTreeMap.remove(X_OKAPI_TENANT);
     headerTreeMap.put(X_OKAPI_TENANT, Constants.MODULE_TENANT);
     super.postTenantSync(
         entity,
