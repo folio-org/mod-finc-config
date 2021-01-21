@@ -5,7 +5,7 @@ import io.vertx.core.Future;
 import java.util.Map;
 import java.util.Objects;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
-import org.folio.rest.utils.nameresolver.OrgaizationNameResolver;
+import org.folio.rest.utils.nameresolver.OrganizationNameResolver;
 
 public class AttributeNameAdder {
 
@@ -22,7 +22,7 @@ public class AttributeNameAdder {
     if (Objects.isNull(organizationId)) return Future.succeededFuture(metadataSource);
 
     Future<String> orgaNameFuture =
-        OrgaizationNameResolver.resolveName(organizationId, okapiHeaders, vertxContext);
+        OrganizationNameResolver.resolveName(organizationId, okapiHeaders, vertxContext);
     return orgaNameFuture.map(
         name -> {
           if (Objects.nonNull(name)) {

@@ -15,13 +15,13 @@ import org.folio.okapi.common.XOkapiHeaders;
 
 import java.util.Map;
 
-public class OrgaizationNameResolver {
+public class OrganizationNameResolver {
 
-  private static final Logger logger = LogManager.getLogger(OrgaizationNameResolver.class);
+  private static final Logger logger = LogManager.getLogger(OrganizationNameResolver.class);
 
   private static final String ORGANIZATION_ENDPOINT = "/organizations-storage/organizations/";
 
-  private OrgaizationNameResolver() {
+  private OrganizationNameResolver() {
     throw new IllegalStateException("Utility class");
   }
 
