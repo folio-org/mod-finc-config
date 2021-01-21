@@ -18,13 +18,14 @@ import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
@@ -65,30 +66,15 @@ public class TenantITest {
     RestAssured.defaultParser = Parser.JSON;
     DeploymentOptions options =
         new DeploymentOptions().setConfig(new JsonObject().put("http.port", port));
-    startVerticle(options);
+    startVerticle(options, context);
+    prepareTenants(context);
   }
 
-  private static void startVerticle(DeploymentOptions options)
-      throws InterruptedException, ExecutionException, TimeoutException {
-
-    CompletableFuture<String> deploymentComplete = new CompletableFuture<>();
-
-    vertx.deployVerticle(
-        RestVerticle.class.getName(),
-        options,
-        res -> {
-          if (res.succeeded()) {
-            deploymentComplete.complete(res.result());
-          } else {
-            deploymentComplete.completeExceptionally(res.cause());
-          }
-        });
-
-    deploymentComplete.get(30, TimeUnit.SECONDS);
+  private static void startVerticle(DeploymentOptions options, TestContext context) {
+    vertx.deployVerticle(RestVerticle.class.getName(), options, context.asyncAssertSuccess());
   }
 
-  @Before
-  public void prepareTenants(TestContext context) {
+  public static void prepareTenants(TestContext context) {
     Async async = context.async();
     TenantUtil tenantUtil = new TenantUtil();
     tenantUtil
@@ -106,23 +92,15 @@ public class TenantITest {
   }
 
   @AfterClass
-  public static void teardown() throws InterruptedException, ExecutionException, TimeoutException {
+  public static void teardown(TestContext context)
+      throws InterruptedException, ExecutionException, TimeoutException {
     RestAssured.reset();
-    CompletableFuture<String> undeploymentComplete = new CompletableFuture<>();
-    vertx.close(
-        res -> {
-          if (res.succeeded()) {
-            undeploymentComplete.complete(null);
-          } else {
-            undeploymentComplete.completeExceptionally(res.cause());
-          }
-        });
-    undeploymentComplete.get(20, TimeUnit.SECONDS);
+    vertx.close(context.asyncAssertSuccess());
     PostgresClient.stopEmbeddedPostgres();
   }
 
   @Test
-  public void testNoDeletionWithoutPurge() throws IOException, XmlPullParserException {
+  public void testDeactivateAndPurge() throws IOException, XmlPullParserException {
     String mockedOkapiUrl = "http://localhost:" + wireMockRule.port();
 
     // GET
@@ -159,30 +137,15 @@ public class TenantITest {
         .then()
         .contentType(ContentType.JSON)
         .statusCode(200);
-  }
-
-  @Test
-  public void testOnlyFincCanPurge() throws IOException, XmlPullParserException {
-    String mockedOkapiUrl = "http://localhost:" + wireMockRule.port();
-
-    // GET
-    given()
-        .header(XOkapiHeaders.TENANT, TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
-        .get(FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT)
-        .then()
-        .contentType(ContentType.JSON)
-        .statusCode(200);
 
     // Purge module with tenant UBL
-    TenantAttributes attributes =
+    TenantAttributes purgeAttributes =
         new TenantAttributes()
             .withModuleTo(null)
             .withModuleFrom(ApiTestSuite.getModuleVersion())
             .withPurge(true);
     given()
-        .body(attributes)
+        .body(purgeAttributes)
         .header("content-type", ContentType.JSON)
         .header(XOkapiHeaders.TENANT, TENANT_UBL)
         .header(XOkapiHeaders.URL, mockedOkapiUrl)
@@ -192,7 +155,7 @@ public class TenantITest {
 
     // Deactivate module with tenant finc
     given()
-        .body(attributes)
+        .body(purgeAttributes)
         .header("content-type", ContentType.JSON)
         .header(XOkapiHeaders.TENANT, Constants.MODULE_TENANT)
         .header(XOkapiHeaders.URL, mockedOkapiUrl)
