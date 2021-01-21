@@ -3,43 +3,37 @@ package org.folio.finc.select;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import org.folio.finc.ApiTestSuite;
+import org.folio.finc.TenantUtil;
 import org.folio.finc.select.verticles.SelectMetadataSourceVerticle;
 import org.folio.rest.RestVerticle;
-import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
-import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @RunWith(VertxUnitRunner.class)
 public class SelectMetadataSourceVerticleTest {
 
   private static final String TENANT_UBL = "ubl";
-  private static Vertx vertx = Vertx.vertx();
+  private static Vertx vertx;
   private static SelectMetadataSourceVerticle cut;
-  @Rule
-  public Timeout timeout = Timeout.seconds(10);
+  private static int port;
+  @Rule public Timeout timeout = Timeout.seconds(10);
 
   @BeforeClass
   public static void setUp(TestContext context)
@@ -53,14 +47,14 @@ public class SelectMetadataSourceVerticleTest {
       context.fail(e);
       return;
     }
-    int port = NetworkUtils.nextFreePort();
+    port = NetworkUtils.nextFreePort();
 
     RestAssured.reset();
     RestAssured.baseURI = "http://localhost";
     RestAssured.port = port;
     RestAssured.defaultParser = Parser.JSON;
     DeploymentOptions options =
-        new DeploymentOptions().setConfig(new JsonObject().put("http.port", port)).setWorker(true);
+        new DeploymentOptions().setConfig(new JsonObject().put("http.port", port));
     startVerticle(options);
     prepareTenants(context);
     cut = new SelectMetadataSourceVerticle(vertx, vertx.getOrCreateContext());
@@ -85,36 +79,20 @@ public class SelectMetadataSourceVerticleTest {
     deploymentComplete.get(30, TimeUnit.SECONDS);
   }
 
-  private static void prepareTenants(TestContext context) {
-    SelectMetadataSourceVerticleTestHelper selectMetadataSourceVerticleTestHelper =
-        new SelectMetadataSourceVerticleTestHelper();
-    String url = RestAssured.baseURI + ":" + RestAssured.port;
-    try {
-      CompletableFuture fincFuture = new CompletableFuture();
-      CompletableFuture ublFuture = new CompletableFuture();
-      TenantClient tenantClientFinc =
-          new TenantClient(url, Constants.MODULE_TENANT, Constants.MODULE_TENANT);
-      TenantClient tenantClientUbl = new TenantClient(url, TENANT_UBL, TENANT_UBL);
-      tenantClientFinc.postTenant(
-          new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
-          postTenantRes -> {
-            Future<Void> future =
-                selectMetadataSourceVerticleTestHelper.writeDataToDB(context, vertx);
-            future.onComplete(
-                ar -> {
-                  fincFuture.complete(postTenantRes);
-                });
-          });
-      tenantClientUbl.postTenant(
-          new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
-          ublFuture::complete
-      );
-      fincFuture.get(30, TimeUnit.SECONDS);
-      ublFuture.get(30, TimeUnit.SECONDS);
-    } catch (Exception e) {
-      assert false;
+    private static void prepareTenants(TestContext context) {
+        Async async = context.async();
+        TenantUtil tenantUtil = new TenantUtil();
+        tenantUtil
+                .postFincTenant(port, vertx, context)
+                .onSuccess(
+                        unused ->
+                                tenantUtil
+                                        .postUBLTenant(port, vertx)
+                                        .onSuccess(unused1 -> async.complete())
+                                        .onFailure(context::fail))
+                .onFailure(context::fail);
+        async.await();
     }
-  }
 
   @AfterClass
   public static void teardown() throws InterruptedException, ExecutionException, TimeoutException {
@@ -137,13 +115,13 @@ public class SelectMetadataSourceVerticleTest {
     JsonObject cfg2 = vertx.getOrCreateContext().config();
     cfg2.put("tenantId", TENANT_UBL);
     cfg2.put(
-        "metadataSourceId", SelectMetadataSourceVerticleTestHelper.getMetadataSource2().getId());
+        "metadataSourceId", TenantUtil.getMetadataSource2().getId());
     cfg2.put("testing", true);
 
     CompletableFuture<String> deploymentComplete = new CompletableFuture<>();
     vertx.deployVerticle(
         cut,
-        new DeploymentOptions().setConfig(cfg2).setWorker(true),
+        new DeploymentOptions().setConfig(cfg2),
         res -> {
           if (res.succeeded()) {
             deploymentComplete.complete(res.result());
@@ -158,7 +136,7 @@ public class SelectMetadataSourceVerticleTest {
   public void testSuccessfulSelect(TestContext context) {
     Async async = context.async();
     cut.selectAllCollections(
-        SelectMetadataSourceVerticleTestHelper.getMetadataSource2().getId(), TENANT_UBL)
+            TenantUtil.getMetadataSource2().getId(), TENANT_UBL)
         .onComplete(
             aVoid -> {
               if (aVoid.succeeded()) {
@@ -169,7 +147,7 @@ public class SelectMetadataSourceVerticleTest {
                           .setJSONB(true)
                           .setOperation("=")
                           .setVal(
-                              SelectMetadataSourceVerticleTestHelper.getMetadataCollection3()
+                              TenantUtil.getMetadataCollection3()
                                   .getLabel());
                   Criterion criterion = new Criterion(labelCrit);
                   PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
@@ -206,7 +184,7 @@ public class SelectMetadataSourceVerticleTest {
   public void testNoSelect(TestContext context) {
     Async async = context.async();
     cut.selectAllCollections(
-        SelectMetadataSourceVerticleTestHelper.getMetadataSource2().getId(), TENANT_UBL)
+            TenantUtil.getMetadataSource2().getId(), TENANT_UBL)
         .onComplete(
             aVoid -> {
               if (aVoid.succeeded()) {
@@ -217,7 +195,7 @@ public class SelectMetadataSourceVerticleTest {
                           .setJSONB(true)
                           .setOperation("=")
                           .setVal(
-                              SelectMetadataSourceVerticleTestHelper.getMetadataCollection2()
+                              TenantUtil.getMetadataCollection2()
                                   .getLabel());
                   Criterion criterion = new Criterion(labelCrit);
                   PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)

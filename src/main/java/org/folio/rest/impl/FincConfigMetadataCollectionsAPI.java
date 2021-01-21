@@ -1,17 +1,8 @@
 package org.folio.rest.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Context;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import javax.ws.rs.core.Response;
+import io.vertx.core.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.cql2pgjson.CQL2PgJSON;
 import org.folio.cql2pgjson.exception.FieldException;
 import org.folio.finc.dao.MetadataSourcesDAO;
@@ -32,6 +23,11 @@ import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
 import org.folio.rest.utils.Constants;
 
+import javax.ws.rs.core.Response;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 /**
  * ATTENTION: API works tenant agnostic. Thus, don't use 'x-okapi-tenant' header, but {@value
  * Constants#MODULE_TENANT} as tenant.
@@ -40,7 +36,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
 
   private static final String TABLE_NAME = "metadata_collections";
   private final Messages messages = Messages.getInstance();
-  private final Logger logger = LoggerFactory.getLogger(FincConfigMetadataCollectionsAPI.class);
+  private final Logger logger = LogManager.getLogger(FincConfigMetadataCollectionsAPI.class);
 
   private MetadataSourcesDAO metadataSourcesDAO;
 
@@ -118,7 +114,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
                         }
                       });
             } catch (IllegalStateException e) {
-              logger.debug("IllegalStateException: " + e.getLocalizedMessage());
+              logger.debug("IllegalStateException: {}", e.getLocalizedMessage());
               asyncResultHandler.handle(
                   Future.succeededFuture(
                       GetFincConfigMetadataCollectionsResponse.respond400WithTextPlain(
@@ -129,7 +125,9 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
                 cause = cause.getCause();
               }
               logger.debug(
-                  "Got error " + cause.getClass().getSimpleName() + ": " + e.getLocalizedMessage());
+                  String.format(
+                      "Got error %s: %s",
+                      cause.getClass().getSimpleName(), e.getLocalizedMessage()));
               if (cause.getClass().getSimpleName().contains("CQLParseException")) {
                 logger.debug("BAD CQL");
                 asyncResultHandler.handle(
@@ -202,7 +200,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    logger.debug("Getting single metadata collection by id: " + id);
+    logger.debug("Getting single metadata collection by id: {}", id);
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
     PgUtil.getById(
         TABLE_NAME,
@@ -222,7 +220,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    logger.debug("Delete metadata collection: " + id);
+    logger.debug("Delete metadata collection: {}", id);
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
     PgUtil.deleteById(
         TABLE_NAME,
@@ -242,7 +240,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    logger.debug("Update metadata collection: " + id);
+    logger.debug("Update metadata collection: {}", id);
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
 
     this.addMdSourceNameTo(entity, vertxContext)
@@ -284,7 +282,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
                     entitiesMDSource.setName(mdSource.getLabel());
                     result.complete(entity.withMdSource(entitiesMDSource));
                   } else {
-                    logger.info("No metadata source found for id " + entitiesMDSource.getId());
+                    logger.info("No metadata source found for id {}", entitiesMDSource.getId());
                     result.complete(entity);
                   }
                 } else {

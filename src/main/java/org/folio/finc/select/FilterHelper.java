@@ -1,24 +1,25 @@
 package org.folio.finc.select;
 
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.finc.dao.SelectFileDAO;
 import org.folio.finc.dao.SelectFileDAOImpl;
 import org.folio.finc.dao.SelectFilterDAO;
 import org.folio.finc.dao.SelectFilterDAOImpl;
+import org.folio.okapi.common.GenericCompositeFuture;
 import org.folio.rest.jaxrs.model.FilterFile;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.persist.PgExceptionUtil;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class FilterHelper {
 
-  private static final Logger logger = LoggerFactory.getLogger(FilterHelper.class);
+  private static final Logger logger = LogManager.getLogger(FilterHelper.class);
 
   private final SelectFilterDAO selectFilterDAO;
   private final SelectFileDAO selectFileDAO;
@@ -68,19 +69,16 @@ public class FilterHelper {
                       selectFileDAO.deleteById(filterFile.getFileId(), isil, vertxContext))
               .collect(Collectors.toList());
 
-      CompositeFuture.all(deleteFutures)
+      GenericCompositeFuture.all(deleteFutures)
           .onComplete(
               ar -> {
                 if (ar.succeeded()) {
                   logger.info(
-                      "Associated files of filter " + filter.getId() + " deleted successfully.");
+                          String.format("Associated files of filter %s deleted successfully.",  filter.getId()));
                   result.complete();
                 } else {
                   logger.error(
-                      "Error while deleting files of filter "
-                          + filter.getId()
-                          + ". \n"
-                          + PgExceptionUtil.getMessage(ar.cause()));
+                          String.format("Error while deleting files of filter %s. %n %s", filter.getId(), PgExceptionUtil.getMessage(ar.cause())));
                   result.fail(ar.cause());
                 }
               });
@@ -103,7 +101,7 @@ public class FilterHelper {
             .collect(Collectors.toList());
 
     Promise<FincSelectFilter> result = Promise.promise();
-    CompositeFuture.all(filesToDeleteFuture)
+    GenericCompositeFuture.all(filesToDeleteFuture)
         .onComplete(
             ar -> {
               if (ar.succeeded()) {

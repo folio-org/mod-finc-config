@@ -5,29 +5,11 @@ import io.restassured.parsing.Parser;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.folio.finc.config.ConfigContactsIT;
-import org.folio.finc.config.ConfigEZBCredentialsIT;
-import org.folio.finc.config.ConfigFilesIT;
-import org.folio.finc.config.ConfigFiltersIT;
-import org.folio.finc.config.ConfigMetadataCollectionsIT;
-import org.folio.finc.config.ConfigMetadataSourcesIT;
-import org.folio.finc.config.TinyMetadataSourcesIT;
-import org.folio.finc.select.FilterHelperTest;
-import org.folio.finc.select.FincSelectFilesIT;
-import org.folio.finc.select.FincSelectFiltersIT;
-import org.folio.finc.select.IsilsIT;
-import org.folio.finc.select.SelectEZBCredentialsIT;
-import org.folio.finc.select.SelectMetadataCollectionsIT;
-import org.folio.finc.select.SelectMetadataSourcesIT;
+import org.folio.finc.config.*;
+import org.folio.finc.select.*;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.TenantAttributes;
@@ -39,30 +21,37 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    ConfigMetadataCollectionsIT.class,
-    ConfigMetadataSourcesIT.class,
-    ConfigFiltersIT.class,
-    ConfigFilesIT.class,
-    ConfigContactsIT.class,
-    FincSelectFilesIT.class,
-    FincSelectFiltersIT.class,
-    IsilsIT.class,
-    SelectMetadataCollectionsIT.class,
-    SelectMetadataSourcesIT.class,
-    TinyMetadataSourcesIT.class,
-    FilterHelperTest.class,
-    ConfigMetadataCollectionsIT.class,
-    ConfigMetadataSourcesIT.class,
-    FincSelectFilesIT.class,
-    FincSelectFiltersIT.class,
-    IsilsIT.class,
-    SelectMetadataCollectionsIT.class,
-    SelectMetadataSourcesIT.class,
-    TinyMetadataSourcesIT.class,
-    ConfigEZBCredentialsIT.class,
-    SelectEZBCredentialsIT.class
+  ConfigMetadataCollectionsIT.class,
+  ConfigMetadataSourcesIT.class,
+  ConfigFiltersIT.class,
+  ConfigFilesIT.class,
+  ConfigContactsIT.class,
+  FincSelectFilesIT.class,
+  FincSelectFiltersIT.class,
+  IsilsIT.class,
+  SelectMetadataCollectionsIT.class,
+  SelectMetadataSourcesIT.class,
+  TinyMetadataSourcesIT.class,
+  FilterHelperTest.class,
+  ConfigMetadataCollectionsIT.class,
+  ConfigMetadataSourcesIT.class,
+  FincSelectFilesIT.class,
+  FincSelectFiltersIT.class,
+  IsilsIT.class,
+  SelectMetadataCollectionsIT.class,
+  SelectMetadataSourcesIT.class,
+  TinyMetadataSourcesIT.class,
+  ConfigEZBCredentialsIT.class,
+  SelectEZBCredentialsIT.class
 })
 public class ApiTestSuite {
 
@@ -95,7 +84,6 @@ public class ApiTestSuite {
 
     DeploymentOptions options = new DeploymentOptions();
     options.setConfig(new JsonObject().put("http.port", port));
-    options.setWorker(true);
 
     startVerticle(options);
 
@@ -146,6 +134,7 @@ public class ApiTestSuite {
   }
 
   private static void prepareTenants() {
+
     String url = RestAssured.baseURI + ":" + RestAssured.port;
     try {
       CompletableFuture fincFuture = new CompletableFuture();
@@ -156,17 +145,12 @@ public class ApiTestSuite {
       TenantClient tenantClientDiku = new TenantClient(url, TENANT_DIKU, TENANT_DIKU);
       TenantClient tenantClientUbl = new TenantClient(url, TENANT_UBL, TENANT_UBL);
       tenantClientFinc.postTenant(
-          new TenantAttributes().withModuleTo(getModuleVersion()),
-          postTenantRes -> fincFuture.complete(postTenantRes));
+          new TenantAttributes().withModuleTo(getModuleVersion()), fincFuture::complete);
       tenantClientDiku.postTenant(
-          new TenantAttributes().withModuleTo(getModuleVersion()),
-          postTenantRes -> dikuFuture.complete(postTenantRes));
+          new TenantAttributes().withModuleTo(getModuleVersion()), dikuFuture::complete);
       tenantClientUbl.postTenant(
-          new TenantAttributes().withModuleTo(getModuleVersion()),
-          postTenantRes -> ublFuture.complete(postTenantRes));
-      fincFuture.get(30, TimeUnit.SECONDS);
-      dikuFuture.get(30, TimeUnit.SECONDS);
-      ublFuture.get(30, TimeUnit.SECONDS);
+          new TenantAttributes().withModuleTo(getModuleVersion()), ublFuture::complete);
+      CompletableFuture.allOf(fincFuture, dikuFuture, ublFuture).get();
     } catch (Exception e) {
       assert false;
     }

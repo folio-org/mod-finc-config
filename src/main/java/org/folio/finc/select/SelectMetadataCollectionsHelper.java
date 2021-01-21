@@ -1,23 +1,25 @@
 package org.folio.finc.select;
 
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
-import java.util.List;
-import java.util.Map;
 import org.folio.finc.dao.IsilDAO;
 import org.folio.finc.dao.IsilDAOImpl;
 import org.folio.finc.dao.MetadataCollectionsDAO;
 import org.folio.finc.dao.MetadataCollectionsDAOImpl;
 import org.folio.finc.select.exception.FincSelectNotPermittedException;
+import org.folio.okapi.common.GenericCompositeFuture;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection.UsageRestricted;
 import org.folio.rest.jaxrs.model.Select;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.TenantTool;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Helper class to select metadata collections for finc-select. Filters out information if an item
@@ -87,7 +89,7 @@ public class SelectMetadataCollectionsHelper {
         metadataCollectionsDAO.getById(id, vertxContext);
 
     Promise<FincConfigMetadataCollection> result = Promise.promise();
-    CompositeFuture.all(isilFuture, metadataCollectionFuture)
+    GenericCompositeFuture.all(Arrays.asList(isilFuture, metadataCollectionFuture))
         .onComplete(
             ar -> {
               if (ar.succeeded()) {

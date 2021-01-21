@@ -4,12 +4,13 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.finc.dao.FilterToCollectionsDAO;
 import org.folio.finc.dao.FilterToCollectionsDAOImpl;
 import org.folio.finc.dao.IsilDAO;
@@ -34,7 +35,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
   private final FilterToCollectionsDAO filterToCollectionsDAO;
   private final FilterHelper filterHelper;
   private final Messages messages = Messages.getInstance();
-  private final Logger logger = LoggerFactory.getLogger(FincSelectFiltersAPI.class);
+  private final Logger logger = LogManager.getLogger(FincSelectFiltersAPI.class);
 
   public FincSelectFiltersAPI() {
     this.isilDAO = new IsilDAOImpl();
@@ -221,8 +222,8 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
                     .removeFilesToDelete(entity, isil, vertxContext)
                     .compose(
                         fincSelectFilter ->
-                            selectFilterDAO
-                                .update(fincSelectFilter.withIsil(isil), id, vertxContext)))
+                            selectFilterDAO.update(
+                                fincSelectFilter.withIsil(isil), id, vertxContext)))
         .onComplete(
             ar -> {
               if (ar.succeeded()) {

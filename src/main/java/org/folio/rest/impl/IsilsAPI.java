@@ -1,16 +1,8 @@
 package org.folio.rest.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Context;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import javax.ws.rs.core.Response;
+import io.vertx.core.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.cql2pgjson.CQL2PgJSON;
 import org.folio.cql2pgjson.exception.FieldException;
 import org.folio.finc.dao.IsilDAO;
@@ -28,11 +20,16 @@ import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
 import org.folio.rest.utils.Constants;
 
+import javax.ws.rs.core.Response;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 public class IsilsAPI implements FincConfigIsils {
 
   private static final String TABLE_NAME = "isils";
   private final Messages messages = Messages.getInstance();
-  private final Logger logger = LoggerFactory.getLogger(IsilsAPI.class);
+  private final Logger logger = LogManager.getLogger(IsilsAPI.class);
   private final IsilDAO isilDAO;
 
   public IsilsAPI(Vertx vertx, String tenantId) {
@@ -104,7 +101,7 @@ public class IsilsAPI implements FincConfigIsils {
                         }
                       });
             } catch (IllegalStateException e) {
-              logger.debug("IllegalStateException: " + e.getLocalizedMessage());
+              logger.debug("IllegalStateException: {}", e.getLocalizedMessage());
               asyncResultHandler.handle(
                   Future.succeededFuture(
                       GetFincConfigIsilsResponse.respond400WithTextPlain(
@@ -115,7 +112,7 @@ public class IsilsAPI implements FincConfigIsils {
                 cause = cause.getCause();
               }
               logger.debug(
-                  "Got error " + cause.getClass().getSimpleName() + ": " + e.getLocalizedMessage());
+                  "Got error {}: {}", cause.getClass().getSimpleName(), e.getLocalizedMessage());
               if (cause.getClass().getSimpleName().contains("CQLParseException")) {
                 logger.debug("BAD CQL");
                 asyncResultHandler.handle(
@@ -159,27 +156,30 @@ public class IsilsAPI implements FincConfigIsils {
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
 
     String tenant = entity.getTenant();
-    isilDAO.getIsilForTenant(tenant, vertxContext)
-        .onSuccess(isil -> {
-          if (isil == null) {
-            PgUtil.post(
-                TABLE_NAME,
-                entity,
-                okapiHeaders,
-                vertxContext,
-                PostFincConfigIsilsResponse.class,
-                asyncResultHandler);
-          } else {
-            asyncResultHandler.handle(Future.succeededFuture(PostFincConfigIsilsResponse
-                .respond400WithTextPlain(
-                    "Tenant already has an isil. Only one isil per tenant allowed.")));
-          }
-        })
-        .onFailure(throwable ->
-            asyncResultHandler.handle(Future.succeededFuture(PostFincConfigIsilsResponse
-                .respond500WithTextPlain(
-                    throwable)))
-        );
+    isilDAO
+        .getIsilForTenant(tenant, vertxContext)
+        .onSuccess(
+            isil -> {
+              if (isil == null) {
+                PgUtil.post(
+                    TABLE_NAME,
+                    entity,
+                    okapiHeaders,
+                    vertxContext,
+                    PostFincConfigIsilsResponse.class,
+                    asyncResultHandler);
+              } else {
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        PostFincConfigIsilsResponse.respond400WithTextPlain(
+                            "Tenant already has an isil. Only one isil per tenant allowed.")));
+              }
+            })
+        .onFailure(
+            throwable ->
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        PostFincConfigIsilsResponse.respond500WithTextPlain(throwable))));
   }
 
   @Override
@@ -231,28 +231,31 @@ public class IsilsAPI implements FincConfigIsils {
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
 
     String tenant = entity.getTenant();
-    isilDAO.getIsilForTenant(tenant, vertxContext)
-        .onSuccess(isil -> {
-          if (isilIsValid(isil, entity.getIsil())) {
-            PgUtil.put(
-                TABLE_NAME,
-                entity,
-                id,
-                okapiHeaders,
-                vertxContext,
-                PutFincConfigIsilsByIdResponse.class,
-                asyncResultHandler);
-          } else {
-            asyncResultHandler.handle(Future.succeededFuture(PostFincConfigIsilsResponse
-                .respond400WithTextPlain(
-                    "Tenant already has an isil. Only one isil per tenant allowed.")));
-          }
-        })
-        .onFailure(throwable ->
-            asyncResultHandler.handle(Future.succeededFuture(PostFincConfigIsilsResponse
-                .respond500WithTextPlain(
-                    throwable)))
-        );
+    isilDAO
+        .getIsilForTenant(tenant, vertxContext)
+        .onSuccess(
+            isil -> {
+              if (isilIsValid(isil, entity.getIsil())) {
+                PgUtil.put(
+                    TABLE_NAME,
+                    entity,
+                    id,
+                    okapiHeaders,
+                    vertxContext,
+                    PutFincConfigIsilsByIdResponse.class,
+                    asyncResultHandler);
+              } else {
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        PostFincConfigIsilsResponse.respond400WithTextPlain(
+                            "Tenant already has an isil. Only one isil per tenant allowed.")));
+              }
+            })
+        .onFailure(
+            throwable ->
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        PostFincConfigIsilsResponse.respond500WithTextPlain(throwable))));
   }
 
   private boolean isilIsValid(String isilForTenant, String isilFromRequestes) {
@@ -261,5 +264,4 @@ public class IsilsAPI implements FincConfigIsils {
     }
     return isilForTenant.equals(isilFromRequestes);
   }
-
 }

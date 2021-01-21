@@ -1,25 +1,32 @@
 # mod-finc-config
 
-Copyright (C) 2019-2020 The Open Library Foundation
+Copyright (C) 2019-2021 The Open Library Foundation
 
 This software is distributed under the terms of the Apache License,
 Version 2.0. See the file "[LICENSE](LICENSE)" for more information.
 
 ## Introduction
 
-Backend module for finc-config and finc-select.
+Backend module for both ui-finc-config and ui-finc-select.
 
-The finc apps allow the maintenance of metadata sources and collection for the finc user community. 
+In general, the finc apps allow the maintenance of metadata sources and collection for the finc user community. 
 
-finc-config allows the configuration of metadata sources and collections. finc-select allows members of the finc user community (libraries) to select or deselect metadata collections as well as whole metadata sources.
+This module works tenant-agnostic. That means, its data is not stored separated by tenant. ui-finc-config gives access to the data as stored. It allows the configuration of metadata sources and collections.
 
-This module works tenant-agnostic. That means, its data is not stored separated by tenant. finc-config gives access to the data as stored. finc-select provides a view on the data filtered for the current tenant.
+ui-finc-select provides a view on the same data filtered for the current tenant. It allows members of the finc user community (libraries) to select or deselect metadata collections as well as whole metadata sources.
 
 For instance, a user of a specific tenant with an isil (International Standard Identifier for Libraries and Related Organizations) may have access to the finc-select app. This user can only see if its library has selected a certain metadata collection. In addition, the user can only select/deselect a metadata collection for its library. Moreover, the user cannot see if other libraries do have selected the metadata collection.
 
-Only a user with granted permissions for finc-config can edit the metadata source resp. collection. In addition, only a user with this permissions is able to see which library selected which metadata source resp. collection.
+Only a user with granted permissions for ui-finc-config can edit the metadata source resp. collection. In addition, only a user with these permissions is able to see which library selected which metadata source resp. collection.
 
 In order to implement the mentioned functionality, the module uses Okapi's */_/tenant* interface in a special way. If the module is registered for a new tenant, its own */_/tenant* interface overwrites the given *x-okapi-header* with the prefix predefined in the module, namely *finc*.
+
+Hence, it is good practice to first create a Folio tenant named _finc_. Afterwards it is recommended to activate the module for this tenant via the interface `_/proxy/tenants/finc/install`. This will create the needed database schema.
+
+In the next step the module can be activated for tenants as needed, e.g. tenant _diku_. Note, this activation will not create any database schema. 
+
+When disabling the module for a tenant, the query parameter `purge=true` works only when disabling the module for the tenant _finc_. This means it is impossible to purge the database schema for any tenant different as _finc_.
+
 
 ## Filters
 

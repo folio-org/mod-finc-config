@@ -1,16 +1,17 @@
 package org.folio.finc;
 
-import static io.restassured.RestAssured.given;
-
 import io.restassured.http.ContentType;
 import io.vertx.core.json.Json;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 import org.folio.rest.jaxrs.model.Isil;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
+import static io.restassured.RestAssured.given;
 
 public class ApiTestBase {
 
@@ -20,16 +21,23 @@ public class ApiTestBase {
   protected static final String ISILS_API_ENDPOINT = "/finc-config/isils";
   protected static final String FINC_SELECT_FILES_ENDPOINT = "/finc-select/files";
   protected static final String FINC_SELECT_FILTERS_ENDPOINT = "/finc-select/filters";
-  protected static final String FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT = "/finc-select/metadata-collections";
-  protected static final String FINC_SELECT_METADATA_SOURCES_ENDPOINT = "/finc-select/metadata-sources";
-  protected static final String FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT = "/finc-config/metadata-collections";
-  protected static final String FINC_CONFIG_METADATA_SOURCES_ENDPOINT = "/finc-config/metadata-sources";
+  protected static final String FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT =
+      "/finc-select/metadata-collections";
+  protected static final String FINC_SELECT_METADATA_SOURCES_ENDPOINT =
+      "/finc-select/metadata-sources";
+  protected static final String FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT =
+      "/finc-config/metadata-collections";
+  protected static final String FINC_CONFIG_METADATA_SOURCES_ENDPOINT =
+      "/finc-config/metadata-sources";
   protected static final String FINC_CONFIG_CONTACTS_ENDPOINT = "/finc-config/contacts";
-  protected static final String FINC_CONFIG_TINY_METADATA_SOURCES_ENDPOINT = "/finc-config/tiny-metadata-sources";
+  protected static final String FINC_CONFIG_TINY_METADATA_SOURCES_ENDPOINT =
+      "/finc-config/tiny-metadata-sources";
   protected static final String FINC_CONFIG_FILTERS_ENDPOINT = "/finc-config/filters";
   protected static final String FINC_CONFIG_FILES_ENDPOINT = "/finc-config/files";
-  protected static final String FINC_CONFIG_EZB_CREDENTIALS_ENDPOINT = "/finc-config/ezb-credentials";
-  protected static final String FINC_SELECT_EZB_CREDENTIALS_ENDPOINT = "/finc-select/ezb-credentials";
+  protected static final String FINC_CONFIG_EZB_CREDENTIALS_ENDPOINT =
+      "/finc-config/ezb-credentials";
+  protected static final String FINC_SELECT_EZB_CREDENTIALS_ENDPOINT =
+      "/finc-select/ezb-credentials";
 
   private static boolean runningOnOwn;
 

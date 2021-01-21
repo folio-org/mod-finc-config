@@ -3,9 +3,8 @@ package org.folio.finc.rules;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.rest.impl.TenantAPI;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.jaxrs.model.FincSelectFilter.Type;
@@ -15,12 +14,14 @@ import org.folio.rest.tools.utils.VertxUtils;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class EmbeddedPostgresRule implements TestRule {
 
-  private static final Logger log = LoggerFactory.getLogger(EmbeddedPostgresRule.class);
+  private static final Logger log = LogManager.getLogger(EmbeddedPostgresRule.class);
   Vertx vertx = VertxUtils.getVertxFromContextOrNew();
   String tenant;
 
@@ -28,17 +29,14 @@ public class EmbeddedPostgresRule implements TestRule {
     this.tenant = tenant;
   }
 
-  public EmbeddedPostgresRule() {
-  }
-
   private Future<List<String>> createSchema(String tenant) {
     log.info("Creating schema for tenant: {}", tenant);
     Promise<List<String>> createSchema = Promise.promise();
     try {
-      String sqlFile = new TenantAPI().sqlFile(tenant, false, null, null);
+      String[] sqlFile = new TenantAPI().sqlFile(tenant, false, null, null);
       PostgresClient.getInstance(vertx)
           .runSQLFile(
-              sqlFile,
+              String.join("\n", sqlFile),
               true,
               ar -> {
                 if (ar.succeeded()) {
@@ -60,38 +58,46 @@ public class EmbeddedPostgresRule implements TestRule {
   private Future<Void> insertIsil(String tenant) {
     log.info("Creating isil for tenant: {}", tenant);
     Promise<Void> result = Promise.promise();
-    Isil isil = new Isil()
-        .withId(UUID.randomUUID().toString())
-        .withIsil(tenant)
-        .withTenant(tenant)
-        .withLibrary(tenant);
+    Isil isil =
+        new Isil()
+            .withId(UUID.randomUUID().toString())
+            .withIsil(tenant)
+            .withTenant(tenant)
+            .withLibrary(tenant);
     PostgresClient.getInstance(vertx, tenant)
-        .save("isils", isil, ar -> {
-          if (ar.succeeded()) {
-            result.complete();
-          } else {
-            result.fail(ar.cause());
-          }
-        });
+        .save(
+            "isils",
+            isil,
+            ar -> {
+              if (ar.succeeded()) {
+                result.complete();
+              } else {
+                result.fail(ar.cause());
+              }
+            });
     return result.future();
   }
 
   private Future<Void> insertFilter(String tenant) {
     log.info("Creating filter for tenant: {}", tenant);
     Promise<Void> result = Promise.promise();
-    FincSelectFilter filter = new FincSelectFilter()
-        .withId(UUID.randomUUID().toString())
-        .withLabel("EZB holdings")
-        .withType(Type.WHITELIST)
-        .withIsil(tenant);
+    FincSelectFilter filter =
+        new FincSelectFilter()
+            .withId(UUID.randomUUID().toString())
+            .withLabel("EZB holdings")
+            .withType(Type.WHITELIST)
+            .withIsil(tenant);
     PostgresClient.getInstance(vertx, tenant)
-        .save("filters", filter, ar -> {
-          if (ar.succeeded()) {
-            result.complete();
-          } else {
-            result.fail(ar.cause());
-          }
-        });
+        .save(
+            "filters",
+            filter,
+            ar -> {
+              if (ar.succeeded()) {
+                result.complete();
+              } else {
+                result.fail(ar.cause());
+              }
+            });
     return result.future();
   }
 
