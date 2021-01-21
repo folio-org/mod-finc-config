@@ -145,17 +145,12 @@ public class ApiTestSuite {
       TenantClient tenantClientDiku = new TenantClient(url, TENANT_DIKU, TENANT_DIKU);
       TenantClient tenantClientUbl = new TenantClient(url, TENANT_UBL, TENANT_UBL);
       tenantClientFinc.postTenant(
-          new TenantAttributes().withModuleTo(getModuleVersion()),
-              fincFuture::complete);
+          new TenantAttributes().withModuleTo(getModuleVersion()), fincFuture::complete);
       tenantClientDiku.postTenant(
-          new TenantAttributes().withModuleTo(getModuleVersion()),
-              dikuFuture::complete);
+          new TenantAttributes().withModuleTo(getModuleVersion()), dikuFuture::complete);
       tenantClientUbl.postTenant(
-          new TenantAttributes().withModuleTo(getModuleVersion()),
-              ublFuture::complete);
-      fincFuture.get(30, TimeUnit.SECONDS);
-      dikuFuture.get(30, TimeUnit.SECONDS);
-      ublFuture.get(30, TimeUnit.SECONDS);
+          new TenantAttributes().withModuleTo(getModuleVersion()), ublFuture::complete);
+      CompletableFuture.allOf(fincFuture, dikuFuture, ublFuture).get();
     } catch (Exception e) {
       assert false;
     }
