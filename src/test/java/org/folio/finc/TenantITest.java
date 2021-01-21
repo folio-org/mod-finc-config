@@ -79,13 +79,16 @@ public class TenantITest {
     TenantUtil tenantUtil = new TenantUtil();
     tenantUtil
         .postFincTenant(port, vertx, context)
-        .onSuccess(unused -> tenantUtil.postUBLTenant(port, vertx))
-        .onFailure(context::fail)
         .onSuccess(
-            unused ->
+            fincResp ->
                 tenantUtil
-                    .postDikuTenant(port, vertx)
-                    .onSuccess(unused1 -> async.complete())
+                    .postUBLTenant(port, vertx)
+                    .onSuccess(
+                        ublResp ->
+                            tenantUtil
+                                .postDikuTenant(port, vertx)
+                                .onSuccess(dikuResp -> async.complete())
+                                .onFailure(context::fail))
                     .onFailure(context::fail))
         .onFailure(context::fail);
     async.awaitSuccess();
