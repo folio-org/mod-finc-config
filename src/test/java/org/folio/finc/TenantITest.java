@@ -66,7 +66,6 @@ public class TenantITest {
     DeploymentOptions options =
         new DeploymentOptions().setConfig(new JsonObject().put("http.port", port));
     startVerticle(options);
-    // prepareTenants(context);
   }
 
   private static void startVerticle(DeploymentOptions options)

@@ -29,8 +29,6 @@ public class EmbeddedPostgresRule implements TestRule {
     this.tenant = tenant;
   }
 
- // public EmbeddedPostgresRule() {}
-
   private Future<List<String>> createSchema(String tenant) {
     log.info("Creating schema for tenant: {}", tenant);
     Promise<List<String>> createSchema = Promise.promise();
