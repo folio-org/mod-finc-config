@@ -1,3 +1,6 @@
+# 5.0.0
+* Upgrade to RMB 32 (UIFC-227)
+
 # 4.0.1
 * Upgrade to RMB 31.1.5 and Vert.x 3.9.4 (UIFC-223)
 
