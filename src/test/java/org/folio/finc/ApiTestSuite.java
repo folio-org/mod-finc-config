@@ -5,11 +5,13 @@ import io.restassured.parsing.Parser;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.client.WebClient;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.folio.finc.config.*;
 import org.folio.finc.select.*;
+import org.folio.postgres.testing.PostgresTesterContainer;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.TenantAttributes;
@@ -69,10 +71,9 @@ public class ApiTestSuite {
   public static void before()
       throws IOException, InterruptedException, ExecutionException, TimeoutException {
 
-    PostgresClient.setIsEmbedded(true);
-    PostgresClient.setEmbeddedPort(NetworkUtils.nextFreePort());
+    PostgresClient.setPostgresTester(new PostgresTesterContainer());
     PostgresClient client = PostgresClient.getInstance(vertx);
-    client.startEmbeddedPostgres();
+    client.startPostgresTester();
 
     initialised = true;
     int port = NetworkUtils.nextFreePort();
@@ -107,7 +108,8 @@ public class ApiTestSuite {
 
     undeploymentComplete.get(20, TimeUnit.SECONDS);
 
-    PostgresClient.stopEmbeddedPostgres();
+//    PostgresClient.stopEmbeddedPostgres();
+    PostgresClient.stopPostgresTester();
   }
 
   public static boolean isNotInitialised() {
@@ -137,13 +139,14 @@ public class ApiTestSuite {
 
     String url = RestAssured.baseURI + ":" + RestAssured.port;
     try {
+      WebClient webClient = WebClient.create(vertx);
       CompletableFuture fincFuture = new CompletableFuture();
       CompletableFuture ublFuture = new CompletableFuture();
       CompletableFuture dikuFuture = new CompletableFuture();
       TenantClient tenantClientFinc =
-          new TenantClient(url, Constants.MODULE_TENANT, Constants.MODULE_TENANT);
-      TenantClient tenantClientDiku = new TenantClient(url, TENANT_DIKU, TENANT_DIKU);
-      TenantClient tenantClientUbl = new TenantClient(url, TENANT_UBL, TENANT_UBL);
+          new TenantClient(url, Constants.MODULE_TENANT, Constants.MODULE_TENANT, webClient);
+      TenantClient tenantClientDiku = new TenantClient(url, TENANT_DIKU, TENANT_DIKU, webClient);
+      TenantClient tenantClientUbl = new TenantClient(url, TENANT_UBL, TENANT_UBL, webClient);
       tenantClientFinc.postTenant(
           new TenantAttributes().withModuleTo(getModuleVersion()), fincFuture::complete);
       tenantClientDiku.postTenant(

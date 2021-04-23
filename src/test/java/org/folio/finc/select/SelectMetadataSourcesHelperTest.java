@@ -11,6 +11,7 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.finc.ApiTestSuite;
 import org.folio.finc.TenantUtil;
+import org.folio.postgres.testing.PostgresTesterContainer;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.Select;
@@ -43,14 +44,7 @@ public class SelectMetadataSourcesHelperTest {
   public static void setUp(TestContext context)
       throws InterruptedException, ExecutionException, TimeoutException {
     vertx = Vertx.vertx();
-    try {
-      PostgresClient.setIsEmbedded(true);
-      PostgresClient instance = PostgresClient.getInstance(vertx);
-      instance.startEmbeddedPostgres();
-    } catch (Exception e) {
-      context.fail(e);
-      return;
-    }
+    PostgresClient.setPostgresTester(new PostgresTesterContainer());
 
     int port = NetworkUtils.nextFreePort();
 
@@ -117,7 +111,7 @@ public class SelectMetadataSourcesHelperTest {
           }
         });
     undeploymentComplete.get(20, TimeUnit.SECONDS);
-    PostgresClient.stopEmbeddedPostgres();
+    PostgresClient.stopPostgresTester();
   }
 
   @Test

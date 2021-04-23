@@ -13,6 +13,7 @@ import org.folio.finc.dao.SelectFilterDAOImpl;
 import org.folio.finc.mocks.EZBServiceMock;
 import org.folio.finc.model.File;
 import org.folio.okapi.common.GenericCompositeFuture;
+import org.folio.postgres.testing.PostgresTesterContainer;
 import org.folio.rest.jaxrs.model.Credential;
 import org.folio.rest.jaxrs.model.FilterFile;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
@@ -46,7 +47,7 @@ public class EZBHarvestJobWithFilterITest extends AbstractEZBHarvestJobTest {
     vertxContext = vertx.getOrCreateContext();
     Async async = context.async();
     try {
-      PostgresClient.getInstance(vertx).startEmbeddedPostgres();
+      PostgresClient.setPostgresTester(new PostgresTesterContainer());
 
       createSchema(tenant)
           .compose(s -> insertIsil(tenant))
@@ -66,7 +67,7 @@ public class EZBHarvestJobWithFilterITest extends AbstractEZBHarvestJobTest {
 
   @After
   public void cleanUp(TestContext context) {
-    PostgresClient.stopEmbeddedPostgres();
+    PostgresClient.stopPostgresTester();
   }
 
   @Test

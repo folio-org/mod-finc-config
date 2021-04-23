@@ -1,6 +1,6 @@
 package org.folio.finc.periodic;
 
-import com.google.gson.Gson;
+// import com.google.gson.Gson;
 import io.vertx.core.Context;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -106,12 +106,13 @@ public class EZBHarvestJob implements Job {
   }
 
   private List<JsonObject> createConfigs(Credentials creds, JsonObject vertxConfig) {
-    Gson gson = new Gson();
+//    Gson gson = new Gson();
     return creds.getCredentials().stream()
         .map(
             c -> {
-              JsonObject cfg = gson.fromJson(gson.toJson(vertxConfig), JsonObject.class);
-              cfg.put("isil", c.getIsil());
+//              JsonObject cfg = gson.fromJson(gson.toJson(vertxConfig), JsonObject.class);
+                JsonObject cfg = vertxConfig.copy();
+                cfg.put("isil", c.getIsil());
               cfg.put("user", c.getUser());
               cfg.put("password", c.getPassword());
               cfg.put("libId", c.getLibId());

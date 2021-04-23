@@ -11,6 +11,7 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.finc.TenantUtil;
 import org.folio.finc.select.verticles.SelectMetadataSourceVerticle;
+import org.folio.postgres.testing.PostgresTesterContainer;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.persist.Criteria.Criteria;
@@ -39,14 +40,7 @@ public class SelectMetadataSourceVerticleTest {
   public static void setUp(TestContext context)
       throws InterruptedException, ExecutionException, TimeoutException {
     vertx = Vertx.vertx();
-    try {
-      PostgresClient.setIsEmbedded(true);
-      PostgresClient instance = PostgresClient.getInstance(vertx);
-      instance.startEmbeddedPostgres();
-    } catch (Exception e) {
-      context.fail(e);
-      return;
-    }
+    PostgresClient.setPostgresTester(new PostgresTesterContainer());
     port = NetworkUtils.nextFreePort();
 
     RestAssured.reset();
@@ -79,20 +73,20 @@ public class SelectMetadataSourceVerticleTest {
     deploymentComplete.get(30, TimeUnit.SECONDS);
   }
 
-    private static void prepareTenants(TestContext context) {
-        Async async = context.async();
-        TenantUtil tenantUtil = new TenantUtil();
-        tenantUtil
-                .postFincTenant(port, vertx, context)
-                .onSuccess(
-                        unused ->
-                                tenantUtil
-                                        .postUBLTenant(port, vertx)
-                                        .onSuccess(unused1 -> async.complete())
-                                        .onFailure(context::fail))
-                .onFailure(context::fail);
-        async.await();
-    }
+  private static void prepareTenants(TestContext context) {
+    Async async = context.async();
+    TenantUtil tenantUtil = new TenantUtil();
+    tenantUtil
+        .postFincTenant(port, vertx, context)
+        .onSuccess(
+            unused ->
+                tenantUtil
+                    .postUBLTenant(port, vertx)
+                    .onSuccess(unused1 -> async.complete())
+                    .onFailure(context::fail))
+        .onFailure(context::fail);
+    async.await();
+  }
 
   @AfterClass
   public static void teardown() throws InterruptedException, ExecutionException, TimeoutException {
@@ -107,15 +101,14 @@ public class SelectMetadataSourceVerticleTest {
           }
         });
     undeploymentComplete.get(20, TimeUnit.SECONDS);
-    PostgresClient.stopEmbeddedPostgres();
+    PostgresClient.stopPostgresTester();
   }
 
   @Before
   public void before() throws InterruptedException, ExecutionException, TimeoutException {
     JsonObject cfg2 = vertx.getOrCreateContext().config();
     cfg2.put("tenantId", TENANT_UBL);
-    cfg2.put(
-        "metadataSourceId", TenantUtil.getMetadataSource2().getId());
+    cfg2.put("metadataSourceId", TenantUtil.getMetadataSource2().getId());
     cfg2.put("testing", true);
 
     CompletableFuture<String> deploymentComplete = new CompletableFuture<>();
@@ -135,8 +128,7 @@ public class SelectMetadataSourceVerticleTest {
   @Test
   public void testSuccessfulSelect(TestContext context) {
     Async async = context.async();
-    cut.selectAllCollections(
-            TenantUtil.getMetadataSource2().getId(), TENANT_UBL)
+    cut.selectAllCollections(TenantUtil.getMetadataSource2().getId(), TENANT_UBL)
         .onComplete(
             aVoid -> {
               if (aVoid.succeeded()) {
@@ -146,9 +138,7 @@ public class SelectMetadataSourceVerticleTest {
                           .addField("'label'")
                           .setJSONB(true)
                           .setOperation("=")
-                          .setVal(
-                              TenantUtil.getMetadataCollection3()
-                                  .getLabel());
+                          .setVal(TenantUtil.getMetadataCollection3().getLabel());
                   Criterion criterion = new Criterion(labelCrit);
                   PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
                       .get(
@@ -183,8 +173,7 @@ public class SelectMetadataSourceVerticleTest {
   @Test
   public void testNoSelect(TestContext context) {
     Async async = context.async();
-    cut.selectAllCollections(
-            TenantUtil.getMetadataSource2().getId(), TENANT_UBL)
+    cut.selectAllCollections(TenantUtil.getMetadataSource2().getId(), TENANT_UBL)
         .onComplete(
             aVoid -> {
               if (aVoid.succeeded()) {
@@ -194,9 +183,7 @@ public class SelectMetadataSourceVerticleTest {
                           .addField("'label'")
                           .setJSONB(true)
                           .setOperation("=")
-                          .setVal(
-                              TenantUtil.getMetadataCollection2()
-                                  .getLabel());
+                          .setVal(TenantUtil.getMetadataCollection2().getLabel());
                   Criterion criterion = new Criterion(labelCrit);
                   PostgresClient.getInstance(vertx, Constants.MODULE_TENANT)
                       .get(
