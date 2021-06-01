@@ -1,8 +1,9 @@
 package org.folio.finc.select.transform;
 
-import io.vertx.core.json.jackson.DatabindCodec;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import io.vertx.core.json.jackson.DatabindCodec;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource.Selected;

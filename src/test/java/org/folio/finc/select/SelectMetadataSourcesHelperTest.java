@@ -9,6 +9,7 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.ext.web.client.WebClient;
 import org.folio.finc.ApiTestSuite;
 import org.folio.finc.TenantUtil;
 import org.folio.postgres.testing.PostgresTesterContainer;
@@ -82,9 +83,10 @@ public class SelectMetadataSourcesHelperTest {
     try {
       CompletableFuture fincFuture = new CompletableFuture();
       CompletableFuture ublFuture = new CompletableFuture();
+      WebClient webClient = WebClient.create(vertx);
       TenantClient tenantClientFinc =
-          new TenantClient(url, Constants.MODULE_TENANT, Constants.MODULE_TENANT);
-      TenantClient tenantClientUbl = new TenantClient(url, TENANT_UBL, TENANT_UBL);
+          new TenantClient(url, Constants.MODULE_TENANT, Constants.MODULE_TENANT, webClient);
+      TenantClient tenantClientUbl = new TenantClient(url, TENANT_UBL, TENANT_UBL, webClient);
       tenantClientFinc.postTenant(
           new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
           fincFuture::complete);

@@ -4,7 +4,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.folio.finc.dao.FileDAO;
 import org.folio.finc.dao.FileDAOImpl;
@@ -140,7 +139,7 @@ public class FincConfigFilesAPI extends FincFileHandler implements FincConfigFil
     if (requestBytesArray == null) {
       requestBytesArray = new byte[0];
     }
-    requestBytesArray = ArrayUtils.addAll(requestBytesArray, IOUtils.toByteArray(is));
+    requestBytesArray = ArrayUtils.addAll(requestBytesArray, is.readAllBytes());
     requestedBytes.put(streamId, requestBytesArray);
   }
 }

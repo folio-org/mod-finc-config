@@ -107,8 +107,6 @@ public class ApiTestSuite {
         });
 
     undeploymentComplete.get(20, TimeUnit.SECONDS);
-
-//    PostgresClient.stopEmbeddedPostgres();
     PostgresClient.stopPostgresTester();
   }
 
