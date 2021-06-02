@@ -13,6 +13,7 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.folio.okapi.common.XOkapiHeaders;
+import org.folio.postgres.testing.PostgresTesterContainer;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.persist.PostgresClient;
@@ -50,14 +51,7 @@ public class TenantITest {
   public static void setUp(TestContext context)
       throws InterruptedException, ExecutionException, TimeoutException {
     vertx = Vertx.vertx();
-    try {
-      PostgresClient.setIsEmbedded(true);
-      PostgresClient instance = PostgresClient.getInstance(vertx);
-      instance.startEmbeddedPostgres();
-    } catch (Exception e) {
-      context.fail(e);
-      return;
-    }
+    PostgresClient.setPostgresTester(new PostgresTesterContainer());
     port = NetworkUtils.nextFreePort();
 
     RestAssured.reset();
@@ -99,7 +93,7 @@ public class TenantITest {
       throws InterruptedException, ExecutionException, TimeoutException {
     RestAssured.reset();
     vertx.close(context.asyncAssertSuccess());
-    PostgresClient.stopEmbeddedPostgres();
+    PostgresClient.stopPostgresTester();
   }
 
   @Test

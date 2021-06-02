@@ -9,8 +9,10 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.ext.web.client.WebClient;
 import org.folio.finc.ApiTestSuite;
 import org.folio.finc.TenantUtil;
+import org.folio.postgres.testing.PostgresTesterContainer;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.Select;
@@ -43,14 +45,7 @@ public class SelectMetadataSourcesHelperTest {
   public static void setUp(TestContext context)
       throws InterruptedException, ExecutionException, TimeoutException {
     vertx = Vertx.vertx();
-    try {
-      PostgresClient.setIsEmbedded(true);
-      PostgresClient instance = PostgresClient.getInstance(vertx);
-      instance.startEmbeddedPostgres();
-    } catch (Exception e) {
-      context.fail(e);
-      return;
-    }
+    PostgresClient.setPostgresTester(new PostgresTesterContainer());
 
     int port = NetworkUtils.nextFreePort();
 
@@ -88,9 +83,10 @@ public class SelectMetadataSourcesHelperTest {
     try {
       CompletableFuture fincFuture = new CompletableFuture();
       CompletableFuture ublFuture = new CompletableFuture();
+      WebClient webClient = WebClient.create(vertx);
       TenantClient tenantClientFinc =
-          new TenantClient(url, Constants.MODULE_TENANT, Constants.MODULE_TENANT);
-      TenantClient tenantClientUbl = new TenantClient(url, TENANT_UBL, TENANT_UBL);
+          new TenantClient(url, Constants.MODULE_TENANT, Constants.MODULE_TENANT, webClient);
+      TenantClient tenantClientUbl = new TenantClient(url, TENANT_UBL, TENANT_UBL, webClient);
       tenantClientFinc.postTenant(
           new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
           fincFuture::complete);
@@ -117,7 +113,7 @@ public class SelectMetadataSourcesHelperTest {
           }
         });
     undeploymentComplete.get(20, TimeUnit.SECONDS);
-    PostgresClient.stopEmbeddedPostgres();
+    PostgresClient.stopPostgresTester();
   }
 
   @Test

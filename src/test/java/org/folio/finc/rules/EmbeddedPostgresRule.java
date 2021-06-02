@@ -5,6 +5,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.folio.postgres.testing.PostgresTesterContainer;
 import org.folio.rest.impl.TenantAPI;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.jaxrs.model.FincSelectFilter.Type;
@@ -104,7 +105,7 @@ public class EmbeddedPostgresRule implements TestRule {
   @Override
   public Statement apply(Statement base, Description description) {
     try {
-      PostgresClient.getInstance(vertx).startEmbeddedPostgres();
+      PostgresClient.setPostgresTester(new PostgresTesterContainer());
 
       CompletableFuture<List<String>> future = new CompletableFuture<>();
 
@@ -133,7 +134,7 @@ public class EmbeddedPostgresRule implements TestRule {
         try {
           base.evaluate();
         } finally {
-          PostgresClient.stopEmbeddedPostgres();
+          PostgresClient.stopPostgresTester();
         }
       }
     };

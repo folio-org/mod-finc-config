@@ -191,7 +191,7 @@ public class FilterHelperTest extends ApiTestBase {
                     .get(
                         "files",
                         File.class,
-                        true,
+                        new Criterion(),
                         true,
                         arDB -> {
                           if (arDB.succeeded()) {
