@@ -8,6 +8,9 @@ import org.folio.finc.model.File;
 import org.folio.rest.jaxrs.resource.support.ResponseDelegate;
 import org.folio.rest.tools.utils.BinaryOutStream;
 
+/**
+ * Abstract class to handle file related responses
+ */
 public abstract class FincFileHandler {
 
   protected void handleAsyncFileResponse(AsyncResult<File> ar,

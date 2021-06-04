@@ -18,6 +18,9 @@ import org.folio.rest.jaxrs.model.Credentials;
 import org.folio.rest.jaxrs.resource.FincConfigEzbCredentials;
 import org.folio.rest.utils.Constants;
 
+/**
+ * Manages EZB credentials for ui-finc-config
+ */
 public class FincConfigEZBCredentialsAPI implements FincConfigEzbCredentials {
 
   private final EZBCredentialsDAO ezbCredentialsDAO;

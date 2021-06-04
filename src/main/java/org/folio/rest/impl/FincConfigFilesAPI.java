@@ -21,6 +21,9 @@ import java.util.*;
 
 import static org.folio.rest.utils.Constants.*;
 
+/**
+ * Manages files for ui-finc-config
+ */
 public class FincConfigFilesAPI extends FincFileHandler implements FincConfigFiles {
 
   public static final String X_OKAPI_TENANT = "x-okapi-tenant";

@@ -18,6 +18,9 @@ import org.folio.rest.jaxrs.resource.FincSelectEzbCredentials;
 import org.folio.rest.jaxrs.resource.FincSelectMetadataCollections.GetFincSelectMetadataCollectionsResponse;
 import org.folio.rest.tools.utils.TenantTool;
 
+/**
+ * Manages EZB credentials for ui-finc-select, hence depends on isil/tenant.
+ */
 public class FincSelectEZBCredentialsAPI implements FincSelectEzbCredentials {
 
   private final IsilDAO isilDAO;

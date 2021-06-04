@@ -25,6 +25,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Manages isil to tenant relations
+ */
 public class IsilsAPI implements FincConfigIsils {
 
   private static final String TABLE_NAME = "isils";

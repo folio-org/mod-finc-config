@@ -20,6 +20,8 @@ import javax.ws.rs.core.Response;
 import java.util.Map;
 
 /**
+ * Manages metadata sources for ui-finc-config
+ *
  * ATTENTION: API works tenant agnostic. Thus, don't use 'x-okapi-tenant' header, but {@value
  * Constants#MODULE_TENANT} as tenant.
  */

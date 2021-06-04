@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Manages metadata collections for ui-finc-config
+ *
  * ATTENTION: API works tenant agnostic. Thus, don't use 'x-okapi-tenant' header, but {@value
  * Constants#MODULE_TENANT} as tenant.
  */

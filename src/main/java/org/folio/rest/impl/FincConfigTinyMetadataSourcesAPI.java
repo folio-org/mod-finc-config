@@ -19,6 +19,9 @@ import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
 
+/**
+ * Manages tiny metadata sources for ui-finc-config
+ */
 public class FincConfigTinyMetadataSourcesAPI implements FincConfigTinyMetadataSources {
 
   private final MetadataSourcesTinyDAO metadataSourcesTinyDAO;
