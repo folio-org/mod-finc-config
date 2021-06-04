@@ -11,13 +11,17 @@ Backend module for both ui-finc-config and ui-finc-select.
 
 In general, the finc apps allow the maintenance of metadata sources and collection for the finc user community. 
 
-This module works tenant-agnostic. That means, its data is not stored separated by tenant. ui-finc-config gives access to the data as stored. It allows the configuration of metadata sources and collections.
+This module works tenant-agnostic. That means, its data is stored in a single database schema. There are no separate schemas for each tenant. This enables certain users (ui-finc-config) to have access to data of all tenants that are members of the finc user community (ui-finc-select). 
 
-ui-finc-select provides a view on the same data filtered for the current tenant. It allows members of the finc user community (libraries) to select or deselect metadata collections as well as whole metadata sources.
+ui-finc-config gives access to the data as stored. Users of ui-finc-config can see which metadata sources and collections are selected by which tenant/isil. In addition, it allows the configuration of metadata sources and collections.
+
+ui-finc-select provides a view on the same data as ui-finc-config but filtered for the current tenant. It allows members of the finc user community (libraries) only to select or deselect metadata collections as well as whole metadata sources.
 
 For instance, a user of a specific tenant with an isil (International Standard Identifier for Libraries and Related Organizations) may have access to the finc-select app. This user can only see if its library has selected a certain metadata collection. In addition, the user can only select/deselect a metadata collection for its library. Moreover, the user cannot see if other libraries do have selected the metadata collection.
 
 Only a user with granted permissions for ui-finc-config can edit the metadata source resp. collection. In addition, only a user with these permissions is able to see which library selected which metadata source resp. collection.
+
+mod-finc-config does the translation between the _original_ data used by ui-finc-config und the _view_ used by ui-finc-select. The _views_ used by ui-finc-select are produced based on the tenant's isil.
 
 In order to implement the mentioned functionality, the module uses Okapi's */_/tenant* interface in a special way. If the module is registered for a new tenant, its own */_/tenant* interface overwrites the given *x-okapi-header* with the prefix predefined in the module, namely *finc*.
 
