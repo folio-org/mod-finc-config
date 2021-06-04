@@ -23,6 +23,9 @@ import org.folio.rest.jaxrs.model.Select;
 import org.folio.rest.jaxrs.resource.FincSelectMetadataSources;
 import org.folio.rest.tools.utils.TenantTool;
 
+/**
+ * Manages metadata sources for ui-finc-select, hence depends on isil/tenant.
+ */
 public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
 
   private final SelectMetadataSourcesHelper selectMetadataSourcesHelper;

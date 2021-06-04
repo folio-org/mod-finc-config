@@ -17,6 +17,9 @@ import org.folio.rest.jaxrs.model.Contact;
 import org.folio.rest.jaxrs.resource.FincConfigContacts;
 import org.folio.rest.persist.PostgresClient;
 
+/**
+ * Get contacts for ui-finc-config
+ */
 public class FincConfigContactsAPI implements FincConfigContacts {
 
   private final MetadataSourcesDAO metadataSourcesDAO;

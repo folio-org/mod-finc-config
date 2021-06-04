@@ -26,6 +26,9 @@ import org.folio.rest.tools.utils.TenantTool;
 
 import static org.folio.rest.utils.Constants.*;
 
+/**
+ * Manages files for ui-finc-select, hence depends on isil/tenant.
+ */
 public class FincSelectFilesAPI extends FincFileHandler implements FincSelectFiles {
 
   private final IsilHelper isilHelper;

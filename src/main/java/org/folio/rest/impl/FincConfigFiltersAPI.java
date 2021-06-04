@@ -18,6 +18,9 @@ import org.folio.rest.jaxrs.resource.FincSelectFilters.PutFincSelectFiltersColle
 import org.folio.rest.persist.PgUtil;
 import org.folio.rest.utils.Constants;
 
+/**
+ * Manages filters for ui-finc-config
+ */
 public class FincConfigFiltersAPI implements FincConfigFilters {
 
   public static final String X_OKAPI_TENANT = "x-okapi-tenant";

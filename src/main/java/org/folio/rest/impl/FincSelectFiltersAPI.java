@@ -28,6 +28,9 @@ import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
 import org.folio.rest.tools.utils.TenantTool;
 
+/**
+ * Manages filters for ui-finc-select, hence depends on isil/tenant.
+ */
 public class FincSelectFiltersAPI implements FincSelectFilters {
 
   private final IsilDAO isilDAO;
