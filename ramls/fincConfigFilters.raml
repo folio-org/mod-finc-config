@@ -5,7 +5,7 @@ baseUri: http://localhost/mod-finc-config
 
 documentation:
   - title: mod-finc-config API
-    content: This documents the API calls that can be made to query filters of metadata collections
+    content: This documents the API calls that can be made to query filters of metadata collections for all tenants/isils
 
 types:
   fincSelectFilter: !include schemas/fincSelectFilter.json
@@ -48,17 +48,17 @@ resourceTypes:
         exampleItem: !include examples/fincSelectFilter1.sample
         schema: fincSelectFilter
     get:
-      description: Get one finc select filter identified by id
+      description: Get one finc config filter identified by id
     put:
       description: Put a filter identified by id
     delete:
       description: Delete a filter identified by id
     /collections:
       get:
-        description: Get collections the current filter is assigned to
+        description: Get all metadata collections the current filter is assigned to
         responses:
           200:
-            description: The collection IDs of collection assigned to this filter
+            description: The IDs of collections assigned to this filter
             body:
               application/json:
                 type: fincSelectFilterToCollections
