@@ -1,3 +1,7 @@
+# 5.1.0
+* Upgrade to RMB 33 (UIFC-241)
+* Make backend perm not visible
+
 # 5.0.0
 * Upgrade to RMB 32 (UIFC-227)
 
