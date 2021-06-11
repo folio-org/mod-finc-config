@@ -4,7 +4,7 @@
 
     <groupId>org.folio</groupId>
     <artifactId>mod-finc-config</artifactId>
-    <version>5.1.1-SNAPSHOT</version>
+    <version>5.1.1</version>
     <packaging>jar</packaging>
 
     <licenses>
@@ -520,7 +520,7 @@
         <connection>scm:git:git://github.com/folio-org/${project.artifactId}.git</connection>
         <developerConnection>scm:git:git@github.com:folio-org/${project.artifactId}.git
         </developerConnection>
-        <tag>v5.1.0</tag>
+        <tag>v5.1.1</tag>
     </scm>
 
 </project>
