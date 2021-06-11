@@ -1,3 +1,6 @@
+# 5.1.1
+* Bugfix: Add exec-maven-plugin again so that project can be built (UIFC-251)
+
 # 5.1.0
 * Upgrade to RMB 33 (UIFC-241)
 * Make backend perm not visible
