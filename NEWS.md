@@ -1,3 +1,7 @@
+# 5.1.2
+[UIFC-261](https://issues.folio.org/browse/UIFC-261) RMB 33.2.2 fixing remote execution (CVE-2021-44228)
+[UIFC-260](https://issues.folio.org/browse/UIFC-260) RMB 33.2.1 fixing remote execution (CVE-2021-44228)
+
 # 5.1.1
 * Bugfix: Add exec-maven-plugin again so that project can be built (UIFC-251)
 
