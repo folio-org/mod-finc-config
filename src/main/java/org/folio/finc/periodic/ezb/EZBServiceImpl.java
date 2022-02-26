@@ -11,16 +11,23 @@ import io.vertx.ext.web.client.WebClient;
 
 public class EZBServiceImpl implements EZBService {
 
+  private String url =
+      "https://rzbezb2.ur.de/ezb/export/licenselist_html.php?pack=0&bibid=%s&lang=de&"
+          + "output_style=kbart&todo_license=ALkbart";
+
+  public EZBServiceImpl(String url) {
+    this.url = url;
+  }
+
+  public EZBServiceImpl() {}
+
   @Override
   public Future<String> fetchEZBFile(String user, String password, String libId, Vertx vertx) {
     Promise<String> result = Promise.promise();
     WebClient client = WebClient.create(vertx);
-    String url =
-        String.format(
-            "https://rzbezb2.ur.de/ezb/export/licenselist_html.php?pack=0&bibid=%s&lang=de&output_style=kbart&todo_license=ALkbart",
-            libId);
+    String formattedUrl = String.format(url, libId);
     HttpRequest<Buffer> get =
-        client.request(HttpMethod.GET, url).basicAuthentication(user, password);
+        client.requestAbs(HttpMethod.GET, formattedUrl).basicAuthentication(user, password);
     get.send(
         ar -> {
           if (ar.succeeded()) {
