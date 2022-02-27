@@ -5,6 +5,9 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.folio.finc.dao.EZBCredentialsDAO;
@@ -16,10 +19,6 @@ import org.folio.rest.jaxrs.model.Credentials;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.SchedulerException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /** A {@Link Job} to harvest EZB holding files automatically */
 public class EZBHarvestJob implements Job {
@@ -45,8 +44,9 @@ public class EZBHarvestJob implements Job {
     }
   }
 
-  public void setEZBService(EZBService service) {
+  public EZBHarvestJob setEZBService(EZBService service) {
     this.ezbService = service;
+    return this;
   }
 
   public Future<Void> run(Context vertxContext) {
