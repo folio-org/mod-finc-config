@@ -34,8 +34,13 @@
   "tables": [
     {
       "tableName": "metadata_collections",
-      "fromModuleVersion": "mod-finc-config-3.0.0",
+      "fromModuleVersion": "mod-finc-config-5.2.0",
       "withMetadata": true,
+      "likeIndex": [
+        {
+          "fieldName": "freeContent"
+        }
+      ],
       "fullTextIndex": [
         {
           "fieldName": "freeContent",
@@ -128,9 +133,14 @@
     },
     {
       "tableName": "metadata_sources",
-      "fromModuleVersion": "mod-finc-config-3.0.0",
+      "fromModuleVersion": "mod-finc-config-5.2.0",
       "customSnippetPath": "migration/metadata_sources.sql",
       "withMetadata": true,
+      "likeIndex": [
+        {
+          "fieldName": "status"
+        }
+      ],
       "fullTextIndex": [
         {
           "fieldName": "label",
@@ -170,7 +180,7 @@
     },
     {
       "tableName": "filters",
-      "fromModuleVersion": "mod-finc-config-3.0.0",
+      "fromModuleVersion": "mod-finc-config-5.2.0",
       "withMetadata": true,
       "fullTextIndex": [
         {
@@ -190,6 +200,9 @@
         {
           "fieldName": "isil",
           "tOps": "ADD"
+        },
+        {
+          "fieldName": "label"
         }
       ]
     },
