@@ -22,6 +22,7 @@ import java.net.SocketAddress;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,6 +40,11 @@ public class EZBServiceImplTest {
 
   @Rule public WireMockRule wmRule = new WireMockRule(new WireMockConfiguration().dynamicPort());
   @Rule public WireMockRule proxyRule = new WireMockRule(new WireMockConfiguration().dynamicPort());
+
+  @AfterClass
+  public static void afterClass() {
+    ProxySelector.setDefault(defaultProxySelector);
+  }
 
   @Before
   public void setUp() {
