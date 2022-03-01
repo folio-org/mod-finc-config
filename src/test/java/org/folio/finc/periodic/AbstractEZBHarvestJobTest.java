@@ -70,8 +70,7 @@ public abstract class AbstractEZBHarvestJobTest {
   }
 
   protected Future<FincSelectFilters> getEZBFilter() {
-    return new SelectFilterDAOImpl()
-        .getAll(QUERY, 0, 1, EZBHarvestJobWithFilterITest.tenant, vertxContext);
+    return new SelectFilterDAOImpl().getAll(QUERY, 0, 1, tenant, vertxContext);
   }
 
   protected Future<String> getUpdatedEZBFile() {

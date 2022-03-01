@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class EZBHarvestJobWithFilterITest extends AbstractEZBHarvestJobTest {
+public class EZBHarvestJobITest extends AbstractEZBHarvestJobTest {
 
   private static final EZBHarvestJob EZB_JOB =
       new EZBHarvestJob().setEZBService(new EZBServiceMock());
