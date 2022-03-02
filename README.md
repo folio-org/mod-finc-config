@@ -90,3 +90,7 @@ file* will be updated by the downloaded one. If the files are equal, nothing wil
 Thus, to activate harvesting of holding files you need to define ezb credentials and add a filter
 called *EZB holdings* with a file called *EZB file*.
 
+Proxy settings are honored. Use system properties `http.proxyHost`, `http.proxyPort`
+, `https.proxyHost`, `https.proxyPort`, `http.nonProxyHosts` or environment variables `HTTP_PROXY`
+, `HTTPS_PROXY`, `NO_PROXY` if running as Docker container.
+
