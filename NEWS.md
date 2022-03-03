@@ -1,3 +1,8 @@
+# 5.2.0
+* [UIFC-263](https://issues.folio.org/browse/UIFC-263) Update to the latest RMB 33.* release
+* [UIFC-265](https://issues.folio.org/browse/UIFC-265) EZBHarvestJob is using wrong URL
+* [UIFC-266](https://issues.folio.org/browse/UIFC-266) Honor proxy settings when downloading EZB files
+
 # 5.1.2
 [UIFC-261](https://issues.folio.org/browse/UIFC-261) RMB 33.2.2 fixing remote execution (CVE-2021-44228)
 [UIFC-260](https://issues.folio.org/browse/UIFC-260) RMB 33.2.1 fixing remote execution (CVE-2021-44228)
