@@ -5,6 +5,8 @@ import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import java.util.List;
 import org.folio.rest.jaxrs.model.Isil;
+import org.folio.rest.persist.Criteria.Criteria;
+import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.utils.Constants;
 
@@ -14,12 +16,13 @@ public class IsilHelper {
 
   public Future<String> fetchIsil(String tenantId, Context context) {
     Promise<String> future = Promise.promise();
-    Isil queryIsil = new Isil().withTenant(tenantId);
+    Criterion tenantIdCriterion =
+        new Criterion(new Criteria().addField("tenant").setJSONB(true).setOperation("=").setVal(tenantId));
     PostgresClient.getInstance(context.owner(), Constants.MODULE_TENANT)
         .get(
             TABLE_NAME,
-            queryIsil,
-            true,
+            Isil.class,
+            tenantIdCriterion,
             false,
             ar -> {
               if (ar.succeeded()) {

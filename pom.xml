@@ -18,11 +18,11 @@
     <argLine />
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <raml-module-builder.version>33.2.6</raml-module-builder.version>
+    <raml-module-builder.version>34.1.0</raml-module-builder.version>
     <ramlfiles_path>${basedir}/ramls</ramlfiles_path>
     <database_setup_path>${basedir}/database-setup</database_setup_path>
     <okapi.version>4.9.0</okapi.version>
-    <vertx-version>4.2.5</vertx-version>
+    <vertx-version>4.3.1</vertx-version>
   </properties>
 
   <repositories>
