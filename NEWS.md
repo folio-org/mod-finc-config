@@ -1,3 +1,6 @@
+# 5.3.0
+* [UIFC-275](https://issues.folio.org/browse/UIFC-275) RMB v34 upgrade
+
 # 5.2.0
 * [UIFC-263](https://issues.folio.org/browse/UIFC-263) Update to the latest RMB 33.* release
 * [UIFC-265](https://issues.folio.org/browse/UIFC-265) EZBHarvestJob is using wrong URL
