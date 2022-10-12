@@ -116,7 +116,7 @@ public abstract class AbstractEZBHarvestJobTest {
   protected Future<List<String>> createSchema() {
     String[] sqlFile;
     try {
-      sqlFile = new TenantAPI().sqlFile(tenant, false, null, null);
+      sqlFile = new TenantAPI().sqlFile(tenant, false, null, null, null);
     } catch (IOException | TemplateException e) {
       return failedFuture(e);
     }
@@ -127,7 +127,7 @@ public abstract class AbstractEZBHarvestJobTest {
     String[] sqlFile;
     try {
       sqlFile =
-          new TenantAPI().sqlFile(tenant, false, new TenantAttributes().withPurge(true), null);
+          new TenantAPI().sqlFile(tenant, false, new TenantAttributes().withPurge(true), null, null);
     } catch (IOException | TemplateException e) {
       return failedFuture(e);
     }
