@@ -1,3 +1,6 @@
+# 5.4.0
+* [UIFC-279](https://issues.folio.org/browse/UIFC-279) RMB v35 upgrade
+
 # 5.3.0
 * [UIFC-275](https://issues.folio.org/browse/UIFC-275) RMB v34 upgrade
 
