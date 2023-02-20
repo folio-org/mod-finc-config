@@ -1,3 +1,6 @@
+# 5.4.1
+* [UIFC-305](https://issues.folio.org/browse/UIFC-305) RMB v35.0.6, Vert.x v4.3.8
+
 # 5.4.0
 * [UIFC-279](https://issues.folio.org/browse/UIFC-279) RMB v35 upgrade
 
