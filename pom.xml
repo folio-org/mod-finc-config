@@ -16,6 +16,7 @@
 
   <properties>
     <argLine />
+    <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <raml-module-builder.version>35.0.6</raml-module-builder.version>
@@ -137,7 +138,6 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
-          <release>11</release>
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
@@ -200,13 +200,13 @@
       </plugin>
 
       <plugin>
-        <groupId>com.nickwongdev</groupId>
+        <groupId>dev.aspectj</groupId>
         <artifactId>aspectj-maven-plugin</artifactId>
-        <version>1.12.6</version>
+        <version>1.13.1</version>
         <configuration>
           <verbose>true</verbose>
           <showWeaveInfo>false</showWeaveInfo>
-          <complianceLevel>11</complianceLevel>
+          <complianceLevel>17</complianceLevel>
           <XaddSerialVersionUID>true</XaddSerialVersionUID>
           <aspectLibraries>
             <aspectLibrary>
@@ -226,12 +226,12 @@
           <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
-            <version>1.9.7</version>
+            <version>1.9.19</version>
           </dependency>
           <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjtools</artifactId>
-            <version>1.9.7</version>
+            <version>1.9.19</version>
           </dependency>
         </dependencies>
       </plugin>
