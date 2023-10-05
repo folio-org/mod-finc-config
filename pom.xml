@@ -19,11 +19,11 @@
     <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <raml-module-builder.version>35.0.6</raml-module-builder.version>
+    <raml-module-builder.version>35.1.0</raml-module-builder.version>
     <ramlfiles_path>${basedir}/ramls</ramlfiles_path>
     <database_setup_path>${basedir}/database-setup</database_setup_path>
     <okapi.version>4.9.0</okapi.version>
-    <vertx-version>4.3.8</vertx-version>
+    <vertx-version>4.4.5</vertx-version>
   </properties>
 
   <repositories>
@@ -41,6 +41,25 @@
       <url>https://repository.folio.org/repository/maven-folio</url>
     </pluginRepository>
   </pluginRepositories>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-bom</artifactId>
+        <version>2.20.0</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.vertx</groupId>
+        <artifactId>vertx-stack-depchain</artifactId>
+        <version>${vertx-version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -71,29 +90,24 @@
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-slf4j-impl</artifactId>
-      <version>2.17.2</version>
+      <artifactId>log4j-slf4j2-impl</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
-      <version>${vertx-version}</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-web</artifactId>
-      <version>${vertx-version}</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-web-client</artifactId>
-      <version>${vertx-version}</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-unit</artifactId>
-      <version>${vertx-version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
