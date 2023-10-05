@@ -8,6 +8,7 @@ import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.Timeout;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -36,6 +37,7 @@ import org.folio.rest.tools.utils.VertxUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 
 public abstract class AbstractEZBHarvestJobTest {
 
@@ -45,9 +47,12 @@ public abstract class AbstractEZBHarvestJobTest {
   static final String tenant = "finc";
   static String filterId = null;
 
+  @Rule public Timeout timeout = Timeout.seconds(10);
+
   @BeforeClass
   public static void beforeClass() {
     PostgresClient.setPostgresTester(new PostgresTesterContainer());
+    PostgresClient.getInstance(vertx);
   }
 
   @Before
