@@ -10,6 +10,12 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.ext.web.client.WebClient;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.folio.finc.ApiTestSuite;
 import org.folio.finc.TenantUtil;
 import org.folio.postgres.testing.PostgresTesterContainer;
@@ -26,13 +32,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 @RunWith(VertxUnitRunner.class)
 public class SelectMetadataSourcesHelperTest {
 
@@ -46,6 +45,7 @@ public class SelectMetadataSourcesHelperTest {
       throws InterruptedException, ExecutionException, TimeoutException {
     vertx = Vertx.vertx();
     PostgresClient.setPostgresTester(new PostgresTesterContainer());
+    PostgresClient.getInstance(vertx);
 
     int port = NetworkUtils.nextFreePort();
 

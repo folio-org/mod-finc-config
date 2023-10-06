@@ -9,6 +9,10 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.folio.finc.TenantUtil;
 import org.folio.finc.select.verticles.SelectMetadataSourceVerticle;
 import org.folio.postgres.testing.PostgresTesterContainer;
@@ -21,11 +25,6 @@ import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.Constants;
 import org.junit.*;
 import org.junit.runner.RunWith;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 @RunWith(VertxUnitRunner.class)
 public class SelectMetadataSourceVerticleTest {
@@ -41,6 +40,8 @@ public class SelectMetadataSourceVerticleTest {
       throws InterruptedException, ExecutionException, TimeoutException {
     vertx = Vertx.vertx();
     PostgresClient.setPostgresTester(new PostgresTesterContainer());
+    PostgresClient.getInstance(vertx);
+
     port = NetworkUtils.nextFreePort();
 
     RestAssured.reset();
