@@ -1,3 +1,7 @@
+# 5.6.0
+* [UIFC-347](https://folio-org.atlassian.net/browse/UIFC-347) Update to RMB v35.2.0, Vert.x v4.5.4
+* [UIFC-346](https://folio-org.atlassian.net/browse/UIFC-346) Update http links in sample data
+
 # 5.5.0
 * [UIFC-335](https://issues.folio.org/browse/UIFC-335) RMB v35.1.0, Vert.x v4.4.5
 * [UIFC-315](https://issues.folio.org/browse/UIFC-315) Update to Java 17
