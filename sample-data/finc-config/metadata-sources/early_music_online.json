@@ -23,9 +23,9 @@
   ],
   "lastProcessed": "2017-12-12",
   "tickets": [
-    "http://redmine.de/456"
+    "http://localhost/tickets/456"
   ],
-  "accessUrl": "http://access.url",
+  "accessUrl": "http://localhost/access",
   "sourceId": 2,
   "solrShard": "UBL main",
   "deliveryMethods": [
