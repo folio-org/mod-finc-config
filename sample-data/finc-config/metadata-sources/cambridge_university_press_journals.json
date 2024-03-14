@@ -25,10 +25,10 @@
   "generalNotes": "Test licensing note",
   "lastProcessed": "2018-01-01",
   "tickets": [
-    "http://redmine.de/123",
-    "http://redmine.de/456"
+    "http://localhost/tickets/123",
+    "http://localhost/tickets/456"
   ],
-  "accessUrl": "http://access.url",
+  "accessUrl": "http://localhost/access",
   "sourceId": 1,
   "solrShard": "UBL main",
   "deliveryMethods": [
