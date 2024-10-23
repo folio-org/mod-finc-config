@@ -7,7 +7,6 @@ import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import jakarta.validation.constraints.Pattern;
 
 import java.util.Map;
 import javax.ws.rs.core.Response;
@@ -33,7 +32,6 @@ public class FincConfigContactsAPI implements FincConfigContacts {
   @Override
   @Validate
   public void getFincConfigContacts(
-      @Pattern(regexp = "[a-zA-Z]{2}") String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -53,7 +51,6 @@ public class FincConfigContactsAPI implements FincConfigContacts {
 
   @Override
   public void postFincConfigContacts(
-      @Pattern(regexp = "[a-zA-Z]{2}") String lang,
       Contact entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,

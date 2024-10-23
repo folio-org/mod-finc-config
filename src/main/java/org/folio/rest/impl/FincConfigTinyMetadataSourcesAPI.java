@@ -1,13 +1,13 @@
 package org.folio.rest.impl;
 
 import static io.vertx.core.Future.succeededFuture;
+import static org.folio.rest.impl.Messages.MSG_INTERNAL_SERVER_ERROR;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import jakarta.validation.constraints.Pattern;
 
 import java.util.Map;
 import javax.ws.rs.core.Response;
@@ -17,8 +17,6 @@ import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.TinyMetadataSource;
 import org.folio.rest.jaxrs.resource.FincConfigTinyMetadataSources;
 import org.folio.rest.persist.PostgresClient;
-import org.folio.rest.tools.messages.MessageConsts;
-import org.folio.rest.tools.messages.Messages;
 
 /**
  * Manages tiny metadata sources for ui-finc-config
@@ -26,7 +24,6 @@ import org.folio.rest.tools.messages.Messages;
 public class FincConfigTinyMetadataSourcesAPI implements FincConfigTinyMetadataSources {
 
   private final MetadataSourcesTinyDAO metadataSourcesTinyDAO;
-  private final Messages messages = Messages.getInstance();
 
   public FincConfigTinyMetadataSourcesAPI(Vertx vertx, String tenantId) {
     PostgresClient.getInstance(vertx);
@@ -35,9 +32,10 @@ public class FincConfigTinyMetadataSourcesAPI implements FincConfigTinyMetadataS
 
   @Override
   @Validate
-  public void getFincConfigTinyMetadataSources(@Pattern(regexp = "[a-zA-Z]{2}") String lang,
+  public void getFincConfigTinyMetadataSources(
       Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
+      Handler<AsyncResult<Response>> asyncResultHandler,
+      Context vertxContext) {
 
     metadataSourcesTinyDAO
         .getAll(vertxContext)
@@ -70,7 +68,7 @@ public class FincConfigTinyMetadataSourcesAPI implements FincConfigTinyMetadataS
                   asyncResultHandler.handle(
                       io.vertx.core.Future.succeededFuture(
                           GetFincConfigTinyMetadataSourcesResponse.respond500WithTextPlain(
-                              messages.getMessage(lang, MessageConsts.InternalServerError))));
+                              MSG_INTERNAL_SERVER_ERROR)));
                 }
               }
             });
@@ -79,7 +77,6 @@ public class FincConfigTinyMetadataSourcesAPI implements FincConfigTinyMetadataS
   @Override
   @Validate
   public void postFincConfigTinyMetadataSources(
-      String lang,
       TinyMetadataSource entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,

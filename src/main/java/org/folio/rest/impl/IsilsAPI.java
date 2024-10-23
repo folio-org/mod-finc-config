@@ -1,5 +1,7 @@
 package org.folio.rest.impl;
 
+import static org.folio.rest.impl.Messages.MSG_INTERNAL_SERVER_ERROR;
+
 import io.vertx.core.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,8 +18,6 @@ import org.folio.rest.persist.Criteria.Offset;
 import org.folio.rest.persist.PgUtil;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.cql.CQLWrapper;
-import org.folio.rest.tools.messages.MessageConsts;
-import org.folio.rest.tools.messages.Messages;
 import org.folio.rest.utils.Constants;
 
 import javax.ws.rs.core.Response;
@@ -31,7 +31,6 @@ import java.util.Map;
 public class IsilsAPI implements FincConfigIsils {
 
   private static final String TABLE_NAME = "isils";
-  private final Messages messages = Messages.getInstance();
   private final Logger logger = LogManager.getLogger(IsilsAPI.class);
   private final IsilDAO isilDAO;
 
@@ -51,9 +50,9 @@ public class IsilsAPI implements FincConfigIsils {
   @Validate
   public void getFincConfigIsils(
       String query,
+      String totalRecords,
       int offset,
       int limit,
-      String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -91,16 +90,14 @@ public class IsilsAPI implements FincConfigIsils {
                             asyncResultHandler.handle(
                                 Future.succeededFuture(
                                     GetFincConfigIsilsResponse.respond500WithTextPlain(
-                                        messages.getMessage(
-                                            lang, MessageConsts.InternalServerError))));
+                                        MSG_INTERNAL_SERVER_ERROR)));
                           }
                         } catch (Exception e) {
                           logger.debug(e.getLocalizedMessage());
                           asyncResultHandler.handle(
                               Future.succeededFuture(
                                   GetFincConfigIsilsResponse.respond500WithTextPlain(
-                                      messages.getMessage(
-                                          lang, MessageConsts.InternalServerError))));
+                                      MSG_INTERNAL_SERVER_ERROR)));
                         }
                       });
             } catch (IllegalStateException e) {
@@ -126,7 +123,7 @@ public class IsilsAPI implements FincConfigIsils {
                 asyncResultHandler.handle(
                     io.vertx.core.Future.succeededFuture(
                         GetFincConfigIsilsResponse.respond500WithTextPlain(
-                            messages.getMessage(lang, MessageConsts.InternalServerError))));
+                            MSG_INTERNAL_SERVER_ERROR)));
               }
             }
           });
@@ -142,8 +139,7 @@ public class IsilsAPI implements FincConfigIsils {
       } else {
         asyncResultHandler.handle(
             io.vertx.core.Future.succeededFuture(
-                GetFincConfigIsilsResponse.respond500WithTextPlain(
-                    messages.getMessage(lang, MessageConsts.InternalServerError))));
+                GetFincConfigIsilsResponse.respond500WithTextPlain(MSG_INTERNAL_SERVER_ERROR)));
       }
     }
   }
@@ -151,7 +147,6 @@ public class IsilsAPI implements FincConfigIsils {
   @Override
   @Validate
   public void postFincConfigIsils(
-      String lang,
       Isil entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
@@ -189,7 +184,6 @@ public class IsilsAPI implements FincConfigIsils {
   @Validate
   public void getFincConfigIsilsById(
       String id,
-      String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -208,7 +202,6 @@ public class IsilsAPI implements FincConfigIsils {
   @Validate
   public void deleteFincConfigIsilsById(
       String id,
-      String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -226,7 +219,6 @@ public class IsilsAPI implements FincConfigIsils {
   @Validate
   public void putFincConfigIsilsById(
       String id,
-      String lang,
       Isil entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
