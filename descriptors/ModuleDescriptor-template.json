@@ -3,8 +3,8 @@
   "name": "mod-finc-config",
   "provides": [
     {
-      "id": "finc-config/metadata-sources",
-      "version": "3.0",
+      "id": "finc-config-metadata-sources",
+      "version": "1.0",
       "handlers": [
         {
           "methods": [
@@ -63,8 +63,8 @@
       ]
     },
     {
-      "id": "finc-config/metadata-collections",
-      "version": "2.0",
+      "id": "finc-config-metadata-collections",
+      "version": "1.0",
       "handlers": [
         {
           "methods": [
@@ -114,7 +114,7 @@
       ]
     },
     {
-      "id": "finc-config/isils",
+      "id": "finc-config-isils",
       "version": "1.0",
       "handlers": [
         {
@@ -165,7 +165,7 @@
       ]
     },
     {
-      "id": "finc-config/filters",
+      "id": "finc-config-filters",
       "version": "1.0",
       "handlers": [
         {
@@ -234,7 +234,7 @@
       ]
     },
     {
-      "id": "finc-config/files",
+      "id": "finc-config-files",
       "version": "1.0",
       "handlers": [
         {
@@ -267,7 +267,7 @@
       ]
     },
     {
-      "id": "finc-config/ezb-credentials",
+      "id": "finc-config-ezb-credentials",
       "version": "1.0",
       "handlers": [
         {
@@ -318,7 +318,7 @@
       ]
     },
     {
-      "id": "finc-config/contacts",
+      "id": "finc-config-contacts",
       "version": "1.0",
       "handlers": [
         {
@@ -333,8 +333,8 @@
       ]
     },
     {
-      "id": "finc-select/metadata-collections",
-      "version": "2.0",
+      "id": "finc-select-metadata-collections",
+      "version": "1.0",
       "handlers": [
         {
           "methods": [
@@ -375,8 +375,8 @@
       ]
     },
     {
-      "id": "finc-select/metadata-sources",
-      "version": "3.0",
+      "id": "finc-select-metadata-sources",
+      "version": "1.0",
       "handlers": [
         {
           "methods": [
@@ -408,8 +408,8 @@
       ]
     },
     {
-      "id": "finc-select/filters",
-      "version": "1.2",
+      "id": "finc-select-filters",
+      "version": "1.0",
       "handlers": [
         {
           "methods": [
@@ -477,7 +477,7 @@
       ]
     },
     {
-      "id": "finc-select/filter-files",
+      "id": "finc-select-filter-files",
       "version": "1.0",
       "handlers": [
         {
@@ -519,7 +519,7 @@
       ]
     },
     {
-      "id": "finc-select/files",
+      "id": "finc-select-files",
       "version": "1.0",
       "handlers": [
         {
@@ -552,7 +552,7 @@
       ]
     },
     {
-      "id": "finc-select/ezb-credentials",
+      "id": "finc-select-ezb-credentials",
       "version": "1.0",
       "handlers": [
         {
