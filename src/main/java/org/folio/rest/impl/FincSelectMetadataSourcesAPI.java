@@ -1,7 +1,5 @@
 package org.folio.rest.impl;
 
-import static io.vertx.core.Future.succeededFuture;
-
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
