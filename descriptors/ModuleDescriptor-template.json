@@ -57,7 +57,7 @@
           ],
           "pathPattern": "/finc-config/tiny-metadata-sources",
           "permissionsRequired": [
-            "finc-config.metadata-sources.collection.get"
+            "finc-config.tiny-metadata-sources.collection.get"
           ]
         }
       ]
@@ -219,7 +219,7 @@
           ],
           "pathPattern": "/finc-config/filters/{id}/collections",
           "permissionsRequired": [
-            "finc-config.filters.item.get"
+            "finc-config.filters.item.collections.item.get"
           ]
         },
         {
@@ -228,7 +228,7 @@
           ],
           "pathPattern": "/finc-config/filters/{id}/collections",
           "permissionsRequired": [
-            "finc-config.filters.item.put"
+            "finc-config.filters.item.collections.item.put"
           ]
         }
       ]
@@ -327,7 +327,7 @@
           ],
           "pathPattern": "/finc-config/contacts",
           "permissionsRequired": [
-            "finc-config.metadata-sources.collection.get"
+            "finc-config.contacts.collection.get"
           ]
         }
       ]
@@ -360,16 +360,7 @@
           ],
           "pathPattern": "/finc-select/metadata-collections/{id}/select",
           "permissionsRequired": [
-            "finc-select.metadata-collections.item.select"
-          ]
-        },
-        {
-          "methods": [
-            "PUT"
-          ],
-          "pathPattern": "/finc-select/metadata-collections/{id}/filters",
-          "permissionsRequired": [
-            "finc-select.metadata-collections.item.filters"
+            "finc-select.metadata-collections.item.select.item.put"
           ]
         }
       ]
@@ -402,7 +393,7 @@
           ],
           "pathPattern": "/finc-select/metadata-sources/{id}/collections/select-all",
           "permissionsRequired": [
-            "finc-select.metadata-sources.item.select-all"
+            "finc-select.metadata-sources.item.collections.select-all.item.put"
           ]
         }
       ]
@@ -462,7 +453,7 @@
           ],
           "pathPattern": "/finc-select/filters/{id}/collections",
           "permissionsRequired": [
-            "finc-select.filters.item.get"
+            "finc-select.filters.item.collections.item.get"
           ]
         },
         {
@@ -471,7 +462,7 @@
           ],
           "pathPattern": "/finc-select/filters/{id}/collections",
           "permissionsRequired": [
-            "finc-select.filters.item.put"
+            "finc-select.filters.item.collections.item.put"
           ]
         }
       ]
@@ -585,16 +576,24 @@
       ]
     },
     {
-      "id" : "_tenant",
-      "version" : "2.0",
-      "interfaceType" : "system",
-      "handlers" : [ {
-        "methods" : [ "POST" ],
-        "pathPattern" : "/_/tenant"
-      }, {
-        "methods" : [ "GET", "DELETE" ],
-        "pathPattern" : "/_/tenant/{id}"
-      } ]
+      "id": "_tenant",
+      "version": "2.0",
+      "interfaceType": "system",
+      "handlers": [
+        {
+          "methods": [
+            "POST"
+          ],
+          "pathPattern": "/_/tenant"
+        },
+        {
+          "methods": [
+            "GET",
+            "DELETE"
+          ],
+          "pathPattern": "/_/tenant/{id}"
+        }
+      ]
     }
   ],
   "permissionSets": [
@@ -627,6 +626,16 @@
       "permissionName": "finc-config.metadata-sources.collection.get",
       "displayName": "finc config metadata sources collection get",
       "description": "Finc config: Get a collection of metadata-sources"
+    },
+    {
+      "permissionName": "finc-config.tiny-metadata-sources.collection.get",
+      "displayName": "finc config tiny metadata sources collection get",
+      "description": "Finc config: Get a collection of tiny-metadata-sources"
+    },
+    {
+      "permissionName": "finc-config.contacts.collection.get",
+      "displayName": "finc config contacts collection get",
+      "description": "Finc config: Get a collection of contacts"
     },
     {
       "permissionName": "finc-config.metadata-sources.item.get",
@@ -679,9 +688,19 @@
       "description": "Finc config: Get collection of filters"
     },
     {
+      "permissionName": "finc-config.filters.item.collections.item.get",
+      "displayName": "finc config filters item collections item get",
+      "description": "Finc config: Get collections for a single filter"
+    },
+    {
       "permissionName": "finc-config.filters.item.get",
       "displayName": "finc config filters item get",
       "description": "Finc config: Get a single filter"
+    },
+    {
+      "permissionName": "finc-config.filters.item.collections.item.put",
+      "displayName": "finc config filters item collections item put",
+      "description": "Finc config: Update collections for a single filter"
     },
     {
       "permissionName": "finc-config.filters.item.put",
@@ -749,14 +768,12 @@
       "description": "Finc select: Get a single metadata collection"
     },
     {
-      "permissionName": "finc-select.metadata-collections.item.select",
-      "displayName": "finc select metadata collections item select",
-      "description": "Finc select: Select resp. deselect a single metadata collection"
-    },
-    {
-      "permissionName": "finc-select.metadata-collections.item.filters",
-      "displayName": "finc select metadata collections item filter",
-      "description": "Finc select: Add resp. remove filters to/from a single metadata collection"
+      "permissionName": "finc-select.metadata-collections.item.select.item.put",
+      "displayName": "finc select metadata collections item select item put",
+      "description": "Finc select: Select resp. deselect a single metadata collection",
+      "replaces": [
+        "finc-select.metadata-collections.item.select"
+      ]
     },
     {
       "permissionName": "finc-select.metadata-sources.collection.get",
@@ -769,9 +786,12 @@
       "description": "Finc select: Get a single metadata source"
     },
     {
-      "permissionName": "finc-select.metadata-sources.item.select-all",
-      "displayName": "finc select metadata sources item select all",
-      "description": "Finc select: Select resp. deselect all collections of a single metadata source"
+      "permissionName": "finc-select.metadata-sources.item.collections.select-all.item.put",
+      "displayName": "finc select metadata sources item select all item put",
+      "description": "Finc select: Select resp. deselect all collections of a single metadata source",
+      "replaces": [
+        "finc-select.metadata-sources.item.select-all"
+      ]
     },
     {
       "permissionName": "finc-select.filters.collection.get",
@@ -779,9 +799,19 @@
       "description": "Finc select: Get a collection of filters"
     },
     {
+      "permissionName": "finc-select.filters.item.collections.item.get",
+      "displayName": "finc select filters item collection item get",
+      "description": "Finc select: Get collections for a single filter"
+    },
+    {
       "permissionName": "finc-select.filters.item.get",
       "displayName": "finc select filters item get",
       "description": "Finc select: Get a single filter"
+    },
+    {
+      "permissionName": "finc-select.filters.item.collections.item.put",
+      "displayName": "finc select filters item collections item put",
+      "description": "Finc select: Update collections of an existing filter"
     },
     {
       "permissionName": "finc-select.filters.item.put",
@@ -863,12 +893,16 @@
         "finc-config.metadata-sources.item.post",
         "finc-config.metadata-sources.item.put",
         "finc-config.metadata-sources.item.delete",
+        "finc-config.tiny-metadata-sources.collection.get",
+        "finc-config.contacts.collection.get",
         "finc-config.isils.collection.get",
         "finc-config.isils.item.get",
         "finc-config.isils.item.post",
         "finc-config.isils.item.put",
         "finc-config.isils.item.delete",
         "finc-config.filters.collection.get",
+        "finc-config.filters.item.collections.item.get",
+        "finc-config.filters.item.collections.item.put",
         "finc-config.filters.item.get",
         "finc-config.filters.item.put",
         "finc-config.filters.item.delete",
@@ -890,12 +924,13 @@
       "subPermissions": [
         "finc-select.metadata-collections.collection.get",
         "finc-select.metadata-collections.item.get",
-        "finc-select.metadata-collections.item.select",
-        "finc-select.metadata-collections.item.filters",
+        "finc-select.metadata-collections.item.select.item.put",
         "finc-select.metadata-sources.collection.get",
         "finc-select.metadata-sources.item.get",
-        "finc-select.metadata-sources.item.select-all",
+        "finc-select.metadata-sources.item.collections.select-all.item.put",
         "finc-select.filters.collection.get",
+        "finc-select.filters.item.collections.item.get",
+        "finc-select.filters.item.collections.item.put",
         "finc-select.filters.item.get",
         "finc-select.filters.item.put",
         "finc-select.filters.item.delete",
