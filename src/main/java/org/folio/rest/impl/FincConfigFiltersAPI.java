@@ -38,9 +38,9 @@ public class FincConfigFiltersAPI implements FincConfigFilters {
       String query,
       String orderBy,
       FincConfigFiltersGetOrder order,
+      String totalRecords,
       int offset,
       int limit,
-      String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -61,7 +61,6 @@ public class FincConfigFiltersAPI implements FincConfigFilters {
   @Override
   @Validate
   public void postFincConfigFilters(
-      String lang,
       FincSelectFilter entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
@@ -80,7 +79,6 @@ public class FincConfigFiltersAPI implements FincConfigFilters {
   @Validate
   public void getFincConfigFiltersById(
       String id,
-      String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -99,7 +97,6 @@ public class FincConfigFiltersAPI implements FincConfigFilters {
   @Validate
   public void deleteFincConfigFiltersById(
       String id,
-      String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -117,7 +114,6 @@ public class FincConfigFiltersAPI implements FincConfigFilters {
   @Validate
   public void putFincConfigFiltersById(
       String id,
-      String lang,
       FincSelectFilter entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,

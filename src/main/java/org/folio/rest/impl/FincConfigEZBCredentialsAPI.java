@@ -31,8 +31,13 @@ public class FincConfigEZBCredentialsAPI implements FincConfigEzbCredentials {
 
   @Override
   @Validate
-  public void getFincConfigEzbCredentials(String query, int offset, int limit, String lang,
-      Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler,
+  public void getFincConfigEzbCredentials(
+      String query,
+      String totalRecords,
+      int offset,
+      int limit,
+      Map<String, String> okapiHeaders,
+      Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     ezbCredentialsDAO.getAll(query, offset, limit, vertxContext)
         .onComplete(ar -> {
@@ -53,8 +58,10 @@ public class FincConfigEZBCredentialsAPI implements FincConfigEzbCredentials {
 
   @Override
   @Validate
-  public void postFincConfigEzbCredentials(String lang, Credential entity,
-      Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler,
+  public void postFincConfigEzbCredentials(
+      Credential entity,
+      Map<String, String> okapiHeaders,
+      Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
 
@@ -79,8 +86,10 @@ public class FincConfigEZBCredentialsAPI implements FincConfigEzbCredentials {
 
   @Override
   @Validate
-  public void getFincConfigEzbCredentialsByIsil(String isil, String lang,
-      Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler,
+  public void getFincConfigEzbCredentialsByIsil(
+      String isil,
+      Map<String, String> okapiHeaders,
+      Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
 
     ezbCredentialsDAO.getByIsil(isil, vertxContext)
@@ -105,8 +114,10 @@ public class FincConfigEZBCredentialsAPI implements FincConfigEzbCredentials {
 
   @Override
   @Validate
-  public void deleteFincConfigEzbCredentialsByIsil(String isil, String lang,
-      Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler,
+  public void deleteFincConfigEzbCredentialsByIsil(
+      String isil,
+      Map<String, String> okapiHeaders,
+      Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
 
     ezbCredentialsDAO.deleteByIsil(isil, vertxContext)
@@ -123,8 +134,11 @@ public class FincConfigEZBCredentialsAPI implements FincConfigEzbCredentials {
 
   @Override
   @Validate
-  public void putFincConfigEzbCredentialsByIsil(String isil, String lang, Credential entity,
-      Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler,
+  public void putFincConfigEzbCredentialsByIsil(
+      String isil,
+      Credential entity,
+      Map<String, String> okapiHeaders,
+      Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
 
     if (!isil.equals(entity.getIsil())) {

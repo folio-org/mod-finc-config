@@ -43,9 +43,9 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
       String query,
       String orderBy,
       FincConfigMetadataSourcesGetOrder order,
+      String totalRecords,
       int offset,
       int limit,
-      String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -79,7 +79,6 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
   @Override
   @Validate
   public void postFincConfigMetadataSources(
-      String lang,
       FincConfigMetadataSource entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
@@ -112,7 +111,6 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
   @Validate
   public void getFincConfigMetadataSourcesById(
       String id,
-      String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -132,7 +130,6 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
   @Validate
   public void deleteFincConfigMetadataSourcesById(
       String id,
-      String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -151,7 +148,6 @@ public class FincConfigMetadataSourcesAPI implements FincConfigMetadataSources {
   @Validate
   public void putFincConfigMetadataSourcesById(
       String id,
-      String lang,
       FincConfigMetadataSource entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,

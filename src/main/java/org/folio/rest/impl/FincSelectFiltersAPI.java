@@ -1,5 +1,7 @@
 package org.folio.rest.impl;
 
+import static org.folio.rest.impl.Messages.MSG_INTERNAL_SERVER_ERROR;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
@@ -24,8 +26,6 @@ import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.jaxrs.model.FincSelectFilterToCollections;
 import org.folio.rest.jaxrs.model.FincSelectFiltersGetOrder;
 import org.folio.rest.jaxrs.resource.FincSelectFilters;
-import org.folio.rest.tools.messages.MessageConsts;
-import org.folio.rest.tools.messages.Messages;
 import org.folio.rest.tools.utils.TenantTool;
 
 /**
@@ -37,7 +37,6 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
   private final SelectFilterDAO selectFilterDAO;
   private final FilterToCollectionsDAO filterToCollectionsDAO;
   private final FilterHelper filterHelper;
-  private final Messages messages = Messages.getInstance();
   private final Logger logger = LogManager.getLogger(FincSelectFiltersAPI.class);
 
   public FincSelectFiltersAPI() {
@@ -53,9 +52,9 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
       String query,
       String orderBy,
       FincSelectFiltersGetOrder order,
+      String totalRecords,
       int offset,
       int limit,
-      String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -86,7 +85,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
                 asyncResultHandler.handle(
                     io.vertx.core.Future.succeededFuture(
                         GetFincSelectFiltersResponse.respond500WithTextPlain(
-                            messages.getMessage(lang, MessageConsts.InternalServerError))));
+                            MSG_INTERNAL_SERVER_ERROR)));
               }
             });
   }
@@ -94,7 +93,6 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
   @Override
   @Validate
   public void postFincSelectFilters(
-      String lang,
       FincSelectFilter entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
@@ -121,7 +119,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
                 asyncResultHandler.handle(
                     Future.succeededFuture(
                         PostFincSelectFiltersResponse.respond500WithTextPlain(
-                            messages.getMessage(lang, MessageConsts.InternalServerError))));
+                            MSG_INTERNAL_SERVER_ERROR)));
               }
             });
   }
@@ -130,7 +128,6 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
   @Validate
   public void getFincSelectFiltersById(
       String id,
-      String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -150,7 +147,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
                   asyncResultHandler.handle(
                       Future.succeededFuture(
                           GetFincSelectFiltersByIdResponse.respond404WithTextPlain(
-                              messages.getMessage(lang, MessageConsts.ObjectDoesNotExist))));
+                              MSG_INTERNAL_SERVER_ERROR)));
                 } else {
                   result.setIsil(null);
                   asyncResultHandler.handle(
@@ -169,7 +166,6 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
   @Validate
   public void deleteFincSelectFiltersById(
       String id,
-      String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -197,7 +193,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
             asyncResultHandler.handle(
                 Future.succeededFuture(
                     DeleteFincSelectFiltersByIdResponse.respond500WithTextPlain(
-                        messages.getMessage(lang, MessageConsts.InternalServerError))));
+                        MSG_INTERNAL_SERVER_ERROR)));
           }
         });
   }
@@ -206,7 +202,6 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
   @Validate
   public void putFincSelectFiltersById(
       String id,
-      String lang,
       FincSelectFilter entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
@@ -238,7 +233,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
                 asyncResultHandler.handle(
                     Future.succeededFuture(
                         PutFincSelectFiltersByIdResponse.respond500WithTextPlain(
-                            messages.getMessage(lang, MessageConsts.InternalServerError))));
+                            MSG_INTERNAL_SERVER_ERROR)));
               }
             });
   }
@@ -277,7 +272,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
                 asyncResultHandler.handle(
                     Future.succeededFuture(
                         GetFincSelectFiltersCollectionsByIdResponse.respond500WithTextPlain(
-                            MessageConsts.InternalServerError)));
+                            MSG_INTERNAL_SERVER_ERROR)));
               }
             });
   }

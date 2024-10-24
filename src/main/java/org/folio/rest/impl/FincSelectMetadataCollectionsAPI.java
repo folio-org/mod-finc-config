@@ -44,9 +44,9 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
       String query,
       String orderBy,
       FincSelectMetadataCollectionsGetOrder order,
+      String totalRecords,
       int offset,
       int limit,
-      String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -87,7 +87,6 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
   @Validate
   public void getFincSelectMetadataCollectionsById(
       String id,
-      String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -118,7 +117,6 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
   @Validate
   public void putFincSelectMetadataCollectionsSelectById(
       String id,
-      String lang,
       Select entity,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
@@ -152,7 +150,6 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
   @Validate
   public void getFincSelectMetadataCollectionsSelectById(
       String id,
-      String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
@@ -164,7 +161,6 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
   @Validate
   public void deleteFincSelectMetadataCollectionsSelectById(
       String id,
-      String lang,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
