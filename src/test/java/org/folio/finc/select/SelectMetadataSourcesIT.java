@@ -20,7 +20,6 @@ import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataCollection;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource.Selected;
-import org.folio.rest.jaxrs.model.FincSelectMetadataSource.Status;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.jaxrs.model.MdSource;
 import org.folio.rest.jaxrs.model.Organization;
@@ -362,70 +361,5 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
                 + metadataCollectionRestrictedPermitted.getId())
         .then()
         .statusCode(204);
-  }
-
-  @Test
-  public void checkNotImplementedEndpoints() {
-    FincSelectMetadataSource mdSource =
-        new FincSelectMetadataSource()
-            .withId(UUID.randomUUID().toString())
-            .withLabel("Metadata Source 1")
-            .withStatus(Status.CLOSED)
-            .withSourceId(1);
-    // POST metadata source
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
-        .body(Json.encode(mdSource))
-        .post(FINC_SELECT_METADATA_SOURCES_ENDPOINT)
-        .then()
-        .statusCode(501);
-
-    // DELETE metadata source
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.TEXT)
-        .delete(FINC_SELECT_METADATA_SOURCES_ENDPOINT + "/uuid-1234")
-        .then()
-        .statusCode(501);
-
-    // PUT metadata source
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.TEXT)
-        .body(Json.encode(mdSource))
-        .put(FINC_SELECT_METADATA_SOURCES_ENDPOINT + "/uuid-1234")
-        .then()
-        .statusCode(501);
-
-    // getFincSelectMetadataSourcesCollectionsById
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
-        .get(FINC_SELECT_METADATA_SOURCES_ENDPOINT + "/uuid-1234/collections")
-        .then()
-        .statusCode(501);
-
-    // getFincSelectMetadataSourcesCollectionsSelectAllById
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
-        .get(FINC_SELECT_METADATA_SOURCES_ENDPOINT + "/uuid-1234/collections/select-all")
-        .then()
-        .statusCode(501);
-
-    // deleteFincSelectMetadataSourcesCollectionsSelectAllById
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.TEXT)
-        .delete(FINC_SELECT_METADATA_SOURCES_ENDPOINT + "/uuid-1234/collections/select-all")
-        .then()
-        .statusCode(501);
   }
 }

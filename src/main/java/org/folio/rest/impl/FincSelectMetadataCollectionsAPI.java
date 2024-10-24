@@ -1,6 +1,5 @@
 package org.folio.rest.impl;
 
-import static io.vertx.core.Future.succeededFuture;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
@@ -144,27 +143,5 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
                 }
               }
             });
-  }
-
-  @Override
-  @Validate
-  public void getFincSelectMetadataCollectionsSelectById(
-      String id,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {
-    vertxContext.runOnContext(
-        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
-  }
-
-  @Override
-  @Validate
-  public void deleteFincSelectMetadataCollectionsSelectById(
-      String id,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {
-    vertxContext.runOnContext(
-        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
   }
 }

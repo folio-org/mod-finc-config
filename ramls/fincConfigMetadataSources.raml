@@ -24,6 +24,7 @@ traits:
 
 resourceTypes:
   collection: !include ./raml-util/rtypes/collection.raml
+  collection-get: !include ./raml-util/rtypes/collection-get.raml
   collection-item: !include ./raml-util/rtypes/item-collection.raml
 
 /finc-config/metadata-sources:
@@ -57,7 +58,7 @@ resourceTypes:
       description: Put an metadata source identified by id
 /finc-config/tiny-metadata-sources:
   type:
-    collection:
+    collection-get:
       exampleCollection: !include examples/tinyMetadataSource_collection.sample
       exampleItem: !include examples/tinyMetadataSource.sample
       schemaCollection: tinyMetadataSources
@@ -66,7 +67,7 @@ resourceTypes:
     description: Get all tiny metadata sources
 /finc-config/contacts:
   type:
-    collection:
+    collection-get:
       exampleCollection: !include examples/contact_collection.sample
       exampleItem: !include examples/contact.sample
       schemaCollection: contacts

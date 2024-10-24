@@ -1,19 +1,16 @@
 package org.folio.rest.impl;
 
-import static io.vertx.core.Future.succeededFuture;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import org.folio.finc.dao.MetadataSourcesDAO;
 import org.folio.finc.dao.MetadataSourcesDAOImpl;
 import org.folio.rest.annotations.Validate;
-import org.folio.rest.jaxrs.model.Contact;
 import org.folio.rest.jaxrs.resource.FincConfigContacts;
 import org.folio.rest.persist.PostgresClient;
 
@@ -47,15 +44,5 @@ public class FincConfigContactsAPI implements FincConfigContacts {
                 asyncResultHandler.handle(
                     Future.succeededFuture(
                         GetFincConfigContactsResponse.respond500WithTextPlain(throwable))));
-  }
-
-  @Override
-  public void postFincConfigContacts(
-      Contact entity,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {
-    vertxContext.runOnContext(
-        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
   }
 }

@@ -18,9 +18,7 @@ import org.folio.rest.jaxrs.model.TinyMetadataSource;
 import org.folio.rest.jaxrs.resource.FincConfigTinyMetadataSources;
 import org.folio.rest.persist.PostgresClient;
 
-/**
- * Manages tiny metadata sources for ui-finc-config
- */
+/** Manages tiny metadata sources for ui-finc-config */
 public class FincConfigTinyMetadataSourcesAPI implements FincConfigTinyMetadataSources {
 
   private final MetadataSourcesTinyDAO metadataSourcesTinyDAO;
@@ -72,16 +70,5 @@ public class FincConfigTinyMetadataSourcesAPI implements FincConfigTinyMetadataS
                 }
               }
             });
-  }
-
-  @Override
-  @Validate
-  public void postFincConfigTinyMetadataSources(
-      TinyMetadataSource entity,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {
-    vertxContext.runOnContext(
-        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
   }
 }
