@@ -22,10 +22,9 @@ traits:
   validate: !include ./raml-util/traits/validation.raml
 
 resourceTypes:
-  collection: !include ./raml-util/rtypes/collection.raml
   collection-get: !include ./raml-util/rtypes/collection-get.raml
-  collection-item: !include ./raml-util/rtypes/item-collection.raml
   collection-item-get: !include ./raml-util/rtypes/item-collection-get.raml
+  collection-item-put: !include ./rtypes/item-collection-put.raml
 
 /finc-select/metadata-collections:
   displayName: Metadata Collections Select
@@ -49,7 +48,7 @@ resourceTypes:
       description: Get one metadata collection identified by id
     /select:
       type:
-        collection-item:
+        collection-item-put:
           exampleItem: !include examples/select.sample
           schema: select
       put:

@@ -22,13 +22,14 @@ traits:
   validate: !include ./raml-util/traits/validation.raml
 
 resourceTypes:
-  collection: !include ./raml-util/rtypes/collection.raml
-  collection-item: !include ./raml-util/rtypes/item-collection.raml
+  collection-get: !include ./raml-util/rtypes/collection-get.raml
+  collection-item-get: !include ./raml-util/rtypes/item-collection-get.raml
+  collection-item-put: !include ./rtypes/item-collection-put.raml
 
 /finc-select/metadata-sources:
   displayName: Metadata Sources Select
   type:
-    collection:
+    collection-get:
       exampleCollection: !include examples/fincSelectMetadataSource_collection.sample
       exampleItem: !include examples/fincSelectMetadataSource.sample
       schemaCollection: fincSelectMetadataSources
@@ -42,17 +43,14 @@ resourceTypes:
     description: Get all metadata sources
   /{id}:
     type:
-      collection-item:
+      collection-item-get:
         exampleItem: !include examples/fincSelectMetadataSource.sample
         schema: fincSelectMetadataSource
     get:
       description: Get one metadata source identified by id
-    /collections:
-      get:
-        description: Get metadata collections assigned to this metadata source
-      /select-all:
+    /collections/select-all:
         type:
-          collection-item:
+          collection-item-put:
             exampleItem: !include examples/select.sample
             schema: select
         put:

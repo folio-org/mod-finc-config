@@ -1,7 +1,5 @@
 package org.folio.rest.impl;
 
-import static io.vertx.core.Future.succeededFuture;
-
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
@@ -82,17 +80,6 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
 
   @Override
   @Validate
-  public void postFincSelectMetadataSources(
-      FincSelectMetadataSource entity,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {
-    vertxContext.runOnContext(
-        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
-  }
-
-  @Override
-  @Validate
   public void getFincSelectMetadataSourcesById(
       String id,
       Map<String, String> okapiHeaders,
@@ -130,40 +117,6 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
 
   @Override
   @Validate
-  public void deleteFincSelectMetadataSourcesById(
-      String id,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {
-    vertxContext.runOnContext(
-        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
-  }
-
-  @Override
-  @Validate
-  public void putFincSelectMetadataSourcesById(
-      String id,
-      FincSelectMetadataSource entity,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {
-    vertxContext.runOnContext(
-        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
-  }
-
-  @Override
-  @Validate
-  public void getFincSelectMetadataSourcesCollectionsById(
-      String id,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {
-    vertxContext.runOnContext(
-        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
-  }
-
-  @Override
-  @Validate
   public void putFincSelectMetadataSourcesCollectionsSelectAllById(
       String id,
       Select entity,
@@ -172,27 +125,5 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
       Context vertxContext) {
     this.selectMetadataSourcesHelper.selectAllCollectionsOfMetadataSource(
         id, entity, okapiHeaders, asyncResultHandler, vertxContext);
-  }
-
-  @Override
-  @Validate
-  public void getFincSelectMetadataSourcesCollectionsSelectAllById(
-      String id,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {
-    vertxContext.runOnContext(
-        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
-  }
-
-  @Override
-  @Validate
-  public void deleteFincSelectMetadataSourcesCollectionsSelectAllById(
-      String id,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {
-    vertxContext.runOnContext(
-        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
   }
 }

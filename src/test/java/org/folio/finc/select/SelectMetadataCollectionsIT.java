@@ -456,28 +456,4 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
         .then()
         .statusCode(204);
   }
-
-  @Test
-  public void check501Status() {
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
-        .get(
-            FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT
-                + "/"
-                + metadataCollectionPermitted.getId()
-                + "/select")
-        .then();
-
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .delete(
-            FINC_SELECT_METADATA_COLLECTIONS_ENDPOINT
-                + "/"
-                + metadataCollectionPermitted.getId()
-                + "/select")
-        .then()
-        .statusCode(501);
-  }
 }

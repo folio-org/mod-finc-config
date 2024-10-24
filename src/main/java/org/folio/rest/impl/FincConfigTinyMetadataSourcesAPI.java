@@ -1,6 +1,5 @@
 package org.folio.rest.impl;
 
-import static io.vertx.core.Future.succeededFuture;
 import static org.folio.rest.impl.Messages.MSG_INTERNAL_SERVER_ERROR;
 
 import io.vertx.core.AsyncResult;
@@ -14,13 +13,10 @@ import javax.ws.rs.core.Response;
 import org.folio.finc.dao.MetadataSourcesTinyDAO;
 import org.folio.finc.dao.MetadataSourcesTinyDAOImpl;
 import org.folio.rest.annotations.Validate;
-import org.folio.rest.jaxrs.model.TinyMetadataSource;
 import org.folio.rest.jaxrs.resource.FincConfigTinyMetadataSources;
 import org.folio.rest.persist.PostgresClient;
 
-/**
- * Manages tiny metadata sources for ui-finc-config
- */
+/** Manages tiny metadata sources for ui-finc-config */
 public class FincConfigTinyMetadataSourcesAPI implements FincConfigTinyMetadataSources {
 
   private final MetadataSourcesTinyDAO metadataSourcesTinyDAO;
@@ -72,16 +68,5 @@ public class FincConfigTinyMetadataSourcesAPI implements FincConfigTinyMetadataS
                 }
               }
             });
-  }
-
-  @Override
-  @Validate
-  public void postFincConfigTinyMetadataSources(
-      TinyMetadataSource entity,
-      Map<String, String> okapiHeaders,
-      Handler<AsyncResult<Response>> asyncResultHandler,
-      Context vertxContext) {
-    vertxContext.runOnContext(
-        aVoid -> asyncResultHandler.handle(succeededFuture(Response.status(501).build())));
   }
 }
