@@ -362,15 +362,6 @@
           "permissionsRequired": [
             "finc-select.metadata-collections.item.select.put"
           ]
-        },
-        {
-          "methods": [
-            "PUT"
-          ],
-          "pathPattern": "/finc-select/metadata-collections/{id}/filters",
-          "permissionsRequired": [
-            "finc-select.metadata-collections.item.filters.put"
-          ]
         }
       ]
     },
@@ -785,14 +776,6 @@
       ]
     },
     {
-      "permissionName": "finc-select.metadata-collections.item.filters.put",
-      "displayName": "finc select metadata collections item filter",
-      "description": "Finc select: Add resp. remove filters to/from a single metadata collection",
-      "replaces": [
-        "finc-select.metadata-collections.item.filters"
-      ]
-    },
-    {
       "permissionName": "finc-select.metadata-sources.collection.get",
       "displayName": "finc select metadata sources collection select",
       "description": "Finc select: Get a collection of metadata sources"
@@ -942,7 +925,6 @@
         "finc-select.metadata-collections.collection.get",
         "finc-select.metadata-collections.item.get",
         "finc-select.metadata-collections.item.select.put",
-        "finc-select.metadata-collections.item.filters.put",
         "finc-select.metadata-sources.collection.get",
         "finc-select.metadata-sources.item.get",
         "finc-select.metadata-sources.item.collections.select-all.put",
