@@ -26,6 +26,7 @@
     <okapi.version>5.3.0</okapi.version>
     <aspect.version>1.9.22.1</aspect.version>
     <aspectj-maven-plugin.version>1.14</aspectj-maven-plugin.version>
+    <folio-module-descriptor-validator.version>1.0.0</folio-module-descriptor-validator.version>
   </properties>
 
   <repositories>
@@ -145,13 +146,25 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.folio</groupId>
+        <artifactId>folio-module-descriptor-validator</artifactId>
+        <version>${folio-module-descriptor-validator.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>validate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
