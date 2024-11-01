@@ -1,3 +1,9 @@
+# 6.0.0
+* [UIFC-382](https://folio-org.atlassian.net/browse/UIFC-382) Upgrade RMB to v35.3.0
+* [UIFC-383](https://folio-org.atlassian.net/browse/UIFC-383) Update interface names per folio naming convention
+* [UIFC-392](https://folio-org.atlassian.net/browse/UIFC-392) Review and cleanup Module Descriptor
+* [UIFC-393](https://folio-org.atlassian.net/browse/UIFC-393) Remove unimplemented endpoints
+
 # 5.6.0
 * [UIFC-347](https://folio-org.atlassian.net/browse/UIFC-347) Update to RMB v35.2.0, Vert.x v4.5.4
 * [UIFC-346](https://folio-org.atlassian.net/browse/UIFC-346) Update http links in sample data
