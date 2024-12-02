@@ -280,7 +280,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.2.5</version>
+        <version>3.5.2</version>
         <configuration>
           <!-- en.US required because some unit tests rely on English error messages.
              @{argLine} required for sonarqube jacoco -->
@@ -519,17 +519,11 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.2.5</version>
+        <version>3.5.2</version>
         <executions>
           <execution>
-            <id>integration-test</id>
             <goals>
               <goal>integration-test</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>verify</id>
-            <goals>
               <goal>verify</goal>
             </goals>
           </execution>
@@ -543,6 +537,9 @@
             <include>**/ApiTestSuite.java</include>
             <include>**/*ITest.java</include>
           </includes>
+          <environmentVariables>
+            <EZB_DOWNLOAD_URL>http://localhost?libId=%s</EZB_DOWNLOAD_URL>
+          </environmentVariables>
         </configuration>
       </plugin>
     </plugins>

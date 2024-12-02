@@ -6,6 +6,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.github.tomakehurst.wiremock.client.BasicCredentials;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
@@ -50,6 +52,33 @@ public class EZBServiceImplTest {
   public void setUp() {
     ProxySelector.setDefault(defaultProxySelector);
     ezbService = new EZBServiceImpl(wmRule.url("%s"));
+  }
+
+  @Test
+  public void testThatEmptyUrlThrowsException() {
+    assertThatThrownBy(() -> new EZBServiceImpl("")).isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  public void testThatNullUrlThrowsException() {
+    assertThatThrownBy(() -> new EZBServiceImpl(null)).isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  public void testThatInvalidUrlThrowsException() {
+    assertThatThrownBy(() -> new EZBServiceImpl("http://localhost/"))
+        .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  public void testThatValidUrlDoesNotThrowException() {
+    assertThatCode(() -> new EZBServiceImpl("http://localhost?libId=%s"))
+        .doesNotThrowAnyException();
+  }
+
+  @Test
+  public void testGetUrl() {
+    assertThat(ezbService.getUrl()).isEqualTo(wmRule.url("%s"));
   }
 
   @Test
