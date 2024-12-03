@@ -6,6 +6,12 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClient;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -22,13 +28,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
@@ -84,7 +83,7 @@ public class ApiTestSuite {
     RestAssured.defaultParser = Parser.JSON;
 
     DeploymentOptions options = new DeploymentOptions();
-    options.setConfig(new JsonObject().put("http.port", port));
+    options.setConfig(new JsonObject().put("http.port", port).put("testing", true));
 
     startVerticle(options);
 

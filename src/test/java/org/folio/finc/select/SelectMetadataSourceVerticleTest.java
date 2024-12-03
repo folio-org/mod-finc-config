@@ -49,7 +49,8 @@ public class SelectMetadataSourceVerticleTest {
     RestAssured.port = port;
     RestAssured.defaultParser = Parser.JSON;
     DeploymentOptions options =
-        new DeploymentOptions().setConfig(new JsonObject().put("http.port", port));
+        new DeploymentOptions()
+            .setConfig(new JsonObject().put("http.port", port).put("testing", true));
     startVerticle(options);
     prepareTenants(context);
     cut = new SelectMetadataSourceVerticle(vertx, vertx.getOrCreateContext());

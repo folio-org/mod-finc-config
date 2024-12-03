@@ -60,7 +60,8 @@ public class TenantITest {
     RestAssured.port = port;
     RestAssured.defaultParser = Parser.JSON;
     DeploymentOptions options =
-        new DeploymentOptions().setConfig(new JsonObject().put("http.port", port));
+        new DeploymentOptions()
+            .setConfig(new JsonObject().put("http.port", port).put("testing", true));
     startVerticle(options, context);
     prepareTenants(context);
   }
