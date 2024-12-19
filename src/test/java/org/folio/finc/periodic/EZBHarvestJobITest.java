@@ -21,8 +21,7 @@ import org.junit.runner.RunWith;
 @RunWith(VertxUnitRunner.class)
 public class EZBHarvestJobITest extends AbstractEZBHarvestJobTest {
 
-  private static final EZBHarvestJob EZB_JOB =
-      new EZBHarvestJob().setEZBService(new EZBServiceMock());
+  private static final EZBHarvestJob EZB_JOB = new EZBHarvestJob(new EZBServiceMock());
   private static final Date DATE =
       Date.from(LocalDate.of(1977, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC));
   private static final String FILE_ID = "f81e18f1-4427-4eb7-a936-2039ca1c5023";

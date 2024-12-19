@@ -13,7 +13,6 @@ import org.apache.logging.log4j.Logger;
 import org.folio.finc.dao.EZBCredentialsDAO;
 import org.folio.finc.dao.EZBCredentialsDAOImpl;
 import org.folio.finc.periodic.ezb.EZBService;
-import org.folio.finc.periodic.ezb.EZBServiceImpl;
 import org.folio.okapi.common.GenericCompositeFuture;
 import org.folio.rest.jaxrs.model.Credentials;
 import org.quartz.Job;
@@ -27,6 +26,10 @@ public class EZBHarvestJob implements Job {
   private final EZBCredentialsDAO ezbCredentialsDAO = new EZBCredentialsDAOImpl();
   private EZBService ezbService;
 
+  public EZBHarvestJob(EZBService ezbService) {
+    this.ezbService = ezbService;
+  }
+
   @Override
   public void execute(JobExecutionContext jobExecutionContext) {
     final Context vertxContext;
@@ -37,16 +40,10 @@ public class EZBHarvestJob implements Job {
         log.error("Cannot find vertxContext.");
         return;
       }
-      ezbService = new EZBServiceImpl();
       run(vertxContext);
     } catch (SchedulerException e) {
       log.error("Error while executing job to update ezb file.", e);
     }
-  }
-
-  public EZBHarvestJob setEZBService(EZBService service) {
-    this.ezbService = service;
-    return this;
   }
 
   public Future<Void> run(Context vertxContext) {
@@ -116,5 +113,9 @@ public class EZBHarvestJob implements Job {
               return cfg;
             })
         .collect(Collectors.toList());
+  }
+
+  public EZBService getEzbService() {
+    return ezbService;
   }
 }

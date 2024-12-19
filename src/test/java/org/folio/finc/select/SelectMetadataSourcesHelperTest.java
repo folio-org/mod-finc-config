@@ -55,7 +55,8 @@ public class SelectMetadataSourcesHelperTest {
     RestAssured.defaultParser = Parser.JSON;
 
     DeploymentOptions options =
-        new DeploymentOptions().setConfig(new JsonObject().put("http.port", port));
+        new DeploymentOptions()
+            .setConfig(new JsonObject().put("http.port", port).put("testing", true));
 
     startVerticle(options);
     prepareTenants();

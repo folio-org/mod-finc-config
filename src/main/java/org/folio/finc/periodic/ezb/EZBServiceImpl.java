@@ -14,18 +14,25 @@ import java.net.ProxySelector;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class EZBServiceImpl implements EZBService {
+  private static final Logger log = LogManager.getLogger();
 
-  private String url =
-      "https://rzbezb2.ur.de/ezb/export/licenselist_html.php?pack=0&bibid=%s&lang=de&"
-          + "output_style=kbart&todo_license=ALkbart";
+  private final String url;
 
   public EZBServiceImpl(String url) {
+    if (StringUtils.isEmpty(url)) {
+      throw new IllegalArgumentException("EZB download URL cannot be null or empty");
+    }
+    if (StringUtils.countMatches(url, "%s") != 1) {
+      throw new IllegalArgumentException(
+          "EZB download URL needs to contain exactly one '%s' placeholder for the libId");
+    }
     this.url = url;
   }
-
-  public EZBServiceImpl() {}
 
   private Optional<ProxyOptions> getProxyOptions(String url) {
     try {
@@ -38,7 +45,7 @@ public class EZBServiceImpl implements EZBService {
                 return new ProxyOptions().setHost(addr.getHostName()).setPort(addr.getPort());
               });
     } catch (URISyntaxException e) {
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return Optional.empty();
     }
   }
@@ -68,5 +75,9 @@ public class EZBServiceImpl implements EZBService {
           }
         });
     return result.future();
+  }
+
+  public String getUrl() {
+    return url;
   }
 }
