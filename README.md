@@ -90,6 +90,9 @@ file* will be updated by the downloaded one. If the files are equal, nothing wil
 Thus, to activate harvesting of holding files you need to define ezb credentials and add a filter
 called *EZB holdings* with a file called *EZB file*.
 
+The EZB URL needs to be configured using the environment variable `EZB_DOWNLOAD_URL`. This URL must include a '%s'
+placeholder, which will be substituted with the bidId when processing requests.
+
 Proxy settings are honored. Use system properties `http.proxyHost`, `http.proxyPort`
 , `https.proxyHost`, `https.proxyPort`, `http.nonProxyHosts` or environment variables `HTTP_PROXY`
 , `HTTPS_PROXY`, `NO_PROXY` if running as Docker container.
