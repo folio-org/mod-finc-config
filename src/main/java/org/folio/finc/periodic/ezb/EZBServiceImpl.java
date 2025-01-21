@@ -19,7 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class EZBServiceImpl implements EZBService {
-  private static final Logger log = LogManager.getLogger();
+  private static final Logger log = LogManager.getLogger(EZBServiceImpl.class);
 
   private final String url;
 
