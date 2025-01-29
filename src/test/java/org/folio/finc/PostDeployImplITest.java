@@ -47,7 +47,8 @@ public class PostDeployImplITest {
     scheduler.getListenerManager().addJobListener(new TestJobListener(urlResultPromise));
 
     int port = NetworkUtils.nextFreePort();
-    DeploymentOptions options = new DeploymentOptions(new JsonObject().put("http.port", port));
+    DeploymentOptions options =
+        new DeploymentOptions().setConfig(new JsonObject().put("http.port", port));
     vertx.deployVerticle(
         RestVerticle.class.getName(),
         options,
