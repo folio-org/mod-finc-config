@@ -16,19 +16,19 @@
 
   <properties>
     <argLine />
-    <maven.compiler.release>17</maven.compiler.release>
+    <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <ramlfiles_path>${basedir}/ramls</ramlfiles_path>
     <database_setup_path>${basedir}/database-setup</database_setup_path>
-    <raml-module-builder.version>35.3.0</raml-module-builder.version>
-    <vertx-version>4.5.10</vertx-version>
-    <okapi.version>5.3.0</okapi.version>
+    <raml-module-builder.version>35.4.0</raml-module-builder.version>
+    <vertx-version>4.5.13</vertx-version>
+    <okapi.version>6.2.1</okapi.version>
     <aspect.version>1.9.22.1</aspect.version>
     <aspectj-maven-plugin.version>1.14</aspectj-maven-plugin.version>
-    <folio-module-descriptor-validator.version>1.0.0</folio-module-descriptor-validator.version>
-    <spotless.version>2.43.0</spotless.version>
-    <google-java-format.version>1.24.0</google-java-format.version>
+    <folio-module-descriptor-validator.version>1.0.1</folio-module-descriptor-validator.version>
+    <spotless.version>2.44.3</spotless.version>
+    <google-java-format.version>1.25.2</google-java-format.version>
   </properties>
 
   <repositories>
@@ -52,7 +52,7 @@
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-bom</artifactId>
-        <version>2.23.0</version>
+        <version>2.24.3</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -117,30 +117,30 @@
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
-      <version>5.4.0</version>
+      <version>5.5.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.22.0</version>
+      <version>3.27.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.github.tomakehurst</groupId>
-      <artifactId>wiremock</artifactId>
-      <version>2.27.2</version>
+      <groupId>org.wiremock</groupId>
+      <artifactId>wiremock-standalone</artifactId>
+      <version>3.12.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
-      <version>2.3.2</version>
+      <version>2.4.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
-      <version>3.8.1</version>
+      <version>3.9.9</version>
     </dependency>
   </dependencies>
 
