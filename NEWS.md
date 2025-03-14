@@ -1,3 +1,12 @@
+# 6.1.0
+* [UIFC-420](https://folio-org.atlassian.net/browse/UIFC-420) Upgrade to Java 21
+* [UIFC-406](https://folio-org.atlassian.net/browse/UIFC-406) Increase maximum allowed string length for RMBs ObjectMapper
+* [UIFC-407](https://folio-org.atlassian.net/browse/UIFC-407) Fix test deployment port
+* [UIFC-406](https://folio-org.atlassian.net/browse/UIFC-406) Increase maximum allowed string length to 50MB in Jacksons ObjectMapper
+* [UIFC-398](https://folio-org.atlassian.net/browse/UIFC-398) Fix logging scope and logger initialization
+* [UIFC-398](https://folio-org.atlassian.net/browse/UIFC-398) Make EZB URL configurable
+* Add `spotless-maven-plugin` and update `CONTRIBUTING.md`
+
 # 6.0.0
 * [UIFC-382](https://folio-org.atlassian.net/browse/UIFC-382) Upgrade RMB to v35.3.0
 * [UIFC-383](https://folio-org.atlassian.net/browse/UIFC-383) Update interface names per folio naming convention
