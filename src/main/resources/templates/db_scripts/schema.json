@@ -122,12 +122,20 @@
     },
     {
       "tableName": "isils",
-      "fromModuleVersion": "mod-finc-config-1.4.0",
+      "fromModuleVersion": "mod-finc-config-6.2.0",
       "withMetadata": true,
       "fullTextIndex": [
         {
           "fieldName": "isil",
           "tOps": "ADD"
+        }
+      ],
+      "uniqueIndex": [
+        {
+          "fieldName": "isil"
+        },
+        {
+          "fieldName": "tenant"
         }
       ]
     },
