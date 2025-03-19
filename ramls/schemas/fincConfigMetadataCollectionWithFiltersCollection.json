@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "description": "Collection of metadata collections with filters in finc config",
+  "javaType": "org.folio.rest.jaxrs.model.FincConfigMetadataCollectionWithFiltersCollection",
+  "properties": {
+    "fincConfigMetadataCollections": {
+      "type": "array",
+      "description": "List of metadata collections with filters in finc config",
+      "items": {
+        "type": "object",
+        "$ref": "fincConfigMetadataCollectionWithFilters.json"
+      }
+    },
+    "totalRecords": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "fincConfigMetadataCollections",
+    "totalRecords"
+  ]
+}

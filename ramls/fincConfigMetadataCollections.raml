@@ -10,6 +10,8 @@ documentation:
 types:
   fincConfigMetadataCollection: !include schemas/fincConfigMetadataCollection.json
   fincConfigMetadataCollections: !include schemas/fincConfigMetadataCollections.json
+  fincConfigMetadataCollectionWithFilters: !include schemas/fincConfigMetadataCollectionWithFilters.json
+  fincConfigMetadataCollectionWithFiltersCollection: !include schemas/fincConfigMetadataCollectionWithFiltersCollection.json
   errors: !include ./raml-util/schemas/errors.schema
 
 traits:
@@ -17,6 +19,7 @@ traits:
   pageable: !include ./raml-util/traits/pageable.raml
   searchable: !include ./raml-util/traits/searchable.raml
   validate: !include ./raml-util/traits/validation.raml
+  include_filtered_by: !include ./traits/include_filtered_by.raml
 
 resourceTypes:
   collection: !include ./raml-util/rtypes/collection.raml
@@ -34,9 +37,15 @@ resourceTypes:
     is: [
       searchable: {description: "", example: "((label=\"Science*\") and metadataAvailable=(\"yes\" or \"no\")) sortby label"},
       orderable: {fieldsList: "label, mdSource, metadataAvailable, usageRestricted, permittedFor, freeContent"},
-      pageable
+      pageable,
+      include_filtered_by
     ]
     description: Get all metadata collections
+    responses:
+      200:
+        body:
+          application/json:
+            type: fincConfigMetadataCollectionWithFiltersCollection
   post:
     is: [validate]
     description: Post new metadata collection
@@ -46,7 +55,13 @@ resourceTypes:
         exampleItem: !include examples/fincConfigMetadataCollection.sample
         schema: fincConfigMetadataCollection
     get:
+      is: [include_filtered_by]
       description: Get one metadata collection identified by id
+      responses:
+        200:
+          body:
+            application/json:
+              type: fincConfigMetadataCollectionWithFilters
     delete:
       description: Delete an metadata collection identified by id
     put:
