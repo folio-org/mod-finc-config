@@ -27,7 +27,7 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class UnselectMetadataSourceVerticleTest {
+public class ITUnselectMetadataSourceVerticle {
 
   private static final String TENANT_UBL = "ubl";
   private static Vertx vertx;

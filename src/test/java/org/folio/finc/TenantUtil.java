@@ -9,7 +9,7 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.folio.finc.select.SelectMetadataSourceVerticleTest;
+import org.folio.finc.select.ITSelectMetadataSourceVerticle;
 import org.folio.okapi.common.XOkapiHeaders;
 import org.folio.rest.impl.TenantReferenceApi;
 import org.folio.rest.jaxrs.model.*;
@@ -26,7 +26,7 @@ import java.util.Map;
 
 public class TenantUtil {
 
-  private static final Logger logger = LogManager.getLogger(SelectMetadataSourceVerticleTest.class);
+  private static final Logger logger = LogManager.getLogger(TenantUtil.class);
   private static final String TENANT_UBL = "ubl";
   private static final String TENANT_DIKU = "diku";
 

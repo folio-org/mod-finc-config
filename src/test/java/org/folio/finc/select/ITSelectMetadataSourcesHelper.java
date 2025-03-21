@@ -33,7 +33,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class SelectMetadataSourcesHelperTest {
+public class ITSelectMetadataSourcesHelper {
 
   private static final String TENANT_UBL = "ubl";
   private static Vertx vertx;
