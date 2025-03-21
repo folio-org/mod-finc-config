@@ -48,10 +48,10 @@ public class ApiTestBase {
 
   @BeforeClass
   public static void before() throws Exception {
-    if (ApiTestSuite.isNotInitialised()) {
+    if (ITTestSuiteJunit4.isNotInitialised()) {
       System.out.println("Running test on own, initialising suite manually");
       runningOnOwn = true;
-      ApiTestSuite.before();
+      ITTestSuiteJunit4.before();
     }
   }
 
@@ -64,7 +64,7 @@ public class ApiTestBase {
   public static void after() throws InterruptedException, ExecutionException, TimeoutException {
     if (runningOnOwn) {
       System.out.println("Running test on own, un-initialising suite manually");
-      ApiTestSuite.after();
+      ITTestSuiteJunit4.after();
     }
   }
 

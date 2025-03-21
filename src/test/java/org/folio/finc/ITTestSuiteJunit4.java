@@ -23,6 +23,7 @@ import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
+import org.folio.rest.tools.utils.VertxUtils;
 import org.folio.rest.utils.Constants;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -31,30 +32,22 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-  ConfigMetadataCollectionsIT.class,
-  ConfigMetadataSourcesIT.class,
-  ConfigFiltersIT.class,
-  ConfigFilesIT.class,
   ConfigContactsIT.class,
-  FincSelectFilesIT.class,
-  FincSelectFiltersIT.class,
-  IsilsIT.class,
-  SelectMetadataCollectionsIT.class,
-  SelectMetadataSourcesIT.class,
-  TinyMetadataSourcesIT.class,
-  FilterHelperTest.class,
+  ConfigEZBCredentialsIT.class,
+  ConfigFilesIT.class,
+  ConfigFiltersIT.class,
   ConfigMetadataCollectionsIT.class,
   ConfigMetadataSourcesIT.class,
+  FilterHelperIT.class,
   FincSelectFilesIT.class,
   FincSelectFiltersIT.class,
   IsilsIT.class,
+  SelectEZBCredentialsIT.class,
   SelectMetadataCollectionsIT.class,
   SelectMetadataSourcesIT.class,
   TinyMetadataSourcesIT.class,
-  ConfigEZBCredentialsIT.class,
-  SelectEZBCredentialsIT.class
 })
-public class ApiTestSuite {
+public class ITTestSuiteJunit4 {
 
   public static final String TENANT_UBL = "ubl";
   public static final String TENANT_DIKU = "diku";

@@ -31,7 +31,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class FilterHelperTest extends ApiTestBase {
+public class FilterHelperIT extends ApiTestBase {
 
   private static final String TEST_CONTENT = "This is the test content!!!!";
   @Rule public Timeout timeout = Timeout.seconds(10);

@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class EZBHarvestJobITest extends AbstractEZBHarvestJobTest {
+public class ITEZBHarvestJob extends AbstractEZBHarvestJobTest {
 
   private static final EZBHarvestJob EZB_JOB = new EZBHarvestJob(new EZBServiceMock());
   private static final Date DATE =

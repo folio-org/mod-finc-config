@@ -32,7 +32,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class TenantITest {
+public class ITTenant {
 
   @Rule public Timeout timeout = Timeout.seconds(10);
   @Rule public WireMockRule wireMockRule = new WireMockRule(options().dynamicPort());
@@ -116,7 +116,7 @@ public class TenantITest {
     TenantAttributes attributes =
         new TenantAttributes()
             .withModuleTo(null)
-            .withModuleFrom(ApiTestSuite.getModuleVersion())
+            .withModuleFrom(ITTestSuiteJunit4.getModuleVersion())
             .withPurge(false);
     given()
         .body(attributes)
@@ -141,7 +141,7 @@ public class TenantITest {
     TenantAttributes purgeAttributes =
         new TenantAttributes()
             .withModuleTo(null)
-            .withModuleFrom(ApiTestSuite.getModuleVersion())
+            .withModuleFrom(ITTestSuiteJunit4.getModuleVersion())
             .withPurge(true);
     given()
         .body(purgeAttributes)

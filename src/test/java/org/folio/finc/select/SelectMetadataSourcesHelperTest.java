@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.folio.finc.ApiTestSuite;
+import org.folio.finc.ITTestSuiteJunit4;
 import org.folio.finc.TenantUtil;
 import org.folio.postgres.testing.PostgresTesterContainer;
 import org.folio.rest.RestVerticle;
@@ -89,10 +89,10 @@ public class SelectMetadataSourcesHelperTest {
           new TenantClient(url, Constants.MODULE_TENANT, Constants.MODULE_TENANT, webClient);
       TenantClient tenantClientUbl = new TenantClient(url, TENANT_UBL, TENANT_UBL, webClient);
       tenantClientFinc.postTenant(
-          new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
+          new TenantAttributes().withModuleTo(ITTestSuiteJunit4.getModuleVersion()),
           fincFuture::complete);
       tenantClientUbl.postTenant(
-          new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
+          new TenantAttributes().withModuleTo(ITTestSuiteJunit4.getModuleVersion()),
           ublFuture::complete);
       fincFuture.get(30, TimeUnit.SECONDS);
       ublFuture.get(30, TimeUnit.SECONDS);

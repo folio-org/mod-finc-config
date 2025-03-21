@@ -185,7 +185,7 @@ public class TenantUtil {
       headers.put(XOkapiHeaders.URL, "http://localhost:" + port);
       new TenantReferenceApi()
           .postTenant(
-              new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
+              new TenantAttributes().withModuleTo(ITTestSuiteJunit4.getModuleVersion()),
               headers,
               res -> {
                 if (res.result().getStatus() == 201) {
@@ -222,7 +222,7 @@ public class TenantUtil {
       headers.put(XOkapiHeaders.URL, "http://localhost:" + port);
       new TenantReferenceApi()
           .postTenant(
-              new TenantAttributes().withModuleTo(ApiTestSuite.getModuleVersion()),
+              new TenantAttributes().withModuleTo(ITTestSuiteJunit4.getModuleVersion()),
               headers,
               res -> {
                 if (res.result().getStatus() == 201) {

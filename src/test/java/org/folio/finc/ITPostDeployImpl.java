@@ -32,7 +32,7 @@ import org.quartz.listeners.JobListenerSupport;
 import org.quartz.listeners.SchedulerListenerSupport;
 
 @RunWith(VertxUnitRunner.class)
-public class PostDeployImplITest {
+public class ITPostDeployImpl {
 
   private static final Vertx vertx = VertxUtils.getVertxFromContextOrNew();
 
