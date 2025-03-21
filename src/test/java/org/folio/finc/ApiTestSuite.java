@@ -62,13 +62,11 @@ public class ApiTestSuite {
   private static Vertx vertx;
   private static boolean initialised = false;
 
-  static {
-    vertx = Vertx.vertx();
-  }
-
   @BeforeClass
   public static void before()
       throws IOException, InterruptedException, ExecutionException, TimeoutException {
+
+    vertx = Vertx.vertx();
 
     PostgresClient.setPostgresTester(new PostgresTesterContainer());
     PostgresClient client = PostgresClient.getInstance(vertx);

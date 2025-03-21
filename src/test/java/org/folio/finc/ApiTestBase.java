@@ -2,16 +2,30 @@ package org.folio.finc;
 
 import io.restassured.http.ContentType;
 import io.vertx.core.json.Json;
+
+import org.folio.okapi.common.XOkapiHeaders;
 import org.folio.rest.jaxrs.model.Isil;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import static com.google.common.net.HttpHeaders.ACCEPT;
+import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
+import static com.google.common.net.MediaType.JSON_UTF_8;
+import static com.google.common.net.MediaType.OCTET_STREAM;
 import static io.restassured.RestAssured.given;
+import static org.folio.okapi.common.XOkapiHeaders.TENANT;
+
+import javax.print.attribute.standard.Media;
+
+import com.google.common.net.HttpHeaders;
+import com.google.common.net.MediaType;
 
 public class ApiTestBase {
 
@@ -43,7 +57,6 @@ public class ApiTestBase {
 
   @BeforeClass
   public static void before() throws Exception {
-
     if (ApiTestSuite.isNotInitialised()) {
       System.out.println("Running test on own, initialising suite manually");
       runningOnOwn = true;
@@ -51,16 +64,25 @@ public class ApiTestBase {
     }
   }
 
+  @BeforeAll
+  static void beforeAll() throws Exception {
+    before();
+  }
+
   @AfterClass
   public static void after() throws InterruptedException, ExecutionException, TimeoutException {
-
     if (runningOnOwn) {
       System.out.println("Running test on own, un-initialising suite manually");
       ApiTestSuite.after();
     }
   }
 
-  public Isil loadIsilUbl() {
+  @AfterAll
+  static void afterAll() throws ExecutionException, InterruptedException, TimeoutException {
+    after();
+  }
+
+  public static Isil loadIsilUbl() {
     Isil isil =
         new Isil()
             .withId(UUID.randomUUID().toString())
@@ -70,7 +92,7 @@ public class ApiTestBase {
     return loadIsil(isil);
   }
 
-  public Isil loadIsilDiku() {
+  public static Isil loadIsilDiku() {
     Isil isil =
         new Isil()
             .withId(UUID.randomUUID().toString())
@@ -80,7 +102,7 @@ public class ApiTestBase {
     return loadIsil(isil);
   }
 
-  public Isil loadIsil(Isil isil) {
+  public static Isil loadIsil(Isil isil) {
     Isil isilResp =
         given()
             .body(Json.encode(isil))
@@ -103,5 +125,40 @@ public class ApiTestBase {
         .delete(ISILS_API_ENDPOINT + "/" + isilId)
         .then()
         .statusCode(204);
+  }
+
+  public static String post(String endpoint, Object entity, String tenantId) {
+    return given()
+        .body(Json.encode(entity))
+        .header(TENANT, tenantId)
+        .header(CONTENT_TYPE, JSON_UTF_8.withoutParameters().toString())
+        .post(endpoint)
+        .then()
+        .statusCode(201)
+        .extract()
+        .jsonPath()
+        .getString("id");
+  }
+
+  public static void put(String endpoint, Object entity, String tenantId) {
+    given()
+      .body(Json.encode(entity))
+      .header(TENANT, tenantId)
+      .header(CONTENT_TYPE, JSON_UTF_8.withoutParameters().toString())
+      .put(endpoint)
+      .then()
+      .statusCode(200);
+  }
+
+  public static String postFile(String content, String tenantId) {
+    return given()
+      .body(content.getBytes())
+      .header(TENANT, tenantId)
+      .header(CONTENT_TYPE, OCTET_STREAM.toString())
+      .post(FINC_SELECT_FILES_ENDPOINT)
+      .then()
+      .statusCode(200)
+      .extract()
+      .asString();
   }
 }
