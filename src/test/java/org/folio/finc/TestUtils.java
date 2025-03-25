@@ -1,5 +1,7 @@
 package org.folio.finc;
 
+import static org.folio.finc.ApiTestBase.APPLICATION_JSON;
+import static org.folio.finc.ApiTestBase.CONTENT_TYPE;
 import static org.folio.rest.utils.Constants.MODULE_TENANT;
 
 import io.restassured.RestAssured;
@@ -9,12 +11,10 @@ import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClient;
-
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
-
 import org.folio.postgres.testing.PostgresTesterContainer;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
@@ -27,6 +27,7 @@ public class TestUtils {
 
   public static final String TENANT_UBL = "ubl";
   public static final String TENANT_DIKU = "diku";
+
   private static final Vertx vertx = Vertx.vertx();
   static final WebClient WEB_CLIENT = WebClient.create(vertx);
   private static final int verticlePort = NetworkUtils.nextFreePort();
@@ -116,6 +117,7 @@ public class TestUtils {
     RestAssured.baseURI = BASE_URI;
     RestAssured.port = verticlePort;
     RestAssured.defaultParser = Parser.JSON;
+    RestAssured.requestSpecification = RestAssured.given().header(CONTENT_TYPE, APPLICATION_JSON);
   }
 
   public static void resetRestAssured() {
