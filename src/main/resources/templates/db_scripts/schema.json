@@ -3,7 +3,7 @@
     {
       "run": "after",
       "snippetPath": "views.sql",
-      "fromModuleVersion": "mod-finc-config-3.0.0"
+      "fromModuleVersion": "mod-finc-config-6.2.0"
     },
     {
       "run": "after",
@@ -227,7 +227,8 @@
     },
     {
       "tableName": "filter_to_collections",
-      "fromModuleVersion": "mod-finc-config-2.0.0",
+      "fromModuleVersion": "mod-finc-config-6.2.0",
+      "customSnippetPath": "filter_to_collections.sql",
       "withMetadata": true
     },
     {

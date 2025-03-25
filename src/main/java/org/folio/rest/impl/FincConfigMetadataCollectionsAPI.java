@@ -1,56 +1,54 @@
 package org.folio.rest.impl;
 
-import static org.folio.rest.impl.Messages.MSG_INTERNAL_SERVER_ERROR;
+import static org.folio.okapi.common.XOkapiHeaders.TENANT;
+import static org.folio.rest.utils.Constants.MODULE_TENANT;
 
 import io.vertx.core.*;
+import java.util.Map;
+import javax.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.folio.cql2pgjson.CQL2PgJSON;
-import org.folio.cql2pgjson.exception.FieldException;
 import org.folio.finc.dao.MetadataSourcesDAO;
 import org.folio.finc.dao.MetadataSourcesDAOImpl;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
+import org.folio.rest.jaxrs.model.FincConfigMetadataCollectionWithFilters;
+import org.folio.rest.jaxrs.model.FincConfigMetadataCollectionWithFiltersCollection;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollectionsGetOrder;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.folio.rest.jaxrs.model.MdSource;
 import org.folio.rest.jaxrs.resource.FincConfigMetadataCollections;
-import org.folio.rest.persist.Criteria.Limit;
-import org.folio.rest.persist.Criteria.Offset;
 import org.folio.rest.persist.PgUtil;
-import org.folio.rest.persist.PostgresClient;
-import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.utils.Constants;
-
-import javax.ws.rs.core.Response;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Manages metadata collections for ui-finc-config
  *
- * ATTENTION: API works tenant agnostic. Thus, don't use 'x-okapi-tenant' header, but {@value
+ * <p>ATTENTION: API works tenant agnostic. Thus, don't use 'x-okapi-tenant' header, but {@value
  * Constants#MODULE_TENANT} as tenant.
  */
 public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataCollections {
 
   private static final String TABLE_NAME = "metadata_collections";
+  private static final String TABLE_NAME_W_FILTERS = "metadata_collections_w_filters";
+  private static final MetadataSourcesDAO metadataSourcesDAO = new MetadataSourcesDAOImpl();
   private final Logger logger = LogManager.getLogger(FincConfigMetadataCollectionsAPI.class);
 
-  private MetadataSourcesDAO metadataSourcesDAO;
-
-  public FincConfigMetadataCollectionsAPI(Vertx vertx, String tenantId) {
-    PostgresClient.getInstance(vertx);
-    metadataSourcesDAO = new MetadataSourcesDAOImpl();
+  private String determineTableName(boolean includeFilteredBy) {
+    return includeFilteredBy ? TABLE_NAME_W_FILTERS : TABLE_NAME;
   }
 
-  private CQLWrapper getCQL(String query, int limit, int offset) throws FieldException {
-    CQL2PgJSON cql2PgJSON = new CQL2PgJSON(Arrays.asList(TABLE_NAME + ".jsonb"));
-    return new CQLWrapper(cql2PgJSON, query)
-        .setLimit(new Limit(limit))
-        .setOffset(new Offset(offset));
+  private Class<?> determineClass(boolean includeFilteredBy) {
+    return includeFilteredBy
+        ? FincConfigMetadataCollectionWithFilters.class
+        : FincConfigMetadataCollection.class;
+  }
+
+  private Class<?> determineCollectionClass(boolean includeFilteredBy) {
+    return includeFilteredBy
+        ? FincConfigMetadataCollectionWithFiltersCollection.class
+        : org.folio.rest.jaxrs.model.FincConfigMetadataCollections.class;
   }
 
   @Override
@@ -62,100 +60,25 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
       String totalRecords,
       int offset,
       int limit,
+      boolean includeFilteredBy,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
+
     logger.debug("Getting metadata collections");
-    try {
-      CQLWrapper cql = getCQL(query, limit, offset);
-      vertxContext.runOnContext(
-          v -> {
-            String tenantId = Constants.MODULE_TENANT;
-            String field = "*";
-            String[] fieldList = {field};
-            try {
-              PostgresClient.getInstance(vertxContext.owner(), tenantId)
-                  .get(
-                      TABLE_NAME,
-                      FincConfigMetadataCollection.class,
-                      fieldList,
-                      cql,
-                      true,
-                      false,
-                      reply -> {
-                        try {
-                          if (reply.succeeded()) {
-                            org.folio.rest.jaxrs.model.FincConfigMetadataCollections
-                                collectionsCollection =
-                                    new org.folio.rest.jaxrs.model.FincConfigMetadataCollections();
-                            List<FincConfigMetadataCollection> results =
-                                reply.result().getResults();
-                            collectionsCollection.setFincConfigMetadataCollections(results);
-                            collectionsCollection.setTotalRecords(
-                                reply.result().getResultInfo().getTotalRecords());
-                            asyncResultHandler.handle(
-                                Future.succeededFuture(
-                                    GetFincConfigMetadataCollectionsResponse
-                                        .respond200WithApplicationJson(collectionsCollection)));
-                          } else {
-                            asyncResultHandler.handle(
-                                Future.succeededFuture(
-                                    GetFincConfigMetadataCollectionsResponse
-                                        .respond500WithTextPlain(MSG_INTERNAL_SERVER_ERROR)));
-                          }
-                        } catch (Exception e) {
-                          logger.debug(e.getLocalizedMessage());
-                          asyncResultHandler.handle(
-                              Future.succeededFuture(
-                                  GetFincConfigMetadataCollectionsResponse.respond500WithTextPlain(
-                                      MSG_INTERNAL_SERVER_ERROR)));
-                        }
-                      });
-            } catch (IllegalStateException e) {
-              logger.debug("IllegalStateException: {}", e.getLocalizedMessage());
-              asyncResultHandler.handle(
-                  Future.succeededFuture(
-                      GetFincConfigMetadataCollectionsResponse.respond400WithTextPlain(
-                          "CQL Illegal State Error for '" + "" + "': " + e.getLocalizedMessage())));
-            } catch (Exception e) {
-              Throwable cause = e;
-              while (cause.getCause() != null) {
-                cause = cause.getCause();
-              }
-              logger.debug(
-                  String.format(
-                      "Got error %s: %s",
-                      cause.getClass().getSimpleName(), e.getLocalizedMessage()));
-              if (cause.getClass().getSimpleName().contains("CQLParseException")) {
-                logger.debug("BAD CQL");
-                asyncResultHandler.handle(
-                    Future.succeededFuture(
-                        GetFincConfigMetadataCollectionsResponse.respond400WithTextPlain(
-                            "CQL Parsing Error for '" + "" + "': " + cause.getLocalizedMessage())));
-              } else {
-                asyncResultHandler.handle(
-                    io.vertx.core.Future.succeededFuture(
-                        GetFincConfigMetadataCollectionsResponse.respond500WithTextPlain(
-                            MSG_INTERNAL_SERVER_ERROR)));
-              }
-            }
-          });
-    } catch (Exception e) {
-      logger.error(e.getLocalizedMessage(), e);
-      if (e.getCause() != null
-          && e.getCause().getClass().getSimpleName().contains("CQLParseException")) {
-        logger.debug("BAD CQL");
-        asyncResultHandler.handle(
-            Future.succeededFuture(
-                GetFincConfigMetadataCollectionsResponse.respond400WithTextPlain(
-                    "CQL Parsing Error for '" + "" + "': " + e.getLocalizedMessage())));
-      } else {
-        asyncResultHandler.handle(
-            io.vertx.core.Future.succeededFuture(
-                GetFincConfigMetadataCollectionsResponse.respond500WithTextPlain(
-                    MSG_INTERNAL_SERVER_ERROR)));
-      }
-    }
+
+    okapiHeaders.put(TENANT, MODULE_TENANT);
+    PgUtil.get(
+        determineTableName(includeFilteredBy),
+        determineClass(includeFilteredBy),
+        determineCollectionClass(includeFilteredBy),
+        query,
+        offset,
+        limit,
+        okapiHeaders,
+        vertxContext,
+        org.folio.rest.impl.GetFincConfigMetadataCollectionsResponse.class,
+        asyncResultHandler);
   }
 
   @Override
@@ -166,7 +89,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     logger.debug("Posting metadata collection");
-    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
+    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, MODULE_TENANT);
 
     this.addMdSourceNameTo(entity, vertxContext)
         .onComplete(
@@ -193,18 +116,19 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
   @Validate
   public void getFincConfigMetadataCollectionsById(
       String id,
+      boolean includeFilteredBy,
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     logger.debug("Getting single metadata collection by id: {}", id);
-    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
+    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, MODULE_TENANT);
     PgUtil.getById(
-        TABLE_NAME,
-        FincConfigMetadataCollection.class,
+        determineTableName(includeFilteredBy),
+        determineClass(includeFilteredBy),
         id,
         okapiHeaders,
         vertxContext,
-        GetFincConfigMetadataCollectionsByIdResponse.class,
+        org.folio.rest.impl.GetFincConfigMetadataCollectionsResponse.class,
         asyncResultHandler);
   }
 
@@ -216,7 +140,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     logger.debug("Delete metadata collection: {}", id);
-    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
+    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, MODULE_TENANT);
     PgUtil.deleteById(
         TABLE_NAME,
         id,
@@ -235,7 +159,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     logger.debug("Update metadata collection: {}", id);
-    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
+    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, MODULE_TENANT);
 
     this.addMdSourceNameTo(entity, vertxContext)
         .onComplete(

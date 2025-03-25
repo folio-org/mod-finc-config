@@ -169,6 +169,6 @@ public class TenantITest {
         .header("accept", ContentType.JSON)
         .get(FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT)
         .then()
-        .statusCode(500);
+        .statusCode(400);
   }
 }

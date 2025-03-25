@@ -1,0 +1,155 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Metadata Collection With Filters Schema",
+  "description": "Metadata collection with filters in finc config",
+  "type": "object",
+  "javaType": "org.folio.rest.jaxrs.model.FincConfigMetadataCollectionWithFilters",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string",
+      "description": "A unique name for this metadata collection"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description for this metadata collection"
+    },
+    "mdSource": {
+      "type": "object",
+      "description": "The metadata source this metadata collection belongs to",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Id of linked metadata source"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of linked metadata source"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "metadataAvailable": {
+      "type": "string",
+      "description": "Indicates if metadata is available",
+      "enum": [
+        "yes",
+        "no",
+        "undetermined"
+      ]
+    },
+    "usageRestricted": {
+      "type": "string",
+      "description": "Indicates if usage is restricted",
+      "enum": [
+        "yes",
+        "no"
+      ]
+    },
+    "permittedFor": {
+      "type": "array",
+      "description": "List of isils (libraries) this metadata collection is permitted for",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
+    },
+    "freeContent": {
+      "type": "string",
+      "description": "Indicator is content is free",
+      "enum": [
+        "yes",
+        "no",
+        "undetermined"
+      ]
+    },
+    "lod": {
+      "type": "object",
+      "description": "Indicator if LOD publication is permitted",
+      "properties": {
+        "publication": {
+          "type": "string",
+          "description": "Indicator if publication is permitted",
+          "enum": [
+            "yes",
+            "no",
+            "undetermined"
+          ]
+        },
+        "note": {
+          "type": "string",
+          "description": "Note to LOD publication"
+        }
+      }
+    },
+    "collectionId": {
+      "type": "string",
+      "description": "Id of the collection"
+    },
+    "productIsil": {
+      "type": "string",
+      "description": "Isil of product"
+    },
+    "tickets": {
+      "type": "array",
+      "description": "List of links to corresponding tickets",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
+    },
+    "contentFiles": {
+      "type": "array",
+      "description": "URL to linked content file",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
+    },
+    "solrMegaCollections": {
+      "type": "array",
+      "description": "Link to solr mega collections",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
+    },
+    "selectedBy": {
+      "type": "array",
+      "description": "List of isils which selected this metadata collection",
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
+    },
+    "filteredBy": {
+      "type": "array",
+      "description": "List of filters which include this metadata collection",
+      "items": {
+        "type": "object",
+        "$ref": "fincSelectFilter.json"
+      }
+    },
+    "generalNotes": {
+      "type": "string",
+      "description": "Some notes"
+    },
+    "metadata": {
+      "description": "Metadata about creation and changes, provided by the server (client should not provide)",
+      "type": "object",
+      "$ref": "../raml-util/schemas/metadata.schema"
+    }
+  },
+  "required": [
+    "id",
+    "collectionId",
+    "label",
+    "usageRestricted",
+    "solrMegaCollections"
+  ],
+  "additionalProperties": false
+}
