@@ -1,5 +1,7 @@
 package org.folio.finc.select;
 
+import static org.folio.TestUtils.TENANT_UBL;
+
 import io.vertx.core.Vertx;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -20,7 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class ITSelectMetadataSourcesHelper extends ApiTestBase {
+public class ITSelectMetadataSourcesHelper {
 
   private static final Vertx vertx = TestUtils.getVertx();
   private static SelectMetadataSourcesHelper cut;
