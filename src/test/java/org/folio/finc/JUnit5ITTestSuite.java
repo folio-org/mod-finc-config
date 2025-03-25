@@ -1,6 +1,5 @@
-package org.folio.finc.select;
+package org.folio.finc;
 
-import org.folio.finc.ApiTestSuite;
 import org.folio.finc.config.ConfigMetadataCollectionsWithFiltersIT;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
