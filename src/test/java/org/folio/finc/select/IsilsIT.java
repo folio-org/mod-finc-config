@@ -11,10 +11,13 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.util.UUID;
 import org.folio.finc.ApiTestBase;
+import org.folio.finc.TestUtils;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.jaxrs.model.Isils;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +28,16 @@ public class IsilsIT extends ApiTestBase {
   @Rule
   public Timeout timeout = Timeout.seconds(10);
   private Isil isilUBL;
+
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    TestUtils.setupTenants();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    TestUtils.teardownTenants();
+  }
 
   @Before
   public void init() {

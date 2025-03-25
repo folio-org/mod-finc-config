@@ -1,15 +1,9 @@
 package org.folio.finc;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
-
 import org.folio.finc.config.*;
 import org.folio.finc.select.*;
-import org.folio.rest.persist.PostgresClient;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 

@@ -7,9 +7,12 @@ import io.vertx.core.json.Json;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.finc.ApiTestBase;
+import org.folio.finc.TestUtils;
 import org.folio.rest.jaxrs.model.Credential;
 import org.hamcrest.Matchers;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +25,17 @@ public class ConfigEZBCredentialsIT extends ApiTestBase {
   private Credential credential;
   private Credential credentialChanged;
 
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    TestUtils.setupTenants();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    TestUtils.teardownTenants();
+  }
+
+
   @Before
   public void init() {
     credential = new Credential()
@@ -30,7 +44,7 @@ public class ConfigEZBCredentialsIT extends ApiTestBase {
         .withPassword("password01")
         .withUser("user01");
 
-    credentialChanged = credential.withPassword("password01CHANGED");
+    credentialChanged = credential.withPassword("password01CHANGED"); // TODO: fix this
   }
 
   @Test

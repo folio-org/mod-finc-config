@@ -7,11 +7,14 @@ import io.vertx.core.json.Json;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.finc.ApiTestBase;
+import org.folio.finc.TestUtils;
 import org.folio.rest.jaxrs.model.Credential;
 import org.folio.rest.jaxrs.model.Isil;
 import org.hamcrest.Matchers;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +26,16 @@ public class SelectEZBCredentialsIT extends ApiTestBase {
   public Timeout timeout = Timeout.seconds(10);
   private Credential credDiku;
   private Isil isilDiku;
+
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    TestUtils.setupTenants();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    TestUtils.teardownTenants();
+  }
 
   @Before
   public void init() {

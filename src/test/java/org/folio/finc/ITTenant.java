@@ -4,12 +4,14 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 import static io.restassured.RestAssured.given;
 import static org.folio.okapi.common.XOkapiHeaders.TENANT;
 import static org.folio.okapi.common.XOkapiHeaders.URL;
+import static org.folio.rest.utils.Constants.MODULE_TENANT;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.rest.jaxrs.model.TenantAttributes;
-import org.folio.rest.utils.Constants;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +21,16 @@ public class ITTenant extends ApiTestBase {
 
   @Rule public Timeout timeout = Timeout.seconds(10);
   @Rule public WireMockRule wireMockRule = new WireMockRule(options().dynamicPort());
+
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    TestUtils.setupTenants();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    TestUtils.teardownTenants();
+  }
 
   @Test
   public void testDeactivateAndPurge() {
@@ -63,7 +75,7 @@ public class ITTenant extends ApiTestBase {
     // Deactivate module with tenant finc
     given()
         .body(purgeAttributes)
-        .header(TENANT, Constants.MODULE_TENANT)
+        .header(TENANT, MODULE_TENANT)
         .header(URL, mockedOkapiUrl)
         .post(TENANT_ENDPOINT)
         .then()

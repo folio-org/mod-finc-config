@@ -13,6 +13,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.util.Arrays;
 import java.util.UUID;
 import org.folio.finc.ApiTestBase;
+import org.folio.finc.TestUtils;
 import org.folio.finc.mocks.MockOrganization;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection.UsageRestricted;
@@ -25,7 +26,9 @@ import org.folio.rest.jaxrs.model.MdSource;
 import org.folio.rest.jaxrs.model.Organization;
 import org.folio.rest.jaxrs.model.SelectedBy;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +42,16 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
   private Organization organizationUUID1234;
   private Isil isilUBL;
   private Isil isilDiku;
+
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    TestUtils.setupTenants();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    TestUtils.teardownTenants();
+  }
 
   @Before
   public void init() {

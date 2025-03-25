@@ -40,12 +40,10 @@ public class TestUtils {
     setupRestAssured();
     setupPostgres();
     deployRestVerticle();
-    setupTenants();
     isTestSuiteRunning = true;
   }
 
   public static void teardownTestSuite() throws Exception {
-    teardownTenants();
     undeployRestVerticle();
     teardownPostgres();
     resetRestAssured();
