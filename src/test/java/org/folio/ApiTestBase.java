@@ -1,4 +1,4 @@
-package org.folio.finc;
+package org.folio;
 
 import static io.restassured.RestAssured.given;
 import static org.folio.okapi.common.XOkapiHeaders.TENANT;

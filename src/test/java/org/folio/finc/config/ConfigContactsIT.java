@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import io.restassured.http.ContentType;
 import io.vertx.core.json.Json;
 
-import org.folio.finc.TestUtils;
+import org.folio.TestUtils;
 import org.folio.finc.mocks.MockOrganization;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

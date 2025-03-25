@@ -7,7 +7,7 @@ import io.restassured.http.ContentType;
 import io.vertx.core.json.Json;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
-import org.folio.finc.TestUtils;
+import org.folio.TestUtils;
 import org.folio.finc.mocks.MockOrganization;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
 import org.junit.AfterClass;

@@ -1,4 +1,4 @@
-package org.folio.finc;
+package org.folio;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -9,7 +9,6 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.folio.finc.select.ITSelectMetadataSourceVerticle;
 import org.folio.okapi.common.XOkapiHeaders;
 import org.folio.rest.impl.TenantReferenceApi;
 import org.folio.rest.jaxrs.model.*;

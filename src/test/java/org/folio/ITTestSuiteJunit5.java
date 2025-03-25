@@ -1,4 +1,4 @@
-package org.folio.finc;
+package org.folio;
 
 import org.folio.finc.config.ConfigMetadataCollectionsWithFiltersIT;
 import org.junit.jupiter.api.AfterAll;

@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.folio.finc.TenantUtil;
+import org.folio.TenantUtil;
 import org.folio.finc.select.verticles.UnselectMetadataSourceVerticle;
 import org.folio.postgres.testing.PostgresTesterContainer;
 import org.folio.rest.RestVerticle;

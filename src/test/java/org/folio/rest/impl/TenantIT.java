@@ -1,4 +1,4 @@
-package org.folio.finc;
+package org.folio.rest.impl;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static io.restassured.RestAssured.given;
@@ -9,6 +9,9 @@ import static org.folio.rest.utils.Constants.MODULE_TENANT;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+
+import org.folio.ApiTestBase;
+import org.folio.TestUtils;
 import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -17,7 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class ITTenant extends ApiTestBase {
+public class TenantIT extends ApiTestBase {
 
   @Rule public Timeout timeout = Timeout.seconds(10);
   @Rule public WireMockRule wireMockRule = new WireMockRule(options().dynamicPort());

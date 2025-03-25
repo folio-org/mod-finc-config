@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.ObjectUtils;
 import org.assertj.core.api.ThrowingConsumer;
-import org.folio.finc.ApiTestBase;
+import org.folio.ApiTestBase;
 import org.folio.rest.jaxrs.model.FilterFile;
 import org.folio.rest.jaxrs.model.FilteredBy;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
