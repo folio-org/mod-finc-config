@@ -5,7 +5,6 @@ import static com.google.common.net.MediaType.JSON_UTF_8;
 import static com.google.common.net.MediaType.PLAIN_TEXT_UTF_8;
 
 import javax.ws.rs.core.Response;
-
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollectionWithFilters;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollectionWithFiltersCollection;
@@ -40,14 +39,14 @@ public class GetFincConfigMetadataCollectionsResponse extends ResponseDelegate {
   }
 
   public static GetFincConfigMetadataCollectionsResponse respond200WithApplicationJson(
-    FincConfigMetadataCollection entity) {
+      FincConfigMetadataCollection entity) {
     Response.ResponseBuilder responseBuilder = Response.status(200).header(CONTENT_TYPE, JSON);
     responseBuilder.entity(entity);
     return new GetFincConfigMetadataCollectionsResponse(responseBuilder.build(), entity);
   }
 
   public static GetFincConfigMetadataCollectionsResponse respond200WithApplicationJson(
-    FincConfigMetadataCollectionWithFilters entity) {
+      FincConfigMetadataCollectionWithFilters entity) {
     Response.ResponseBuilder responseBuilder = Response.status(200).header(CONTENT_TYPE, JSON);
     responseBuilder.entity(entity);
     return new GetFincConfigMetadataCollectionsResponse(responseBuilder.build(), entity);
@@ -69,7 +68,7 @@ public class GetFincConfigMetadataCollectionsResponse extends ResponseDelegate {
 
   public static GetFincConfigMetadataCollectionsResponse respond404WithTextPlain(Object entity) {
     Response.ResponseBuilder responseBuilder =
-      Response.status(404).header(CONTENT_TYPE, PLAIN_TEXT);
+        Response.status(404).header(CONTENT_TYPE, PLAIN_TEXT);
     responseBuilder.entity(entity);
     return new GetFincConfigMetadataCollectionsResponse(responseBuilder.build(), entity);
   }
