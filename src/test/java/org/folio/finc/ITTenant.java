@@ -32,74 +32,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class ITTenant {
+public class ITTenant extends ApiTestBase {
 
   @Rule public Timeout timeout = Timeout.seconds(10);
   @Rule public WireMockRule wireMockRule = new WireMockRule(options().dynamicPort());
 
-  private static final String TENANT_UBL = "ubl";
-  private static final String TENANT_DIKU = "diku";
   private static final String FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT =
       "/finc-config/metadata-collections";
   private static final String TENANT_ENDPOINT = "/_/tenant";
 
-  private static Vertx vertx;
-  private static int port;
-
-  @BeforeClass
-  public static void setUp(TestContext context)
-      throws InterruptedException, ExecutionException, TimeoutException {
-    vertx = Vertx.vertx();
-    PostgresClient.setPostgresTester(new PostgresTesterContainer());
-    PostgresClient.getInstance(vertx);
-
-    port = NetworkUtils.nextFreePort();
-
-    RestAssured.reset();
-    RestAssured.baseURI = "http://localhost";
-    RestAssured.port = port;
-    RestAssured.defaultParser = Parser.JSON;
-    DeploymentOptions options =
-        new DeploymentOptions()
-            .setConfig(new JsonObject().put("http.port", port).put("testing", true));
-    startVerticle(options, context);
-    prepareTenants(context);
-  }
-
-  private static void startVerticle(DeploymentOptions options, TestContext context) {
-    vertx.deployVerticle(RestVerticle.class.getName(), options, context.asyncAssertSuccess());
-  }
-
-  public static void prepareTenants(TestContext context) {
-    Async async = context.async();
-    TenantUtil tenantUtil = new TenantUtil();
-    tenantUtil
-        .postFincTenant(port, vertx, context)
-        .onSuccess(
-            fincResp ->
-                tenantUtil
-                    .postUBLTenant(port, vertx)
-                    .onSuccess(
-                        ublResp ->
-                            tenantUtil
-                                .postDikuTenant(port, vertx)
-                                .onSuccess(dikuResp -> async.complete())
-                                .onFailure(context::fail))
-                    .onFailure(context::fail))
-        .onFailure(context::fail);
-    async.awaitSuccess();
-  }
-
-  @AfterClass
-  public static void teardown(TestContext context)
-      throws InterruptedException, ExecutionException, TimeoutException {
-    RestAssured.reset();
-    vertx.close(context.asyncAssertSuccess());
-    PostgresClient.stopPostgresTester();
-  }
-
   @Test
-  public void testDeactivateAndPurge() throws IOException, XmlPullParserException {
+  public void testDeactivateAndPurge() {
     String mockedOkapiUrl = "http://localhost:" + wireMockRule.port();
 
     // GET
@@ -113,11 +56,7 @@ public class ITTenant {
         .statusCode(200);
 
     // Deactivate module for tenant UBL
-    TenantAttributes attributes =
-        new TenantAttributes()
-            .withModuleTo(null)
-            .withModuleFrom(ITTestSuiteJunit4.getModuleVersion())
-            .withPurge(false);
+    TenantAttributes attributes = new TenantAttributes().withModuleTo(null).withPurge(false);
     given()
         .body(attributes)
         .header("content-type", ContentType.JSON)
@@ -138,11 +77,7 @@ public class ITTenant {
         .statusCode(200);
 
     // Purge module with tenant UBL
-    TenantAttributes purgeAttributes =
-        new TenantAttributes()
-            .withModuleTo(null)
-            .withModuleFrom(ITTestSuiteJunit4.getModuleVersion())
-            .withPurge(true);
+    TenantAttributes purgeAttributes = new TenantAttributes().withModuleTo(null).withPurge(true);
     given()
         .body(purgeAttributes)
         .header("content-type", ContentType.JSON)

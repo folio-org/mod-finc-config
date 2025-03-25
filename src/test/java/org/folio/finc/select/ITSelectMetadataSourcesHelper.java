@@ -16,8 +16,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import org.folio.finc.ApiTestBase;
 import org.folio.finc.ITTestSuiteJunit4;
 import org.folio.finc.TenantUtil;
+import org.folio.finc.TestUtils;
 import org.folio.postgres.testing.PostgresTesterContainer;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
@@ -33,88 +36,21 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class ITSelectMetadataSourcesHelper {
+public class ITSelectMetadataSourcesHelper extends ApiTestBase {
 
-  private static final String TENANT_UBL = "ubl";
-  private static Vertx vertx;
+  private static final Vertx vertx = TestUtils.getVertx();
   private static SelectMetadataSourcesHelper cut;
   @Rule public Timeout timeout = Timeout.seconds(10);
 
   @BeforeClass
-  public static void setUp(TestContext context)
-      throws InterruptedException, ExecutionException, TimeoutException {
-    vertx = Vertx.vertx();
-    PostgresClient.setPostgresTester(new PostgresTesterContainer());
-    PostgresClient.getInstance(vertx);
-
-    int port = NetworkUtils.nextFreePort();
-
-    RestAssured.reset();
-    RestAssured.baseURI = "http://localhost";
-    RestAssured.port = port;
-    RestAssured.defaultParser = Parser.JSON;
-
-    DeploymentOptions options =
-        new DeploymentOptions()
-            .setConfig(new JsonObject().put("http.port", port).put("testing", true));
-
-    startVerticle(options);
-    prepareTenants();
+  public static void setUp() throws Exception {
+    TestUtils.setupTestSuite();
     cut = new SelectMetadataSourcesHelper(vertx, TENANT_UBL);
   }
 
-  private static void startVerticle(DeploymentOptions options)
-      throws InterruptedException, ExecutionException, TimeoutException {
-    CompletableFuture<String> deploymentComplete = new CompletableFuture<>();
-    vertx.deployVerticle(
-        RestVerticle.class.getName(),
-        options,
-        res -> {
-          if (res.succeeded()) {
-            deploymentComplete.complete(res.result());
-          } else {
-            deploymentComplete.completeExceptionally(res.cause());
-          }
-        });
-    deploymentComplete.get(30, TimeUnit.SECONDS);
-  }
-
-  private static void prepareTenants() {
-    String url = RestAssured.baseURI + ":" + RestAssured.port;
-    try {
-      CompletableFuture fincFuture = new CompletableFuture();
-      CompletableFuture ublFuture = new CompletableFuture();
-      WebClient webClient = WebClient.create(vertx);
-      TenantClient tenantClientFinc =
-          new TenantClient(url, Constants.MODULE_TENANT, Constants.MODULE_TENANT, webClient);
-      TenantClient tenantClientUbl = new TenantClient(url, TENANT_UBL, TENANT_UBL, webClient);
-      tenantClientFinc.postTenant(
-          new TenantAttributes().withModuleTo(ITTestSuiteJunit4.getModuleVersion()),
-          fincFuture::complete);
-      tenantClientUbl.postTenant(
-          new TenantAttributes().withModuleTo(ITTestSuiteJunit4.getModuleVersion()),
-          ublFuture::complete);
-      fincFuture.get(30, TimeUnit.SECONDS);
-      ublFuture.get(30, TimeUnit.SECONDS);
-    } catch (Exception e) {
-      assert false;
-    }
-  }
-
   @AfterClass
-  public static void teardown() throws InterruptedException, ExecutionException, TimeoutException {
-    RestAssured.reset();
-    CompletableFuture<String> undeploymentComplete = new CompletableFuture<>();
-    vertx.close(
-        res -> {
-          if (res.succeeded()) {
-            undeploymentComplete.complete(null);
-          } else {
-            undeploymentComplete.completeExceptionally(res.cause());
-          }
-        });
-    undeploymentComplete.get(20, TimeUnit.SECONDS);
-    PostgresClient.stopPostgresTester();
+  public static void teardown() throws Exception {
+    TestUtils.teardownTestSuite();
   }
 
   @Test

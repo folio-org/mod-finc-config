@@ -15,6 +15,7 @@ import org.folio.rest.impl.TenantReferenceApi;
 import org.folio.rest.jaxrs.model.*;
 import org.folio.rest.persist.PgExceptionUtil;
 import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.tools.utils.ModuleName;
 import org.folio.rest.utils.Constants;
 
 import java.nio.file.Files;
@@ -185,7 +186,7 @@ public class TenantUtil {
       headers.put(XOkapiHeaders.URL, "http://localhost:" + port);
       new TenantReferenceApi()
           .postTenant(
-              new TenantAttributes().withModuleTo(ITTestSuiteJunit4.getModuleVersion()),
+              new TenantAttributes().withModuleTo(ModuleName.getModuleVersion()),
               headers,
               res -> {
                 if (res.result().getStatus() == 201) {
@@ -222,7 +223,7 @@ public class TenantUtil {
       headers.put(XOkapiHeaders.URL, "http://localhost:" + port);
       new TenantReferenceApi()
           .postTenant(
-              new TenantAttributes().withModuleTo(ITTestSuiteJunit4.getModuleVersion()),
+              new TenantAttributes().withModuleTo(ModuleName.getModuleVersion()),
               headers,
               res -> {
                 if (res.result().getStatus() == 201) {

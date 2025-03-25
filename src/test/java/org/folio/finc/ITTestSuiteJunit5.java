@@ -9,12 +9,12 @@ class ITTestSuiteJunit5 {
 
   @BeforeAll
   static void beforeAll() throws Exception {
-    ITTestSuiteJunit4.before();
+    TestUtils.setupTestSuite();
   }
 
   @AfterAll
   static void afterAll() throws Exception {
-    ITTestSuiteJunit4.after();
+    TestUtils.teardownTestSuite();
   }
 
   @Nested

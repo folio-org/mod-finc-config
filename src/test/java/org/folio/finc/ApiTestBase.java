@@ -44,14 +44,14 @@ public class ApiTestBase {
   protected static final String FINC_SELECT_EZB_CREDENTIALS_ENDPOINT =
       "/finc-select/ezb-credentials";
 
-  private static boolean runningOnOwn;
+  private static boolean isRunningOnOwn = false;
 
   @BeforeClass
   public static void before() throws Exception {
-    if (ITTestSuiteJunit4.isNotInitialised()) {
+    if (!TestUtils.isIsTestSuiteRunning()) {
       System.out.println("Running test on own, initialising suite manually");
-      runningOnOwn = true;
-      ITTestSuiteJunit4.before();
+      TestUtils.setupTestSuite();
+      isRunningOnOwn = true;
     }
   }
 
@@ -61,15 +61,15 @@ public class ApiTestBase {
   }
 
   @AfterClass
-  public static void after() throws InterruptedException, ExecutionException, TimeoutException {
-    if (runningOnOwn) {
+  public static void after() throws Exception {
+    if (isRunningOnOwn) {
       System.out.println("Running test on own, un-initialising suite manually");
-      ITTestSuiteJunit4.after();
+      TestUtils.teardownTestSuite();
     }
   }
 
   @AfterAll
-  static void afterAll() throws ExecutionException, InterruptedException, TimeoutException {
+  static void afterAll() throws Exception {
     after();
   }
 
