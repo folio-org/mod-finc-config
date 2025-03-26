@@ -6,10 +6,13 @@ import io.restassured.http.ContentType;
 import io.vertx.core.json.Json;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import org.folio.finc.ApiTestBase;
+import org.folio.ApiTestBase;
+import org.folio.TestUtils;
 import org.folio.rest.jaxrs.model.Credential;
 import org.hamcrest.Matchers;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,20 +20,30 @@ import org.junit.runner.RunWith;
 @RunWith(VertxUnitRunner.class)
 public class ConfigEZBCredentialsIT extends ApiTestBase {
 
-  @Rule
-  public Timeout timeout = Timeout.seconds(10);
+  @Rule public Timeout timeout = Timeout.seconds(10);
   private Credential credential;
   private Credential credentialChanged;
 
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    TestUtils.setupTenants();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    TestUtils.teardownTenants();
+  }
+
   @Before
   public void init() {
-    credential = new Credential()
-        .withIsil("DIKU-01")
-        .withLibId("diku01")
-        .withPassword("password01")
-        .withUser("user01");
+    credential =
+        new Credential()
+            .withIsil("DIKU-01")
+            .withLibId("diku01")
+            .withPassword("password01")
+            .withUser("user01");
 
-    credentialChanged = credential.withPassword("password01CHANGED");
+    credentialChanged = credential.withPassword("password01CHANGED"); // TODO: fix this
   }
 
   @Test
@@ -190,6 +203,4 @@ public class ConfigEZBCredentialsIT extends ApiTestBase {
         .then()
         .statusCode(204);
   }
-
-
 }

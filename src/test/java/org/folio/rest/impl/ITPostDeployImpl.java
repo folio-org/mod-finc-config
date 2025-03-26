@@ -1,4 +1,4 @@
-package org.folio.finc;
+package org.folio.rest.impl;
 
 import static io.vertx.core.Future.succeededFuture;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -6,19 +6,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.folio.rest.utils.Constants.QUARTZ_EZB_JOB_KEY;
 
 import io.vertx.core.AsyncResult;
-import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.folio.TestUtils;
 import org.folio.finc.periodic.EZBHarvestJob;
 import org.folio.finc.periodic.ezb.EZBServiceImpl;
-import org.folio.rest.RestVerticle;
-import org.folio.rest.tools.utils.NetworkUtils;
-import org.folio.rest.tools.utils.VertxUtils;
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quartz.Job;
@@ -26,39 +22,30 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.listeners.JobListenerSupport;
 import org.quartz.listeners.SchedulerListenerSupport;
 
 @RunWith(VertxUnitRunner.class)
-public class PostDeployImplITest {
+public class ITPostDeployImpl {
 
-  private static final Vertx vertx = VertxUtils.getVertxFromContextOrNew();
+  @AfterClass
+  public static void afterClass() throws Exception {
+    TestUtils.undeployRestVerticle();
+    TestUtils.teardownPostgres();
+  }
 
   @Test
-  public void testThatPostDeployImplIsSchedulingJobs(TestContext context)
-      throws SchedulerException {
-    Async async = context.async(2);
+  public void testThatPostDeployImplIsSchedulingJobs(TestContext context) throws Exception {
+    Async async = context.async(1);
     Promise<String> urlResultPromise = Promise.promise();
 
     Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
     scheduler.getListenerManager().addSchedulerListener(new TestSchedulerListener(async));
     scheduler.getListenerManager().addJobListener(new TestJobListener(urlResultPromise));
 
-    int port = NetworkUtils.nextFreePort();
-    DeploymentOptions options =
-        new DeploymentOptions().setConfig(new JsonObject().put("http.port", port));
-    vertx.deployVerticle(
-        RestVerticle.class.getName(),
-        options,
-        ar -> {
-          if (ar.succeeded()) {
-            async.countDown();
-          } else {
-            context.fail(ar.cause());
-          }
-        });
+    TestUtils.setupPostgres();
+    TestUtils.deployRestVerticle(false);
 
     // wait for the RestVerticle to be deployed and the job to be scheduled
     async.awaitSuccess(5000);

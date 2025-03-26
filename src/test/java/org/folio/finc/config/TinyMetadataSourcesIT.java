@@ -6,12 +6,25 @@ import static org.hamcrest.Matchers.equalTo;
 import io.restassured.http.ContentType;
 import io.vertx.core.json.Json;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.folio.TestUtils;
 import org.folio.finc.mocks.MockOrganization;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
 public class TinyMetadataSourcesIT extends AbstractMetadataSourcesIT {
+
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    TestUtils.setupTenants();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    TestUtils.teardownTenants();
+  }
 
   @Test
   public void checkThatWeCanGetTinyMetadataSources() {

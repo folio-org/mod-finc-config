@@ -14,7 +14,8 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
-import org.folio.finc.ApiTestBase;
+import org.folio.ApiTestBase;
+import org.folio.TestUtils;
 import org.folio.finc.model.File;
 import org.folio.rest.jaxrs.model.FilterFile;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
@@ -25,13 +26,15 @@ import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.utils.Constants;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class FilterHelperTest extends ApiTestBase {
+public class FilterHelperIT extends ApiTestBase {
 
   private static final String TEST_CONTENT = "This is the test content!!!!";
   @Rule public Timeout timeout = Timeout.seconds(10);
@@ -40,6 +43,16 @@ public class FilterHelperTest extends ApiTestBase {
   private Isil isilDiku;
   private FincSelectFilter filter;
   private Vertx vertx;
+
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    TestUtils.setupTenants();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    TestUtils.teardownTenants();
+  }
 
   @Before
   public void init() {

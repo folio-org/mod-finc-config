@@ -7,10 +7,13 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import org.folio.finc.ApiTestBase;
+import org.folio.ApiTestBase;
+import org.folio.TestUtils;
 import org.folio.rest.jaxrs.model.Isil;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +25,16 @@ public class FincSelectFilesIT extends ApiTestBase {
   @Rule public Timeout timeout = Timeout.seconds(10);
   private Isil isilUBL;
   private Isil isilDiku;
+
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    TestUtils.setupTenants();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    TestUtils.teardownTenants();
+  }
 
   @Before
   public void init() {

@@ -1,16 +1,13 @@
-package org.folio.finc;
+package org.folio;
 
-import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
-import static com.google.common.net.MediaType.JSON_UTF_8;
-import static com.google.common.net.MediaType.OCTET_STREAM;
 import static io.restassured.RestAssured.given;
 import static org.folio.okapi.common.XOkapiHeaders.TENANT;
 
-import io.restassured.http.ContentType;
+import com.google.common.net.HttpHeaders;
+import com.google.common.net.MediaType;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 import org.folio.rest.jaxrs.model.Isil;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -20,9 +17,12 @@ import org.junit.jupiter.api.BeforeAll;
 
 public class ApiTestBase {
 
-  protected static final String TENANT_UBL = "ubl";
-  protected static final String TENANT_DIKU = "diku";
+  public static final String CONTENT_TYPE = HttpHeaders.CONTENT_TYPE;
+  public static final String APPLICATION_JSON = MediaType.JSON_UTF_8.withoutParameters().toString();
+  public static final String OCTET_STREAM = MediaType.OCTET_STREAM.toString();
 
+  protected static final String TENANT_UBL = TestUtils.TENANT_UBL;
+  protected static final String TENANT_DIKU = TestUtils.TENANT_DIKU;
   protected static final String ISILS_API_ENDPOINT = "/finc-config/isils";
   protected static final String FINC_SELECT_FILES_ENDPOINT = "/finc-select/files";
   protected static final String FINC_SELECT_FILTERS_ENDPOINT = "/finc-select/filters";
@@ -43,15 +43,17 @@ public class ApiTestBase {
       "/finc-config/ezb-credentials";
   protected static final String FINC_SELECT_EZB_CREDENTIALS_ENDPOINT =
       "/finc-select/ezb-credentials";
+  protected static final String TENANT_ENDPOINT = "/_/tenant";
+  protected static final Vertx vertx = TestUtils.getVertx();
 
-  private static boolean runningOnOwn;
+  private static boolean isRunningOnOwn = false;
 
   @BeforeClass
   public static void before() throws Exception {
-    if (ApiTestSuite.isNotInitialised()) {
+    if (!TestUtils.isIsTestSuiteRunning()) {
       System.out.println("Running test on own, initialising suite manually");
-      runningOnOwn = true;
-      ApiTestSuite.before();
+      TestUtils.setupTestSuite();
+      isRunningOnOwn = true;
     }
   }
 
@@ -61,19 +63,19 @@ public class ApiTestBase {
   }
 
   @AfterClass
-  public static void after() throws InterruptedException, ExecutionException, TimeoutException {
-    if (runningOnOwn) {
+  public static void after() throws Exception {
+    if (isRunningOnOwn) {
       System.out.println("Running test on own, un-initialising suite manually");
-      ApiTestSuite.after();
+      TestUtils.teardownTestSuite();
     }
   }
 
   @AfterAll
-  static void afterAll() throws ExecutionException, InterruptedException, TimeoutException {
+  static void afterAll() throws Exception {
     after();
   }
 
-  public static Isil loadIsilUbl() {
+  protected static Isil loadIsilUbl() {
     Isil isil =
         new Isil()
             .withId(UUID.randomUUID().toString())
@@ -83,7 +85,7 @@ public class ApiTestBase {
     return loadIsil(isil);
   }
 
-  public static Isil loadIsilDiku() {
+  protected static Isil loadIsilDiku() {
     Isil isil =
         new Isil()
             .withId(UUID.randomUUID().toString())
@@ -93,13 +95,11 @@ public class ApiTestBase {
     return loadIsil(isil);
   }
 
-  public static Isil loadIsil(Isil isil) {
+  protected static Isil loadIsil(Isil isil) {
     Isil isilResp =
         given()
             .body(Json.encode(isil))
-            .header("X-Okapi-Tenant", TENANT_UBL)
-            .header("content-type", ContentType.JSON)
-            .header("accept", ContentType.JSON)
+            .header(TENANT, TENANT_UBL)
             .post(ISILS_API_ENDPOINT)
             .then()
             .statusCode(201)
@@ -110,19 +110,10 @@ public class ApiTestBase {
     return isilResp;
   }
 
-  public void deleteIsil(String isilId) {
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .delete(ISILS_API_ENDPOINT + "/" + isilId)
-        .then()
-        .statusCode(204);
-  }
-
-  public static String post(String endpoint, Object entity, String tenantId) {
+  protected static String post(String endpoint, Object entity, String tenantId) {
     return given()
         .body(Json.encode(entity))
         .header(TENANT, tenantId)
-        .header(CONTENT_TYPE, JSON_UTF_8.withoutParameters().toString())
         .post(endpoint)
         .then()
         .statusCode(201)
@@ -131,25 +122,27 @@ public class ApiTestBase {
         .getString("id");
   }
 
-  public static void put(String endpoint, Object entity, String tenantId) {
-    given()
-        .body(Json.encode(entity))
-        .header(TENANT, tenantId)
-        .header(CONTENT_TYPE, JSON_UTF_8.withoutParameters().toString())
-        .put(endpoint)
-        .then()
-        .statusCode(200);
+  protected static void put(String endpoint, Object entity, String tenantId) {
+    given().body(Json.encode(entity)).header(TENANT, tenantId).put(endpoint).then().statusCode(200);
   }
 
-  public static String postFile(String content, String tenantId) {
+  protected static String postFile(String content, String tenantId) {
     return given()
         .body(content.getBytes())
         .header(TENANT, tenantId)
-        .header(CONTENT_TYPE, OCTET_STREAM.toString())
+        .header(CONTENT_TYPE, OCTET_STREAM)
         .post(FINC_SELECT_FILES_ENDPOINT)
         .then()
         .statusCode(200)
         .extract()
         .asString();
+  }
+
+  protected void deleteIsil(String isilId) {
+    given()
+        .header(TENANT, TENANT_UBL)
+        .delete(ISILS_API_ENDPOINT + "/" + isilId)
+        .then()
+        .statusCode(204);
   }
 }

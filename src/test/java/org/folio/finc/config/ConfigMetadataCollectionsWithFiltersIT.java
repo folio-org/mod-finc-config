@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.ObjectUtils;
 import org.assertj.core.api.ThrowingConsumer;
-import org.folio.finc.ApiTestBase;
+import org.folio.ApiTestBase;
+import org.folio.TestUtils;
 import org.folio.rest.jaxrs.model.FilterFile;
 import org.folio.rest.jaxrs.model.FilteredBy;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
@@ -20,6 +21,7 @@ import org.folio.rest.jaxrs.model.FincConfigMetadataCollectionWithFiltersCollect
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollections;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.jaxrs.model.FincSelectFilterToCollections;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,8 +38,14 @@ public class ConfigMetadataCollectionsWithFiltersIT extends ApiTestBase {
   private static final String COLLECTION2_ID = "68aebb7f-6325-44e8-bcdd-f528fff6dca5";
 
   @BeforeAll
-  static void beforeAll() {
+  static void beforeAll() throws Exception {
+    TestUtils.setupTenants();
     loadTestSamples();
+  }
+
+  @AfterAll
+  static void afterAll() throws Exception {
+    TestUtils.teardownTenants();
   }
 
   private static void loadTestSamples() {

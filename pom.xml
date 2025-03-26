@@ -313,15 +313,6 @@
           <!-- en.US required because some unit tests rely on English error messages.
              @{argLine} required for sonarqube jacoco -->
           <argLine>-Duser.language=en -Duser.region=US @{argLine}</argLine>
-          <includes>
-            <include>**/Test*.java</include>
-            <include>**/*Test.java</include>
-            <include>**/*Tests.java</include>
-            <include>**/*TestCase.java</include>
-          </includes>
-          <excludes>
-            <exclude>**/*ITest.java</exclude>
-          </excludes>
         </configuration>
       </plugin>
 
@@ -558,13 +549,13 @@
         </executions>
         <configuration>
           <useSystemClassLoader>false</useSystemClassLoader>
+          <!--
+          name tests *IT.java if they are part of a suite
+          name tests IT*.java if they are standalone tests / suites
+          -->
           <excludes>
             <exclude>**/*IT.java</exclude>
           </excludes>
-          <includes>
-            <include>**/*TestSuite.java</include>
-            <include>**/*ITest.java</include>
-          </includes>
           <environmentVariables>
             <EZB_DOWNLOAD_URL>http://localhost?libId=%s</EZB_DOWNLOAD_URL>
           </environmentVariables>

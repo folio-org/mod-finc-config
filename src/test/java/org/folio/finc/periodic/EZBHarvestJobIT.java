@@ -6,7 +6,6 @@ import static org.folio.finc.mocks.EZBServiceMock.EZB_FILE_CONTENT;
 
 import io.vertx.core.Future;
 import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Arrays;
@@ -16,10 +15,8 @@ import org.folio.okapi.common.GenericCompositeFuture;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.persist.PostgresClient;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-@RunWith(VertxUnitRunner.class)
-public class EZBHarvestJobITest extends AbstractEZBHarvestJobTest {
+public class EZBHarvestJobIT extends AbstractEZBHarvestJobTest {
 
   private static final EZBHarvestJob EZB_JOB = new EZBHarvestJob(new EZBServiceMock());
   private static final Date DATE =

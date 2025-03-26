@@ -10,11 +10,14 @@ import io.vertx.core.json.Json;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.util.UUID;
-import org.folio.finc.ApiTestBase;
+import org.folio.ApiTestBase;
+import org.folio.TestUtils;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.jaxrs.model.Isils;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,9 +25,18 @@ import org.junit.runner.RunWith;
 @RunWith(VertxUnitRunner.class)
 public class IsilsIT extends ApiTestBase {
 
-  @Rule
-  public Timeout timeout = Timeout.seconds(10);
+  @Rule public Timeout timeout = Timeout.seconds(10);
   private Isil isilUBL;
+
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    TestUtils.setupTenants();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    TestUtils.teardownTenants();
+  }
 
   @Before
   public void init() {
@@ -57,11 +69,12 @@ public class IsilsIT extends ApiTestBase {
   @Test
   public void testCannotPostTwoIsilsForTenant() {
 
-    Isil isilChanged = new Isil()
-        .withIsil("FOO-01")
-        .withTenant(isilUBL.getTenant())
-        .withLibrary(isilUBL.getLibrary())
-        .withId(UUID.randomUUID().toString());
+    Isil isilChanged =
+        new Isil()
+            .withIsil("FOO-01")
+            .withTenant(isilUBL.getTenant())
+            .withLibrary(isilUBL.getLibrary())
+            .withId(UUID.randomUUID().toString());
 
     // POST
     given()
@@ -77,11 +90,12 @@ public class IsilsIT extends ApiTestBase {
   @Test
   public void testCannotPutTwoIsilsForTenant() {
 
-    Isil isilChanged = new Isil()
-        .withIsil("FOO-01")
-        .withTenant(isilUBL.getTenant())
-        .withLibrary(isilUBL.getLibrary())
-        .withId(isilUBL.getId());
+    Isil isilChanged =
+        new Isil()
+            .withIsil("FOO-01")
+            .withTenant(isilUBL.getTenant())
+            .withLibrary(isilUBL.getLibrary())
+            .withId(isilUBL.getId());
 
     // PUT
     given()
@@ -99,11 +113,12 @@ public class IsilsIT extends ApiTestBase {
 
     final String newLibrary = "FooBar";
 
-    Isil isilChanged = new Isil()
-        .withIsil(isilUBL.getIsil())
-        .withTenant(isilUBL.getTenant())
-        .withLibrary(newLibrary)
-        .withId(isilUBL.getId());
+    Isil isilChanged =
+        new Isil()
+            .withIsil(isilUBL.getIsil())
+            .withTenant(isilUBL.getTenant())
+            .withLibrary(newLibrary)
+            .withId(isilUBL.getId());
 
     // PUT
     given()

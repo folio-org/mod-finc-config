@@ -6,12 +6,15 @@ import io.restassured.http.ContentType;
 import io.vertx.core.json.Json;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import org.folio.finc.ApiTestBase;
+import org.folio.ApiTestBase;
+import org.folio.TestUtils;
 import org.folio.rest.jaxrs.model.Credential;
 import org.folio.rest.jaxrs.model.Isil;
 import org.hamcrest.Matchers;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,18 +22,24 @@ import org.junit.runner.RunWith;
 @RunWith(VertxUnitRunner.class)
 public class SelectEZBCredentialsIT extends ApiTestBase {
 
-  @Rule
-  public Timeout timeout = Timeout.seconds(10);
+  @Rule public Timeout timeout = Timeout.seconds(10);
   private Credential credDiku;
   private Isil isilDiku;
+
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    TestUtils.setupTenants();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    TestUtils.teardownTenants();
+  }
 
   @Before
   public void init() {
     isilDiku = loadIsilDiku();
-    credDiku = new Credential()
-        .withPassword("pw")
-        .withUser("user")
-        .withLibId("diku");
+    credDiku = new Credential().withPassword("pw").withUser("user").withLibId("diku");
   }
 
   @After
@@ -108,11 +117,12 @@ public class SelectEZBCredentialsIT extends ApiTestBase {
 
   @Test
   public void checkThatUserCannotAddCredWithWrongIsil() {
-    Credential c = new Credential()
-        .withLibId("libId")
-        .withPassword("password")
-        .withUser("username")
-        .withIsil("foobar");
+    Credential c =
+        new Credential()
+            .withLibId("libId")
+            .withPassword("password")
+            .withUser("username")
+            .withIsil("foobar");
 
     // PUT
     given()

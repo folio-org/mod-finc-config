@@ -9,6 +9,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -16,13 +17,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.folio.ApiTestBase;
+import org.folio.TestUtils;
 import org.folio.finc.dao.FileDAOImpl;
 import org.folio.finc.dao.SelectFileDAO;
 import org.folio.finc.dao.SelectFileDAOImpl;
 import org.folio.finc.dao.SelectFilterDAO;
 import org.folio.finc.dao.SelectFilterDAOImpl;
 import org.folio.finc.model.File;
-import org.folio.postgres.testing.PostgresTesterContainer;
 import org.folio.rest.impl.TenantAPI;
 import org.folio.rest.jaxrs.model.Credential;
 import org.folio.rest.jaxrs.model.FilterFile;
@@ -33,27 +35,21 @@ import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.jaxrs.model.Metadata;
 import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.persist.PostgresClient;
-import org.folio.rest.tools.utils.VertxUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
+import org.junit.runner.RunWith;
 
-public abstract class AbstractEZBHarvestJobTest {
+@RunWith(VertxUnitRunner.class)
+public abstract class AbstractEZBHarvestJobTest extends ApiTestBase {
 
   private static final String QUERY = "label==\"EZB holdings\"";
-  static Vertx vertx = VertxUtils.getVertxFromContextOrNew();
+  static Vertx vertx = TestUtils.getVertx();
   static Context vertxContext = vertx.getOrCreateContext();
   static final String tenant = "finc";
   static String filterId = null;
 
   @Rule public Timeout timeout = Timeout.seconds(10);
-
-  @BeforeClass
-  public static void beforeClass() {
-    PostgresClient.setPostgresTester(new PostgresTesterContainer());
-    PostgresClient.getInstance(vertx);
-  }
 
   @Before
   public void before(TestContext context) {

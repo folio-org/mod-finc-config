@@ -7,7 +7,7 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.util.Arrays;
 import java.util.UUID;
-import org.folio.finc.ApiTestBase;
+import org.folio.ApiTestBase;
 import org.folio.rest.jaxrs.model.Contact;
 import org.folio.rest.jaxrs.model.Contact.Role;
 import org.folio.rest.jaxrs.model.Contact.Type;

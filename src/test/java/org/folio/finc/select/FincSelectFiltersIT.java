@@ -11,13 +11,16 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.util.Arrays;
 import java.util.UUID;
-import org.folio.finc.ApiTestBase;
+import org.folio.ApiTestBase;
+import org.folio.TestUtils;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.jaxrs.model.FincSelectFilter.Type;
 import org.folio.rest.jaxrs.model.FincSelectFilterToCollections;
 import org.folio.rest.jaxrs.model.Isil;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +32,16 @@ public class FincSelectFiltersIT extends ApiTestBase {
   private Isil isilDiku;
   private FincSelectFilter filter1;
   private FincSelectFilter filter2;
+
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    TestUtils.setupTenants();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    TestUtils.teardownTenants();
+  }
 
   @Before
   public void init() {
@@ -121,26 +134,26 @@ public class FincSelectFiltersIT extends ApiTestBase {
     // PUT Filter
     filter1.setLabel("Holdings 1 - CHANGED");
     given()
-      .body(Json.encode(filter1))
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", ContentType.JSON)
-      .header("accept", ContentType.TEXT)
-      .put(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter1.getId())
-      .then()
-      .statusCode(204);
+        .body(Json.encode(filter1))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.TEXT)
+        .put(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter1.getId())
+        .then()
+        .statusCode(204);
 
     // GET
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", ContentType.JSON)
-      .header("accept", ContentType.JSON)
-      .get(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter1.getId())
-      .then()
-      .contentType(ContentType.JSON)
-      .statusCode(200)
-      .body("id", equalTo(filter1.getId()))
-      .body("label", equalTo(filter1.getLabel()))
-      .body("$", not(hasKey("isil")));
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter1.getId())
+        .then()
+        .contentType(ContentType.JSON)
+        .statusCode(200)
+        .body("id", equalTo(filter1.getId()))
+        .body("label", equalTo(filter1.getLabel()))
+        .body("$", not(hasKey("isil")));
 
     // DELETE
     given()
