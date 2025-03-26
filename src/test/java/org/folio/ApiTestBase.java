@@ -5,6 +5,7 @@ import static org.folio.okapi.common.XOkapiHeaders.TENANT;
 
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import java.util.UUID;
 import org.folio.rest.jaxrs.model.Isil;
@@ -43,6 +44,7 @@ public class ApiTestBase {
   protected static final String FINC_SELECT_EZB_CREDENTIALS_ENDPOINT =
       "/finc-select/ezb-credentials";
   protected static final String TENANT_ENDPOINT = "/_/tenant";
+  protected static final Vertx vertx = TestUtils.getVertx();
 
   private static boolean isRunningOnOwn = false;
 
