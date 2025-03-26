@@ -26,8 +26,7 @@ import org.junit.runner.RunWith;
 @RunWith(VertxUnitRunner.class)
 public class ConfigFiltersIT extends ApiTestBase {
 
-  @Rule
-  public Timeout timeout = Timeout.seconds(10);
+  @Rule public Timeout timeout = Timeout.seconds(10);
   private Isil isilUBL;
   private Isil isilDiku;
   private FincSelectFilter filterUBL;
@@ -230,7 +229,5 @@ public class ConfigFiltersIT extends ApiTestBase {
         .delete(FINC_CONFIG_FILTERS_ENDPOINT + "/" + filterDIKU.getId())
         .then()
         .statusCode(204);
-    }
-
-
+  }
 }

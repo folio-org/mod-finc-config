@@ -20,8 +20,7 @@ import org.junit.runner.RunWith;
 @RunWith(VertxUnitRunner.class)
 public class ConfigEZBCredentialsIT extends ApiTestBase {
 
-  @Rule
-  public Timeout timeout = Timeout.seconds(10);
+  @Rule public Timeout timeout = Timeout.seconds(10);
   private Credential credential;
   private Credential credentialChanged;
 
@@ -35,14 +34,14 @@ public class ConfigEZBCredentialsIT extends ApiTestBase {
     TestUtils.teardownTenants();
   }
 
-
   @Before
   public void init() {
-    credential = new Credential()
-        .withIsil("DIKU-01")
-        .withLibId("diku01")
-        .withPassword("password01")
-        .withUser("user01");
+    credential =
+        new Credential()
+            .withIsil("DIKU-01")
+            .withLibId("diku01")
+            .withPassword("password01")
+            .withUser("user01");
 
     credentialChanged = credential.withPassword("password01CHANGED"); // TODO: fix this
   }
@@ -204,6 +203,4 @@ public class ConfigEZBCredentialsIT extends ApiTestBase {
         .then()
         .statusCode(204);
   }
-
-
 }

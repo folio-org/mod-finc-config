@@ -30,8 +30,7 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
 
   private final Select unselect = new Select().withSelect(false);
   private final Select select = new Select().withSelect(true);
-  @Rule
-  public Timeout timeout = Timeout.seconds(10);
+  @Rule public Timeout timeout = Timeout.seconds(10);
   private FincConfigMetadataCollection metadataCollectionPermitted;
   private FincConfigMetadataCollection metadataCollectionPermittedNotSelected;
   private FincConfigMetadataCollection metadataCollectionForbidden;
@@ -241,8 +240,9 @@ public class SelectMetadataCollectionsIT extends ApiTestBase {
     given()
         .header("X-Okapi-Tenant", TENANT_UBL)
         .delete(
-            FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT + "/" + metadataCollectionPermittedNotSelected
-                .getId())
+            FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT
+                + "/"
+                + metadataCollectionPermittedNotSelected.getId())
         .then()
         .statusCode(204);
   }

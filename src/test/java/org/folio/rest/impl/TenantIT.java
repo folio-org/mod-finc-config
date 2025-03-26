@@ -9,7 +9,6 @@ import static org.folio.rest.utils.Constants.MODULE_TENANT;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-
 import org.folio.ApiTestBase;
 import org.folio.TestUtils;
 import org.folio.rest.jaxrs.model.TenantAttributes;

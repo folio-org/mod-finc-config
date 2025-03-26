@@ -25,8 +25,7 @@ import org.junit.runner.RunWith;
 @RunWith(VertxUnitRunner.class)
 public class ConfigMetadataCollectionsIT extends ApiTestBase {
 
-  @Rule
-  public Timeout timeout = Timeout.seconds(10);
+  @Rule public Timeout timeout = Timeout.seconds(10);
   private FincConfigMetadataCollection metadataCollection;
   private FincConfigMetadataCollection metadataCollectionChanged;
 
@@ -54,7 +53,8 @@ public class ConfigMetadataCollectionsIT extends ApiTestBase {
             .withCollectionId("collection-123")
             .withMdSource(mdSource);
 
-    metadataCollectionChanged = metadataCollection.withMetadataAvailable(MetadataAvailable.NO); // TODO: fix this
+    metadataCollectionChanged =
+        metadataCollection.withMetadataAvailable(MetadataAvailable.NO); // TODO: fix this
   }
 
   @Test

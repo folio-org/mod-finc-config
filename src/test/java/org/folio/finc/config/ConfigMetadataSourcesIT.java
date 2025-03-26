@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.equalTo;
 import io.restassured.http.ContentType;
 import io.vertx.core.json.Json;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-
 import org.folio.TestUtils;
 import org.folio.finc.mocks.MockOrganization;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
@@ -209,8 +208,7 @@ public class ConfigMetadataSourcesIT extends AbstractMetadataSourcesIT {
   @Test
   public void checkThatInvalidMetadataSourceIsNotPosted() {
     FincConfigMetadataSource metadataSourceInvalid =
-        Json.decodeValue(
-                Json.encode(metadataSource2), FincConfigMetadataSource.class)
+        Json.decodeValue(Json.encode(metadataSource2), FincConfigMetadataSource.class)
             .withLabel(null);
     given()
         .body(Json.encode(metadataSourceInvalid))

@@ -74,15 +74,15 @@ public class TestUtils {
   }
 
   public static void deployRestVerticle(boolean isTesting)
-    throws ExecutionException, InterruptedException, TimeoutException {
+      throws ExecutionException, InterruptedException, TimeoutException {
     DeploymentOptions options = new DeploymentOptions();
     options.setConfig(new JsonObject().put("http.port", verticlePort).put("testing", isTesting));
     deploymentId =
-      vertx
-        .deployVerticle(RestVerticle.class.getName(), options)
-        .toCompletionStage()
-        .toCompletableFuture()
-        .get(30, TimeUnit.SECONDS);
+        vertx
+            .deployVerticle(RestVerticle.class.getName(), options)
+            .toCompletionStage()
+            .toCompletableFuture()
+            .get(30, TimeUnit.SECONDS);
   }
 
   public static void undeployRestVerticle() throws ExecutionException, InterruptedException {

@@ -11,7 +11,6 @@ import io.vertx.core.Promise;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-
 import org.folio.TestUtils;
 import org.folio.finc.periodic.EZBHarvestJob;
 import org.folio.finc.periodic.ezb.EZBServiceImpl;

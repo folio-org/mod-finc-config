@@ -8,7 +8,6 @@ import io.vertx.core.json.Json;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
 import org.folio.ApiTestBase;
 import org.folio.TestUtils;
 import org.folio.rest.jaxrs.model.*;
