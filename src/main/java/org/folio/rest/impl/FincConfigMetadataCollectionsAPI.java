@@ -51,6 +51,10 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
         : org.folio.rest.jaxrs.model.FincConfigMetadataCollections.class;
   }
 
+  private String determineTotalRecords(boolean includeFilteredBy, String totalRecords) {
+    return includeFilteredBy ? "none" : totalRecords;
+  }
+
   @Override
   @Validate
   public void getFincConfigMetadataCollections(
@@ -73,6 +77,7 @@ public class FincConfigMetadataCollectionsAPI implements FincConfigMetadataColle
         determineClass(includeFilteredBy),
         determineCollectionClass(includeFilteredBy),
         query,
+        determineTotalRecords(includeFilteredBy, totalRecords),
         offset,
         limit,
         okapiHeaders,
