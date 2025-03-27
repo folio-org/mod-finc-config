@@ -122,7 +122,7 @@
     },
     {
       "tableName": "isils",
-      "fromModuleVersion": "mod-finc-config-6.2.0",
+      "fromModuleVersion": "mod-finc-config-7.0.0",
       "withMetadata": true,
       "fullTextIndex": [
         {
