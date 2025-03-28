@@ -10,15 +10,18 @@
     },
     "library": {
       "description": "Descriptive name of the library",
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "isil": {
       "description": "Isil of this library",
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "tenant": {
       "description": "Tenant of this library",
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "metadata": {
       "$ref": "../raml-util/schemas/metadata.schema",
