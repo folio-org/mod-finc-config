@@ -54,7 +54,7 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
 
     isilDAO
-        .getIsilForTenant(tenantId, vertxContext)
+        .withIsilForTenant(tenantId, vertxContext)
         .compose(
             isil -> selectMetadataCollectionsDAO.getAll(query, offset, limit, isil, vertxContext))
         .onComplete(
@@ -94,7 +94,7 @@ public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataColle
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
 
     isilDAO
-        .getIsilForTenant(tenantId, vertxContext)
+        .withIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectMetadataCollectionsDAO.getById(id, isil, vertxContext))
         .onComplete(
             ar -> {

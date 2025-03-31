@@ -23,13 +23,8 @@ import org.folio.rest.tools.utils.TenantTool;
  */
 public class FincSelectEZBCredentialsAPI implements FincSelectEzbCredentials {
 
-  private final IsilDAO isilDAO;
-  private final SelectEZBCredentialsDAO selectEZBCredentialsDAO;
-
-  public FincSelectEZBCredentialsAPI() {
-    this.isilDAO = new IsilDAOImpl();
-    this.selectEZBCredentialsDAO = new SelectEZBCredentialsDAOImpl();
-  }
+  private static final IsilDAO isilDAO = new IsilDAOImpl();
+  private static final SelectEZBCredentialsDAO selectEZBCredentialsDAO = new SelectEZBCredentialsDAOImpl();
 
   @Override
   @Validate
@@ -39,7 +34,7 @@ public class FincSelectEZBCredentialsAPI implements FincSelectEzbCredentials {
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
 
     isilDAO
-        .getIsilForTenant(tenantId, vertxContext)
+        .withIsilForTenant(tenantId, vertxContext)
         .compose(isil ->
             selectEZBCredentialsDAO.getByIsil(isil, vertxContext)
         )
@@ -73,7 +68,7 @@ public class FincSelectEZBCredentialsAPI implements FincSelectEzbCredentials {
       Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
     String tenantId =
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
-    isilDAO.getIsilForTenant(tenantId, vertxContext)
+    isilDAO.withIsilForTenant(tenantId, vertxContext)
         .compose(isil -> {
               if (entity.getIsil() != null && !isil.equals(entity.getIsil())) {
                 return Future.failedFuture(new EZBCredentialsException(
@@ -108,7 +103,7 @@ public class FincSelectEZBCredentialsAPI implements FincSelectEzbCredentials {
       Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
     String tenantId =
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
-    isilDAO.getIsilForTenant(tenantId, vertxContext)
+    isilDAO.withIsilForTenant(tenantId, vertxContext)
         .compose(isil ->
             selectEZBCredentialsDAO.deleteByIsil(isil, vertxContext)
         )

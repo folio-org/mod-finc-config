@@ -84,12 +84,12 @@ public class SelectMetadataCollectionsHelper {
 
   private Future<FincConfigMetadataCollection> doSelect(
       Select selectEntity, String id, String tenantId, Context vertxContext) {
-    Future<String> isilFuture = isilDAO.getIsilForTenant(tenantId, vertxContext);
+    Future<String> isilFuture = isilDAO.withIsilForTenant(tenantId, vertxContext);
     Future<FincConfigMetadataCollection> metadataCollectionFuture =
         metadataCollectionsDAO.getById(id, vertxContext);
 
     Promise<FincConfigMetadataCollection> result = Promise.promise();
-    GenericCompositeFuture.all(Arrays.asList(isilFuture, metadataCollectionFuture))
+    Future.all(List.of(isilFuture, metadataCollectionFuture))
         .onComplete(
             ar -> {
               if (ar.succeeded()) {
