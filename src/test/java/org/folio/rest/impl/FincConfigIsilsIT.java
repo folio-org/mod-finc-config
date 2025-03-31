@@ -1,4 +1,4 @@
-package org.folio.finc.select;
+package org.folio.rest.impl;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,7 +22,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import io.restassured.http.Method;
 
-public class IsilsIT extends ApiTestBase {
+public class FincConfigIsilsIT extends ApiTestBase {
 
   private static final String UNIQUE_ERROR = "value already exists in table";
   private static final String LENGTH_ERROR = "size must be between";
