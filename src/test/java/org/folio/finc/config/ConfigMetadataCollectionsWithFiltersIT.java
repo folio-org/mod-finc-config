@@ -92,12 +92,12 @@ public class ConfigMetadataCollectionsWithFiltersIT extends ApiTestBase {
             .withId(UUID.randomUUID().toString())
             .withType(filterType)
             .withFilterFiles(filterFiles);
-    String filterId = post(FINC_SELECT_FILTERS_ENDPOINT, filter, tenantId);
+    String filterId = postAndGetId(FINC_SELECT_FILTERS_ENDPOINT, filter, tenantId);
 
     // Connect Filter to Collections
     FincSelectFilterToCollections filter2collections =
         new FincSelectFilterToCollections().withId(filterId).withCollectionIds(collections);
-    put(FILTERS_COLLECTIONS_ENDPOINT.formatted(filterId), filter2collections, tenantId);
+    put(FILTERS_COLLECTIONS_ENDPOINT.formatted(filterId), tenantId, filter2collections);
   }
 
   private static void postMetadataCollection(String id, String nameSuffix) {
@@ -108,7 +108,7 @@ public class ConfigMetadataCollectionsWithFiltersIT extends ApiTestBase {
             .withLabel("Metadata Collection Test " + nameSuffix)
             .withUsageRestricted(FincConfigMetadataCollection.UsageRestricted.NO)
             .withSolrMegaCollections(List.of("Solr Mega Collection Test"));
-    post(FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT, metadataCollection, MODULE_TENANT);
+    postAndGetId(FINC_CONFIG_METADATA_COLLECTIONS_ENDPOINT, metadataCollection, MODULE_TENANT);
   }
 
   private static FilterFile createFilterFile(String content, String filename, String tenantId) {

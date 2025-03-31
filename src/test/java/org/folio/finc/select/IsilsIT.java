@@ -1,145 +1,166 @@
 package org.folio.finc.select;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.folio.okapi.common.XOkapiHeaders.TENANT;
 
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
-import io.vertx.core.json.Json;
-import io.vertx.ext.unit.junit.Timeout;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
-import java.util.UUID;
+import java.util.List;
 import org.folio.ApiTestBase;
 import org.folio.TestUtils;
+import org.folio.rest.jaxrs.model.Error;
+import org.folio.rest.jaxrs.model.Errors;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.jaxrs.model.Isils;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.folio.rest.jaxrs.model.Parameter;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-@RunWith(VertxUnitRunner.class)
+import io.restassured.http.Method;
+
 public class IsilsIT extends ApiTestBase {
 
-  @Rule public Timeout timeout = Timeout.seconds(10);
-  private Isil isilUBL;
+  private static final String UNIQUE_ERROR = "value already exists in table";
+  private static final String LENGTH_ERROR = "size must be between";
+  private static final String[] IGNORE_FIELDS = {"metadata"};
+  private static Isil isilUBL;
+  private static Isil isilDiku;
 
-  @BeforeClass
-  public static void beforeClass() throws Exception {
+  @BeforeAll
+  public static void beforeAll() throws Exception {
     TestUtils.setupTenants();
   }
 
-  @AfterClass
-  public static void afterClass() throws Exception {
+  @AfterAll
+  public static void afterAll() throws Exception {
     TestUtils.teardownTenants();
   }
 
-  @Before
-  public void init() {
+  @BeforeEach
+  void setUp() {
     isilUBL = loadIsilUbl();
+    isilDiku = loadIsilDiku();
   }
 
-  @After
-  public void tearDown() {
+  @AfterEach
+  void tearDown() {
     deleteIsil(isilUBL.getId());
+    deleteIsil(isilDiku.getId());
   }
 
   @Test
-  public void testGetIsilForTenant() {
-    Response ubl =
-        given()
-            .header("X-Okapi-Tenant", TENANT_UBL)
-            .header("content-type", ContentType.JSON)
-            .get(ISILS_API_ENDPOINT)
-            .then()
-            .contentType(ContentType.JSON.toString())
-            .statusCode(200)
-            .extract()
-            .response();
-    Isils isils = ubl.getBody().as(Isils.class);
-    assertEquals(1, isils.getIsils().size());
-    Isil ublIsil = isils.getIsils().get(0);
-    assertEquals(isilUBL.getIsil(), ublIsil.getIsil());
+  void testGetFincConfigIsils() {
+    assertThat(
+            given()
+                .header(TENANT, TENANT_UBL)
+                .header(CONTENT_TYPE, APPLICATION_JSON)
+                .get(ISILS_API_ENDPOINT)
+                .then()
+                .contentType(APPLICATION_JSON)
+                .statusCode(200)
+                .extract()
+                .as(Isils.class)
+                .getIsils())
+        .usingRecursiveFieldByFieldElementComparatorIgnoringFields(IGNORE_FIELDS)
+        .containsExactlyInAnyOrder(isilUBL, isilDiku);
   }
 
   @Test
-  public void testCannotPostTwoIsilsForTenant() {
-
-    Isil isilChanged =
-        new Isil()
-            .withIsil("FOO-01")
-            .withTenant(isilUBL.getTenant())
-            .withLibrary(isilUBL.getLibrary())
-            .withId(UUID.randomUUID().toString());
-
-    // POST
-    given()
-        .body(Json.encode(isilChanged))
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
-        .post(ISILS_API_ENDPOINT)
-        .then()
-        .statusCode(400);
+  void testGetFincConfigIsilById() {
+    assertThat(
+            getById(ISILS_API_ENDPOINT, TENANT_UBL, isilUBL.getId())
+                .then()
+                .statusCode(200)
+                .extract()
+                .as(Isil.class))
+        .usingRecursiveComparison()
+        .ignoringFields(IGNORE_FIELDS)
+        .isEqualTo(isilUBL);
   }
 
   @Test
-  public void testCannotPutTwoIsilsForTenant() {
+  void testPutFincConfigIsil() {
+    Isil isilChanged = TestUtils.clone(isilUBL).withLibrary("FooBar");
 
-    Isil isilChanged =
-        new Isil()
-            .withIsil("FOO-01")
-            .withTenant(isilUBL.getTenant())
-            .withLibrary(isilUBL.getLibrary())
-            .withId(isilUBL.getId());
+    putById(ISILS_API_ENDPOINT, TENANT_UBL, isilUBL.getId(), isilChanged).then().statusCode(204);
 
-    // PUT
-    given()
-        .body(Json.encode(isilChanged))
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.TEXT)
-        .put(ISILS_API_ENDPOINT + "/" + isilUBL.getId())
+    Isil getByIdResult =
+      getById(ISILS_API_ENDPOINT, TENANT_UBL, isilUBL.getId())
         .then()
-        .statusCode(400);
-  }
-
-  @Test
-  public void testCanPut() {
-
-    final String newLibrary = "FooBar";
-
-    Isil isilChanged =
-        new Isil()
-            .withIsil(isilUBL.getIsil())
-            .withTenant(isilUBL.getTenant())
-            .withLibrary(newLibrary)
-            .withId(isilUBL.getId());
-
-    // PUT
-    given()
-        .body(Json.encode(isilChanged))
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.TEXT)
-        .put(ISILS_API_ENDPOINT + "/" + isilUBL.getId())
-        .then()
-        .statusCode(204);
-
-    // GET
-    given()
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.JSON)
-        .header("accept", ContentType.JSON)
-        .get(ISILS_API_ENDPOINT + "/" + isilUBL.getId())
-        .then()
-        .contentType(ContentType.JSON)
+        .contentType(APPLICATION_JSON)
         .statusCode(200)
-        .body("id", equalTo(isilUBL.getId()))
-        .body("library", equalTo(newLibrary));
+        .extract()
+        .as(Isil.class);
+    assertThat(getByIdResult)
+      .usingRecursiveComparison()
+      .ignoringFields(IGNORE_FIELDS)
+      .isEqualTo(isilChanged);
+  }
+
+  @ParameterizedTest
+  @CsvSource(value = {"PUT", "POST"})
+  void testThatAttributeIsilIsUnique(Method method) {
+    String endpoint =
+        method == Method.PUT ? ISILS_API_ENDPOINT + "/" + isilDiku.getId() : ISILS_API_ENDPOINT;
+    Isil newIsil =
+        new Isil().withIsil(isilUBL.getIsil()).withLibrary("New Library").withTenant("test-tenant");
+
+    List<Error> errors =
+        sendEntity(endpoint, TENANT_UBL, method, newIsil)
+            .then()
+            .statusCode(422)
+            .extract()
+            .as(Errors.class)
+            .getErrors();
+    assertThat(errors)
+        .hasSize(1)
+        .first()
+        .satisfies(error -> assertThat(error.getMessage()).contains(UNIQUE_ERROR));
+  }
+
+  @ParameterizedTest
+  @CsvSource(value = {"PUT", "POST"})
+  void testThatAttributeTenantIsUnique(Method method) {
+    String endpoint =
+        method == Method.PUT ? ISILS_API_ENDPOINT + "/" + isilDiku.getId() : ISILS_API_ENDPOINT;
+    Isil newIsil =
+        new Isil().withIsil("abc-123").withLibrary("New Library").withTenant(isilUBL.getTenant());
+
+    List<Error> errors =
+        sendEntity(endpoint, TENANT_UBL, method, newIsil)
+            .then()
+            .statusCode(422)
+            .extract()
+            .as(Errors.class)
+            .getErrors();
+    assertThat(errors)
+        .isNotEmpty()
+        .allSatisfy(error -> assertThat(error.getMessage()).contains(UNIQUE_ERROR));
+  }
+
+  @ParameterizedTest
+  @CsvSource(value = {"PUT", "POST"})
+  void testThatAttributesAreNotEmpty(Method method) {
+    String endpoint =
+        method == Method.PUT ? ISILS_API_ENDPOINT + "/" + isilDiku.getId() : ISILS_API_ENDPOINT;
+    Isil newIsil = new Isil().withIsil("").withLibrary("").withTenant("");
+
+    List<Error> errors =
+        sendEntity(endpoint, TENANT_UBL, method, newIsil)
+            .then()
+            .statusCode(422)
+            .extract()
+            .as(Errors.class)
+            .getErrors();
+    assertThat(errors)
+        .isNotEmpty()
+        .allSatisfy(error -> assertThat(error.getMessage()).contains(LENGTH_ERROR))
+        .flatExtracting(Error::getParameters)
+        .extracting(Parameter::getKey)
+        .containsExactlyInAnyOrder("isil", "library", "tenant");
   }
 }

@@ -5,6 +5,9 @@ import static org.folio.okapi.common.XOkapiHeaders.TENANT;
 
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
+
+import io.restassured.http.Method;
+import io.restassured.response.Response;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import java.util.UUID;
@@ -107,14 +110,16 @@ public class ApiTestBase {
             .response()
             .as(Isil.class);
     Assert.assertEquals(isil.getIsil(), isilResp.getIsil());
-    return isilResp;
+    return isilResp.withMetadata(null);
   }
 
-  protected static String post(String endpoint, Object entity, String tenantId) {
-    return given()
-        .body(Json.encode(entity))
-        .header(TENANT, tenantId)
-        .post(endpoint)
+  protected static Response sendEntity(
+      String endpoint, String tenantId, Method method, Object entity) {
+    return given().body(Json.encode(entity)).header(TENANT, tenantId).request(method, endpoint);
+  }
+
+  protected static String postAndGetId(String endpoint, Object entity, String tenantId) {
+    return post(endpoint, tenantId, entity)
         .then()
         .statusCode(201)
         .extract()
@@ -122,8 +127,20 @@ public class ApiTestBase {
         .getString("id");
   }
 
-  protected static void put(String endpoint, Object entity, String tenantId) {
+  protected static Response post(String endpoint, String tenantId, Object entity) {
+    return given().body(Json.encode(entity)).header(TENANT, tenantId).post(endpoint);
+  }
+
+  protected static void put(String endpoint, String tenantId, Object entity) {
     given().body(Json.encode(entity)).header(TENANT, tenantId).put(endpoint).then().statusCode(200);
+  }
+
+  protected static Response putById(String endpoint, String tenantId, String id, Object entity) {
+    return given().body(Json.encode(entity)).header(TENANT, tenantId).put(endpoint + "/" + id);
+  }
+
+  protected static Response getById(String endpoint, String tenantId, String id) {
+    return given().header(TENANT, tenantId).get(endpoint + "/" + id);
   }
 
   protected static String postFile(String content, String tenantId) {

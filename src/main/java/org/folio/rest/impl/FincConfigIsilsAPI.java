@@ -1,5 +1,7 @@
 package org.folio.rest.impl;
 
+import static org.folio.rest.utils.Constants.MODULE_TENANT;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Handler;
@@ -13,7 +15,6 @@ import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.jaxrs.model.Isils;
 import org.folio.rest.jaxrs.resource.FincConfigIsils;
 import org.folio.rest.persist.PgUtil;
-import org.folio.rest.utils.Constants;
 
 /** Manages isil to tenant relations */
 public class FincConfigIsilsAPI implements FincConfigIsils {
@@ -32,7 +33,7 @@ public class FincConfigIsilsAPI implements FincConfigIsils {
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     logger.debug("Getting isils");
-    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
+    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, MODULE_TENANT);
     PgUtil.get(
         TABLE_NAME,
         Isil.class,
@@ -53,7 +54,7 @@ public class FincConfigIsilsAPI implements FincConfigIsils {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
+    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, MODULE_TENANT);
     PgUtil.post(
         TABLE_NAME,
         entity,
@@ -70,7 +71,7 @@ public class FincConfigIsilsAPI implements FincConfigIsils {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
+    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, MODULE_TENANT);
     PgUtil.getById(
         TABLE_NAME,
         Isil.class,
@@ -88,7 +89,7 @@ public class FincConfigIsilsAPI implements FincConfigIsils {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
+    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, MODULE_TENANT);
     PgUtil.deleteById(
         TABLE_NAME,
         id,
@@ -106,7 +107,7 @@ public class FincConfigIsilsAPI implements FincConfigIsils {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, Constants.MODULE_TENANT);
+    okapiHeaders.put(RestVerticle.OKAPI_HEADER_TENANT, MODULE_TENANT);
     PgUtil.put(
         TABLE_NAME,
         entity,
