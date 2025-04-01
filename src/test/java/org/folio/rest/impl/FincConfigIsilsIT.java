@@ -30,12 +30,12 @@ public class FincConfigIsilsIT extends ApiTestBase {
   private static Isil isilDiku;
 
   @BeforeAll
-  public static void beforeAll() throws Exception {
+  static void beforeAll() throws Exception {
     TestUtils.setupTenants();
   }
 
   @AfterAll
-  public static void afterAll() throws Exception {
+  static void afterAll() throws Exception {
     TestUtils.teardownTenants();
   }
 

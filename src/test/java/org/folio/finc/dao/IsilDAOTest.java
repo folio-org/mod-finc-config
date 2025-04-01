@@ -6,7 +6,7 @@ import io.vertx.core.Future;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
-public class IsilDAOTest {
+class IsilDAOTest {
 
   static final String TENANT = "test-tenant";
 
