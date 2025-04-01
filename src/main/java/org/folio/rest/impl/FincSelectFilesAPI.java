@@ -1,10 +1,11 @@
 package org.folio.rest.impl;
 
+import static org.folio.rest.utils.Constants.*;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,11 +25,7 @@ import org.folio.rest.annotations.Validate;
 import org.folio.rest.jaxrs.resource.FincSelectFiles;
 import org.folio.rest.tools.utils.TenantTool;
 
-import static org.folio.rest.utils.Constants.*;
-
-/**
- * Manages files for ui-finc-select, hence depends on isil/tenant.
- */
+/** Manages files for ui-finc-select, hence depends on isil/tenant. */
 public class FincSelectFilesAPI extends FincFileHandler implements FincSelectFiles {
 
   private final IsilHelper isilHelper;
@@ -52,7 +49,7 @@ public class FincSelectFilesAPI extends FincFileHandler implements FincSelectFil
     String tenantId =
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
     isilDAO
-        .getIsilForTenant(tenantId, vertxContext)
+        .withIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectFileDAO.getById(id, isil, vertxContext))
         .onComplete(
             ar ->
@@ -105,7 +102,7 @@ public class FincSelectFilesAPI extends FincFileHandler implements FincSelectFil
     isilHelper.fetchIsil(tenantId, vertxContext);
 
     isilDAO
-        .getIsilForTenant(tenantId, vertxContext)
+        .withIsilForTenant(tenantId, vertxContext)
         .compose(
             isil -> {
               File file = new File().withData(base64Data).withId(uuid).withIsil(isil);
@@ -137,7 +134,7 @@ public class FincSelectFilesAPI extends FincFileHandler implements FincSelectFil
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
 
     isilDAO
-        .getIsilForTenant(tenantId, vertxContext)
+        .withIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectFileDAO.deleteById(id, isil, vertxContext))
         .onComplete(
             ar -> {

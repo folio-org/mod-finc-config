@@ -2,12 +2,12 @@ package org.folio.finc.dao;
 
 import io.vertx.core.Context;
 import io.vertx.core.Future;
-import io.vertx.core.Promise;
-import java.util.List;
+import java.util.Optional;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.persist.interfaces.Results;
 import org.folio.rest.utils.Constants;
 
 public class IsilDAOImpl implements IsilDAO {
@@ -15,33 +15,23 @@ public class IsilDAOImpl implements IsilDAO {
   private static final String TABLE_NAME = "isils";
 
   @Override
-  public Future<String> getIsilForTenant(String tenantId, Context context) {
-    Promise<String> future = Promise.promise();
+  public Future<Optional<String>> getIsilForTenant(String tenantId, Context context) {
     Criteria tenantCrit =
         new Criteria().addField("'tenant'").setJSONB(true).setOperation("=").setVal(tenantId);
     Criterion criterion = new Criterion(tenantCrit);
-    PostgresClient.getInstance(context.owner(), Constants.MODULE_TENANT)
-        .get(
-            TABLE_NAME,
-            Isil.class,
-            criterion,
-            false,
-            false,
-            ar -> {
-              if (ar.succeeded()) {
-                List<Isil> isils = ar.result().getResults();
-                if (isils.isEmpty()) {
-                  future.complete(null);
-                } else if (isils.size() > 1) {
-                  future.fail("Found multiple isils for tenant " + tenantId);
-                } else {
-                  Isil isil = isils.get(0);
-                  future.complete(isil.getIsil());
-                }
-              } else {
-                future.fail("Cannot fetch isil: " + ar.cause());
+
+    return PostgresClient.getInstance(context.owner(), Constants.MODULE_TENANT)
+        .get(TABLE_NAME, Isil.class, criterion)
+        .map(Results::getResults)
+        .map(
+            isils -> {
+              if (isils.isEmpty()) {
+                return Optional.empty();
               }
+              if (isils.size() == 1) {
+                return Optional.of(isils.getFirst().getIsil());
+              }
+              throw new IllegalStateException("Found multiple isils for tenant " + tenantId);
             });
-    return future.future();
   }
 }

@@ -21,9 +21,7 @@ import org.folio.rest.jaxrs.model.Select;
 import org.folio.rest.jaxrs.resource.FincSelectMetadataSources;
 import org.folio.rest.tools.utils.TenantTool;
 
-/**
- * Manages metadata sources for ui-finc-select, hence depends on isil/tenant.
- */
+/** Manages metadata sources for ui-finc-select, hence depends on isil/tenant. */
 public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
 
   private final SelectMetadataSourcesHelper selectMetadataSourcesHelper;
@@ -52,7 +50,7 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
     String tenantId =
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
     isilDAO
-        .getIsilForTenant(tenantId, vertxContext)
+        .withIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectMetadataSourcesDAO.getAll(query, offset, limit, isil, vertxContext))
         .onComplete(
             ar -> {
@@ -89,7 +87,7 @@ public class FincSelectMetadataSourcesAPI implements FincSelectMetadataSources {
     String tenantId =
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
     isilDAO
-        .getIsilForTenant(tenantId, vertxContext)
+        .withIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectMetadataSourcesDAO.getById(id, isil, vertxContext))
         .onComplete(
             ar -> {

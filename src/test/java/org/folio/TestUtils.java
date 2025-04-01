@@ -9,6 +9,7 @@ import io.restassured.parsing.Parser;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClient;
 import java.util.concurrent.ExecutionException;
@@ -125,5 +126,10 @@ public class TestUtils {
 
   public static void resetRestAssured() {
     RestAssured.reset();
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T clone(T object) {
+    return Json.decodeValue(Json.encode(object), (Class<T>) object.getClass());
   }
 }

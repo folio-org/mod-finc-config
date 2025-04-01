@@ -11,7 +11,6 @@ import org.folio.finc.periodic.EZBHarvestJobIT;
 import org.folio.finc.select.FilterHelperIT;
 import org.folio.finc.select.FincSelectFilesIT;
 import org.folio.finc.select.FincSelectFiltersIT;
-import org.folio.finc.select.IsilsIT;
 import org.folio.finc.select.SelectEZBCredentialsIT;
 import org.folio.finc.select.SelectMetadataCollectionsIT;
 import org.folio.finc.select.SelectMetadataSourceVerticleIT;
@@ -36,7 +35,6 @@ import org.junit.runners.Suite;
   FilterHelperIT.class,
   FincSelectFilesIT.class,
   FincSelectFiltersIT.class,
-  IsilsIT.class,
   SelectEZBCredentialsIT.class,
   SelectMetadataCollectionsIT.class,
   SelectMetadataSourceVerticleIT.class,

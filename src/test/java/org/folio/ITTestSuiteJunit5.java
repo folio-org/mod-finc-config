@@ -1,6 +1,7 @@
 package org.folio;
 
 import org.folio.finc.config.ConfigMetadataCollectionsWithFiltersIT;
+import org.folio.rest.impl.FincConfigIsilsIT;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
@@ -20,4 +21,7 @@ class ITTestSuiteJunit5 {
   @Nested
   class ConfigMetadataCollectionsWithFiltersITNested
       extends ConfigMetadataCollectionsWithFiltersIT {}
+
+  @Nested
+  class FincConfigIsilsITNested extends FincConfigIsilsIT {}
 }

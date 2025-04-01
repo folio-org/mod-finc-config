@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.folio.finc.dao.FilterToCollectionsDAO;
@@ -28,9 +27,7 @@ import org.folio.rest.jaxrs.model.FincSelectFiltersGetOrder;
 import org.folio.rest.jaxrs.resource.FincSelectFilters;
 import org.folio.rest.tools.utils.TenantTool;
 
-/**
- * Manages filters for ui-finc-select, hence depends on isil/tenant.
- */
+/** Manages filters for ui-finc-select, hence depends on isil/tenant. */
 public class FincSelectFiltersAPI implements FincSelectFilters {
 
   private final IsilDAO isilDAO;
@@ -63,7 +60,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
 
     isilDAO
-        .getIsilForTenant(tenantId, vertxContext)
+        .withIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectFilterDAO.getAll(query, offset, limit, isil, vertxContext))
         .onComplete(
             ar -> {
@@ -104,7 +101,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
 
     isilDAO
-        .getIsilForTenant(tenantId, vertxContext)
+        .withIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectFilterDAO.insert(entity.withIsil(isil), vertxContext))
         .onComplete(
             ar -> {
@@ -137,7 +134,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
     String tenantId =
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
     isilDAO
-        .getIsilForTenant(tenantId, vertxContext)
+        .withIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectFilterDAO.getById(id, isil, vertxContext))
         .onComplete(
             ar -> {
@@ -177,7 +174,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
 
     Future<Integer> compose =
         isilDAO
-            .getIsilForTenant(tenantId, vertxContext)
+            .withIsilForTenant(tenantId, vertxContext)
             .compose(
                 isil ->
                     filterHelper
@@ -213,7 +210,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
 
     isilDAO
-        .getIsilForTenant(tenantId, vertxContext)
+        .withIsilForTenant(tenantId, vertxContext)
         .compose(
             isil ->
                 filterHelper
@@ -249,7 +246,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
 
     isilDAO
-        .getIsilForTenant(tenantId, vertxContext)
+        .withIsilForTenant(tenantId, vertxContext)
         .compose(isil -> filterToCollectionsDAO.getByIdAndIsil(id, isil, vertxContext))
         .onComplete(
             reply -> {
@@ -289,7 +286,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
 
     isilDAO
-        .getIsilForTenant(tenantId, vertxContext)
+        .withIsilForTenant(tenantId, vertxContext)
         .compose(isil -> selectFilterDAO.getById(id, isil, vertxContext))
         .onComplete(
             reply -> {
@@ -320,7 +317,7 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
     entity.setId(id);
     entity.setCollectionsCount(entity.getCollectionIds().size());
     isilDAO
-        .getIsilForTenant(tenantId, vertxContext)
+        .withIsilForTenant(tenantId, vertxContext)
         .compose(
             isil -> {
               entity.setIsil(isil);
