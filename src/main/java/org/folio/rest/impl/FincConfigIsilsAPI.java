@@ -16,10 +16,10 @@ import org.folio.rest.persist.PgUtil;
 import org.folio.rest.utils.Constants;
 
 /** Manages isil to tenant relations */
-public class IsilsAPI implements FincConfigIsils {
+public class FincConfigIsilsAPI implements FincConfigIsils {
 
   private static final String TABLE_NAME = "isils";
-  private static final Logger logger = LogManager.getLogger(IsilsAPI.class);
+  private static final Logger logger = LogManager.getLogger(FincConfigIsilsAPI.class);
 
   @Override
   @Validate
