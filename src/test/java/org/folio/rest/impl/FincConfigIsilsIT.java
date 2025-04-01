@@ -4,6 +4,7 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.folio.okapi.common.XOkapiHeaders.TENANT;
 
+import io.restassured.http.Method;
 import java.util.List;
 import org.folio.ApiTestBase;
 import org.folio.TestUtils;
@@ -19,8 +20,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import io.restassured.http.Method;
 
 public class FincConfigIsilsIT extends ApiTestBase {
 
@@ -89,16 +88,16 @@ public class FincConfigIsilsIT extends ApiTestBase {
     putById(ISILS_API_ENDPOINT, TENANT_UBL, isilUBL.getId(), isilChanged).then().statusCode(204);
 
     Isil getByIdResult =
-      getById(ISILS_API_ENDPOINT, TENANT_UBL, isilUBL.getId())
-        .then()
-        .contentType(APPLICATION_JSON)
-        .statusCode(200)
-        .extract()
-        .as(Isil.class);
+        getById(ISILS_API_ENDPOINT, TENANT_UBL, isilUBL.getId())
+            .then()
+            .contentType(APPLICATION_JSON)
+            .statusCode(200)
+            .extract()
+            .as(Isil.class);
     assertThat(getByIdResult)
-      .usingRecursiveComparison()
-      .ignoringFields(IGNORE_FIELDS)
-      .isEqualTo(isilChanged);
+        .usingRecursiveComparison()
+        .ignoringFields(IGNORE_FIELDS)
+        .isEqualTo(isilChanged);
   }
 
   @ParameterizedTest

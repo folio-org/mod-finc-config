@@ -5,7 +5,6 @@ import static org.folio.okapi.common.XOkapiHeaders.TENANT;
 
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
-
 import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.vertx.core.Vertx;

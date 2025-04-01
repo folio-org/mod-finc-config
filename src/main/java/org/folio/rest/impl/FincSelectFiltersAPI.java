@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.folio.finc.dao.FilterToCollectionsDAO;
@@ -28,9 +27,7 @@ import org.folio.rest.jaxrs.model.FincSelectFiltersGetOrder;
 import org.folio.rest.jaxrs.resource.FincSelectFilters;
 import org.folio.rest.tools.utils.TenantTool;
 
-/**
- * Manages filters for ui-finc-select, hence depends on isil/tenant.
- */
+/** Manages filters for ui-finc-select, hence depends on isil/tenant. */
 public class FincSelectFiltersAPI implements FincSelectFilters {
 
   private final IsilDAO isilDAO;

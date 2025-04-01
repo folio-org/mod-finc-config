@@ -1,6 +1,5 @@
 package org.folio.rest.impl;
 
-
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
@@ -22,9 +21,7 @@ import org.folio.rest.jaxrs.model.Select;
 import org.folio.rest.jaxrs.resource.FincSelectMetadataCollections;
 import org.folio.rest.tools.utils.TenantTool;
 
-/**
- * Manages metadata collections for ui-finc-select, hence depends on isil/tenant.
- */
+/** Manages metadata collections for ui-finc-select, hence depends on isil/tenant. */
 public class FincSelectMetadataCollectionsAPI implements FincSelectMetadataCollections {
 
   private final SelectMetadataCollectionsHelper selectMetadataCollectionsHelper;

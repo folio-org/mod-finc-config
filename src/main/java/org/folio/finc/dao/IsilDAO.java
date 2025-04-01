@@ -1,11 +1,9 @@
 package org.folio.finc.dao;
 
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.function.Function;
-
 import io.vertx.core.Context;
 import io.vertx.core.Future;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 public interface IsilDAO {
 
