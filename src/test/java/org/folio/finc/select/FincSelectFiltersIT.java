@@ -274,24 +274,24 @@ public class FincSelectFiltersIT extends ApiTestBase {
     filter1.setId(UUID.randomUUID().toString());
 
     given()
-      .body(Json.encode(filter1))
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", ContentType.JSON)
-      .header("accept", ContentType.JSON)
-      .post(FINC_SELECT_FILTERS_ENDPOINT)
-      .then()
-      .statusCode(201)
-      .body("id", equalTo(filter1.getId()))
-      .body("label", equalTo(filter1.getLabel()))
-      .body("type", equalTo(filter1.getType().value()));
+        .body(Json.encode(filter1))
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .post(FINC_SELECT_FILTERS_ENDPOINT)
+        .then()
+        .statusCode(201)
+        .body("id", equalTo(filter1.getId()))
+        .body("label", equalTo(filter1.getLabel()))
+        .body("type", equalTo(filter1.getType().value()));
 
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .header("content-type", ContentType.JSON)
-      .header("accept", ContentType.JSON)
-      .get(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter1.getId() + "/collections")
-      .then()
-      .statusCode(200)
-      .body("collectionIds.size()", equalTo(0));
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter1.getId() + "/collections")
+        .then()
+        .statusCode(200)
+        .body("collectionIds.size()", equalTo(0));
   }
 }
