@@ -268,4 +268,30 @@ public class FincSelectFiltersIT extends ApiTestBase {
         .then()
         .statusCode(400);
   }
+
+  @Test
+  public void checkThatWeReturnAnEmptyListAnd200IfFilterWithNoCollectionIsQueried() {
+    filter1.setId(UUID.randomUUID().toString());
+
+    given()
+      .body(Json.encode(filter1))
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .header("content-type", ContentType.JSON)
+      .header("accept", ContentType.JSON)
+      .post(FINC_SELECT_FILTERS_ENDPOINT)
+      .then()
+      .statusCode(201)
+      .body("id", equalTo(filter1.getId()))
+      .body("label", equalTo(filter1.getLabel()))
+      .body("type", equalTo(filter1.getType().value()));
+
+    given()
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .header("content-type", ContentType.JSON)
+      .header("accept", ContentType.JSON)
+      .get(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter1.getId() + "/collections")
+      .then()
+      .statusCode(200)
+      .body("collectionIds.size()", equalTo(0));
+  }
 }
