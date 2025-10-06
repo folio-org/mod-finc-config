@@ -242,34 +242,55 @@ public class FincSelectFiltersAPI implements FincSelectFilters {
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
+
     String tenantId =
         TenantTool.calculateTenantId(okapiHeaders.get(RestVerticle.OKAPI_HEADER_TENANT));
 
     isilDAO
         .withIsilForTenant(tenantId, vertxContext)
-        .compose(isil -> filterToCollectionsDAO.getByIdAndIsil(id, isil, vertxContext))
+        .compose(
+            isil ->
+                // First check if filter exists
+                selectFilterDAO
+                    .getById(id, isil, vertxContext)
+                    .compose(
+                        filter -> {
+                          if (filter == null) {
+                            return Future.failedFuture("Filter not found");
+                          }
+                          // If filter exists, get its collections
+                          return filterToCollectionsDAO
+                              .getByIdAndIsil(id, isil, vertxContext)
+                              .map(
+                                  collections ->
+                                      collections != null
+                                          ? collections
+                                          : new FincSelectFilterToCollections()
+                                              .withCollectionIds(List.of())
+                                              .withCollectionsCount(0));
+                        }))
         .onComplete(
             reply -> {
               if (reply.succeeded()) {
                 FincSelectFilterToCollections filterToCollections = reply.result();
-                if (filterToCollections != null) {
-                  filterToCollections.setIsil(null);
-                  filterToCollections.setId(null);
-                  asyncResultHandler.handle(
-                      Future.succeededFuture(
-                          GetFincSelectFiltersCollectionsByIdResponse.respond200WithApplicationJson(
-                              filterToCollections)));
-                } else {
+                filterToCollections.setIsil(null);
+                filterToCollections.setId(null);
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        GetFincSelectFiltersCollectionsByIdResponse.respond200WithApplicationJson(
+                            filterToCollections)));
+              } else {
+                if ("Filter not found".equals(reply.cause().getMessage())) {
                   asyncResultHandler.handle(
                       Future.succeededFuture(
                           GetFincSelectFiltersCollectionsByIdResponse.respond404WithTextPlain(
                               "Not found")));
+                } else {
+                  asyncResultHandler.handle(
+                      Future.succeededFuture(
+                          GetFincSelectFiltersCollectionsByIdResponse.respond500WithTextPlain(
+                              MSG_INTERNAL_SERVER_ERROR)));
                 }
-              } else {
-                asyncResultHandler.handle(
-                    Future.succeededFuture(
-                        GetFincSelectFiltersCollectionsByIdResponse.respond500WithTextPlain(
-                            MSG_INTERNAL_SERVER_ERROR)));
               }
             });
   }
