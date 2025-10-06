@@ -271,8 +271,6 @@ public class FincSelectFiltersIT extends ApiTestBase {
 
   @Test
   public void checkThatWeReturnAnEmptyListAnd200IfFilterWithNoCollectionIsQueried() {
-    filter1.setId(UUID.randomUUID().toString());
-
     given()
         .body(Json.encode(filter1))
         .header("X-Okapi-Tenant", TENANT_UBL)
@@ -293,5 +291,19 @@ public class FincSelectFiltersIT extends ApiTestBase {
         .then()
         .statusCode(200)
         .body("collectionIds.size()", equalTo(0));
+
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter1.getId())
+        .then()
+        .statusCode(204);
+
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.JSON)
+        .header("accept", ContentType.JSON)
+        .get(FINC_SELECT_FILTERS_ENDPOINT + "/" + filter1.getId() + "/collections")
+        .then()
+        .statusCode(404);
   }
 }
