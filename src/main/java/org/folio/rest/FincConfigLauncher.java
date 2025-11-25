@@ -1,15 +1,27 @@
 package org.folio.rest;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.json.jackson.DatabindCodec;
 import org.folio.dbschema.ObjectMapperTool;
 
 public class FincConfigLauncher extends RestLauncher {
 
-  static final int MAX_STRING_LEN = 50 * 1024 * 1024; // 50MB
+  static final int MAX_STRING_LEN = 70 * 1024 * 1024; // 70MB (allows 50MB uploads after Base64 encoding)
+
+  static {
+    // Configure Jackson with increased string length limit to support 50MB file uploads
+    StreamReadConstraints constraints =
+        StreamReadConstraints.builder().maxStringLength(MAX_STRING_LEN).build();
+
+    try {
+      DatabindCodec.mapper().getFactory().setStreamReadConstraints(constraints);
+      ObjectMapperTool.getMapper().getFactory().setStreamReadConstraints(constraints);
+    } catch (Exception e) {
+      // Log to stderr since loggers may not be initialized yet
+      System.err.println("WARNING: Failed to configure Jackson constraints: " + e.getMessage());
+    }
+  }
 
   public static void main(String[] args) {
     new FincConfigLauncher().dispatch(args);
@@ -18,21 +30,5 @@ public class FincConfigLauncher extends RestLauncher {
   @Override
   public void beforeStartingVertx(VertxOptions options) {
     super.beforeStartingVertx(options);
-
-    ObjectMapper objectMapper = DatabindCodec.mapper();
-    JsonFactory factory = objectMapper.getFactory();
-
-    // Modify the max string length constraint for Vertx ObjectMapper
-    factory.setStreamReadConstraints(
-        StreamReadConstraints.builder().maxStringLength(MAX_STRING_LEN).build());
-
-    // and for the ObjectMapper used by RMB
-    ObjectMapperTool.getMapper()
-        .getFactory()
-        .setStreamReadConstraints(
-            StreamReadConstraints.builder().maxStringLength(MAX_STRING_LEN).build());
-
-    System.out.println(
-        "Increased max string length to 50 MB for JSON parsing. (FincConfigLauncher)");
   }
 }

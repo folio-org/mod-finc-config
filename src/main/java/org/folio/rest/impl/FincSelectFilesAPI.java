@@ -7,12 +7,15 @@ import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.ws.rs.core.Response;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.finc.dao.IsilDAO;
 import org.folio.finc.dao.IsilDAOImpl;
 import org.folio.finc.dao.SelectFileDAO;
@@ -27,11 +30,13 @@ import org.folio.rest.tools.utils.TenantTool;
 
 /** Manages files for ui-finc-select, hence depends on isil/tenant. */
 public class FincSelectFilesAPI extends FincFileHandler implements FincSelectFiles {
+  private static final Logger log = LogManager.getLogger(FincSelectFilesAPI.class);
 
   private final IsilHelper isilHelper;
   private final IsilDAO isilDAO;
   private final SelectFileDAO selectFileDAO;
-  private Map<String, byte[]> requestedBytes = new HashMap<>();
+  private Map<String, ByteArrayOutputStream> requestedBytes = new ConcurrentHashMap<>();
+  private Map<String, Boolean> failedStreams = new ConcurrentHashMap<>();
 
   public FincSelectFilesAPI() {
     this.isilHelper = new IsilHelper();
@@ -70,18 +75,47 @@ public class FincSelectFilesAPI extends FincFileHandler implements FincSelectFil
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
     String streamId = okapiHeaders.get(STREAM_ID);
+    boolean isComplete = okapiHeaders.get(STREAM_COMPLETE) != null;
+    boolean isAbort = okapiHeaders.get(STREAM_ABORT) != null;
+
     try (InputStream bis = new BufferedInputStream(entity)) {
-      if (Objects.isNull(okapiHeaders.get(STREAM_COMPLETE))) {
+      if (!isComplete && !isAbort) {
         processBytesArrayFromStream(bis, streamId);
-      } else if (Objects.nonNull(okapiHeaders.get(STREAM_ABORT))) {
+      } else if (isAbort) {
+        requestedBytes.remove(streamId);
+        failedStreams.remove(streamId);
         asyncResultHandler.handle(
             Future.succeededFuture(
                 PostFincSelectFilesResponse.respond400WithTextPlain("Stream aborted")));
       } else {
-        // stream is completed
-        createFile(streamId, okapiHeaders, asyncResultHandler, vertxContext);
+        // Check if this stream previously failed validation
+        if (failedStreams.containsKey(streamId)) {
+          failedStreams.remove(streamId);
+          asyncResultHandler.handle(
+              Future.succeededFuture(
+                  PostFincSelectFilesResponse.respond413WithTextPlain(
+                      "File size exceeds maximum allowed size of " + MAX_UPLOAD_FILE_SIZE_MB + " MB")));
+        } else {
+          createFile(streamId, okapiHeaders, asyncResultHandler, vertxContext);
+        }
       }
+    } catch (FileSizeExceededException e) {
+      requestedBytes.remove(streamId);
+      failedStreams.put(streamId, true);
+      asyncResultHandler.handle(
+          Future.succeededFuture(
+              PostFincSelectFilesResponse.respond413WithTextPlain(e.getMessage())));
     } catch (IOException e) {
+      requestedBytes.remove(streamId);
+      failedStreams.remove(streamId);
+      log.error("Error processing file upload for stream {}", streamId, e);
+      asyncResultHandler.handle(
+          Future.succeededFuture(
+              PostFincSelectFilesResponse.respond500WithTextPlain("Internal server error")));
+    } catch (Exception e) {
+      requestedBytes.remove(streamId);
+      failedStreams.remove(streamId);
+      log.error("Unexpected error processing file upload for stream {}", streamId, e);
       asyncResultHandler.handle(
           Future.succeededFuture(
               PostFincSelectFilesResponse.respond500WithTextPlain("Internal server error")));
@@ -93,8 +127,18 @@ public class FincSelectFilesAPI extends FincFileHandler implements FincSelectFil
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    byte[] bytes = requestedBytes.get(streamId);
+    ByteArrayOutputStream baos = requestedBytes.get(streamId);
     requestedBytes.remove(streamId);
+
+    if (baos == null) {
+      log.error("No data found for stream {}", streamId);
+      asyncResultHandler.handle(
+          Future.succeededFuture(
+              PostFincSelectFilesResponse.respond500WithTextPlain("No upload data found")));
+      return;
+    }
+
+    byte[] bytes = baos.toByteArray();
     String base64Data = Base64.getEncoder().encodeToString(bytes);
     String uuid = UUID.randomUUID().toString();
     String tenantId =
@@ -150,11 +194,13 @@ public class FincSelectFilesAPI extends FincFileHandler implements FincSelectFil
   }
 
   private void processBytesArrayFromStream(InputStream is, String streamId) throws IOException {
-    byte[] requestBytesArray = requestedBytes.get(streamId);
-    if (requestBytesArray == null) {
-      requestBytesArray = new byte[0];
+    ByteArrayOutputStream baos = requestedBytes.get(streamId);
+    if (baos == null) {
+      baos = new ByteArrayOutputStream();
     }
-    requestBytesArray = ArrayUtils.addAll(requestBytesArray, IOUtils.toByteArray(is));
-    requestedBytes.put(streamId, requestBytesArray);
+    byte[] newBytes = IOUtils.toByteArray(is);
+
+    validateAndWriteBytes(baos, newBytes, streamId);
+    requestedBytes.put(streamId, baos);
   }
 }

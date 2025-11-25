@@ -3,13 +3,16 @@ package org.folio;
 import static io.restassured.RestAssured.given;
 import static org.folio.okapi.common.XOkapiHeaders.TENANT;
 
+import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.jackson.DatabindCodec;
 import java.util.UUID;
+import org.folio.dbschema.ObjectMapperTool;
 import org.folio.rest.jaxrs.model.Isil;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -18,6 +21,19 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
 public class ApiTestBase {
+
+  static {
+    // Configure Jackson with increased string length limit to support 50MB file uploads in tests
+    StreamReadConstraints constraints =
+        StreamReadConstraints.builder().maxStringLength(70 * 1024 * 1024).build();
+
+    try {
+      DatabindCodec.mapper().getFactory().setStreamReadConstraints(constraints);
+      ObjectMapperTool.getMapper().getFactory().setStreamReadConstraints(constraints);
+    } catch (Exception e) {
+      System.err.println("WARNING: Failed to configure Jackson constraints in tests: " + e.getMessage());
+    }
+  }
 
   public static final String CONTENT_TYPE = HttpHeaders.CONTENT_TYPE;
   public static final String APPLICATION_JSON = MediaType.JSON_UTF_8.withoutParameters().toString();
