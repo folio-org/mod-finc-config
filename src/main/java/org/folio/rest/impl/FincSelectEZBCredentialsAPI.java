@@ -1,12 +1,13 @@
 package org.folio.rest.impl;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import java.util.Map;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import org.folio.finc.dao.EZBCredentialsDAOImpl.EZBCredentialsException;
 import org.folio.finc.dao.IsilDAO;
 import org.folio.finc.dao.IsilDAOImpl;
@@ -48,13 +49,15 @@ public class FincSelectEZBCredentialsAPI implements FincSelectEzbCredentials {
             ar -> {
               if (ar.succeeded()) {
                 Credential cred = ar.result();
-                // Singleton resource: return JSON null if not configured
-                ResponseBuilder ok = Response.ok().type("application/json");
+                // Singleton resource: return JSON null if not configured.
+                // It's not possible to create a Response object with a JSON null as entity using
+                // the respond200WithApplicationJson method, so we create such a Response manually.
                 asyncResultHandler.handle(
                     Future.succeededFuture(
                         cred == null
-                            ? ok.entity("null").build()
-                            : ok.entity(cred.withId(null)).build()));
+                            ? Response.ok().type(APPLICATION_JSON).entity("null").build()
+                            : GetFincSelectEzbCredentialsResponse.respond200WithApplicationJson(
+                                cred.withId(null))));
               } else {
                 asyncResultHandler.handle(
                     Future.succeededFuture(
