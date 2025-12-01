@@ -78,7 +78,7 @@ public class ConfigFilesIT extends ApiTestBase {
     given()
         .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("content-type", ContentType.TEXT)
-        .get(FINC_CONFIG_FILES_ENDPOINT + "/" + UUID.randomUUID().toString())
+        .get(FINC_CONFIG_FILES_ENDPOINT + "/" + UUID.randomUUID())
         .then()
         .contentType(ContentType.TEXT)
         .statusCode(404);
@@ -121,4 +121,61 @@ public class ConfigFilesIT extends ApiTestBase {
         .then()
         .statusCode(400);
   }
+
+  @Test
+  public void checkThatDeletedFileCannotBeRetrieved() {
+    Response postResponse =
+      given()
+        .body(TEST_CONTENT.getBytes())
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.BINARY)
+        .post(FINC_CONFIG_FILES_ENDPOINT + "?isil=" + isilUbl.getIsil())
+        .then()
+        .statusCode(200)
+        .extract()
+        .response();
+
+    String id = postResponse.getBody().print();
+
+    // DELETE
+    given()
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .delete(FINC_CONFIG_FILES_ENDPOINT + "/" + id)
+      .then()
+      .statusCode(204);
+
+    // Try to GET deleted file
+    given()
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .get(FINC_CONFIG_FILES_ENDPOINT + "/" + id)
+      .then()
+      .statusCode(404);
+  }
+
+  @Test
+  public void checkThatWeCanUploadMediumSizedFile() {
+    byte[] content = new byte[5 * 1024 * 1024]; // 5 MB
+    java.util.Arrays.fill(content, (byte) 'A');
+
+    Response postResponse =
+      given()
+        .body(content)
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.BINARY)
+        .post(FINC_CONFIG_FILES_ENDPOINT + "?isil=" + isilUbl.getIsil())
+        .then()
+        .statusCode(200)
+        .extract()
+        .response();
+
+    String id = postResponse.getBody().print();
+
+    // DELETE
+    given()
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .delete(FINC_CONFIG_FILES_ENDPOINT + "/" + id)
+      .then()
+      .statusCode(204);
+  }
+
 }

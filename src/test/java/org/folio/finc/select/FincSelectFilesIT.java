@@ -18,6 +18,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.UUID;
+
 @RunWith(VertxUnitRunner.class)
 public class FincSelectFilesIT extends ApiTestBase {
 
@@ -80,4 +82,100 @@ public class FincSelectFilesIT extends ApiTestBase {
         .then()
         .statusCode(204);
   }
+
+  @Test
+  public void checkThatGetNonExistentFileReturns404() {
+    given()
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .get(FINC_SELECT_FILES_ENDPOINT + "/" + UUID.randomUUID())
+      .then()
+      .statusCode(404);
+  }
+
+  @Test
+  public void checkThatDeletedFileCannotBeRetrieved() {
+    Response postResponse =
+      given()
+        .body(TEST_CONTENT.getBytes())
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.BINARY)
+        .post(FINC_SELECT_FILES_ENDPOINT)
+        .then()
+        .statusCode(200)
+        .extract()
+        .response();
+
+    String id = postResponse.getBody().print();
+
+    // DELETE
+    given()
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .delete(FINC_SELECT_FILES_ENDPOINT + "/" + id)
+      .then()
+      .statusCode(204);
+
+    // Try to GET deleted file
+    given()
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .get(FINC_SELECT_FILES_ENDPOINT + "/" + id)
+      .then()
+      .statusCode(404);
+  }
+
+  @Test
+  public void checkThatWeCanUploadMediumSizedFile() {
+    byte[] content = new byte[5 * 1024 * 1024]; // 5 MB
+
+    Response postResponse =
+      given()
+        .body(content)
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.BINARY)
+        .post(FINC_SELECT_FILES_ENDPOINT)
+        .then()
+        .statusCode(200)
+        .extract()
+        .response();
+
+    String id = postResponse.getBody().print();
+
+    // DELETE
+    given()
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .delete(FINC_SELECT_FILES_ENDPOINT + "/" + id)
+      .then()
+      .statusCode(204);
+  }
+
+  @Test
+  public void checkThatTenantWithoutIsilCannotAccessFiles() {
+    // Upload file as UBL tenant
+    Response postResponse =
+      given()
+        .body(TEST_CONTENT.getBytes())
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .header("content-type", ContentType.BINARY)
+        .post(FINC_SELECT_FILES_ENDPOINT)
+        .then()
+        .statusCode(200)
+        .extract()
+        .response();
+
+    String id = postResponse.getBody().print();
+
+    // Try to access with different tenant (DIKU) - should not find it
+    given()
+      .header("X-Okapi-Tenant", TENANT_DIKU)
+      .get(FINC_SELECT_FILES_ENDPOINT + "/" + id)
+      .then()
+      .statusCode(404);
+
+    // Cleanup
+    given()
+      .header("X-Okapi-Tenant", TENANT_UBL)
+      .delete(FINC_SELECT_FILES_ENDPOINT + "/" + id)
+      .then()
+      .statusCode(204);
+  }
+
 }

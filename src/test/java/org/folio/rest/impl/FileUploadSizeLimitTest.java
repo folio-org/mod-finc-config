@@ -97,8 +97,67 @@ class FileUploadSizeLimitTest {
         .isInstanceOf(FileSizeExceededException.class);
   }
 
+  @Test
+  void testGetAndRemoveStream() {
+    String streamId = "test-stream";
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    handler.requestedBytes.put(streamId, baos);
+
+    ByteArrayOutputStream result = handler.getAndRemoveStream(streamId);
+
+    assertThat(result).isSameAs(baos);
+    assertThat(handler.requestedBytes).doesNotContainKey(streamId);
+  }
+
+  @Test
+  void testGetAndRemoveStreamNotFound() {
+    ByteArrayOutputStream result = handler.getAndRemoveStream("non-existent");
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void testStreamMapsAreIndependent() {
+    String streamId = "test-stream";
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+    handler.requestedBytes.put(streamId, baos);
+    handler.failedStreams.put(streamId, true);
+
+    assertThat(handler.requestedBytes).containsKey(streamId);
+    assertThat(handler.failedStreams).containsKey(streamId);
+
+    // Removing from requestedBytes shouldn't affect failedStreams
+    handler.getAndRemoveStream(streamId);
+    assertThat(handler.requestedBytes).doesNotContainKey(streamId);
+    assertThat(handler.failedStreams).containsKey(streamId);
+  }
+
+  @Test
+  void testEmptyStreamProcessing() throws Exception {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    byte[] emptyData = new byte[0];
+
+    handler.validateAndWriteBytes(baos, emptyData, "empty-stream");
+
+    assertThat(baos.size()).isZero();
+  }
+
+  @Test
+  void testFileSizeExceededExceptionWithMessage() {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    byte[] data = new byte[(int) MAX_UPLOAD_FILE_SIZE + 1000];
+
+    FileSizeExceededException exception =
+        org.junit.jupiter.api.Assertions.assertThrows(
+            FileSizeExceededException.class,
+            () -> handler.validateAndWriteBytes(baos, data, "test-stream-large"));
+
+    assertThat(exception.getMessage()).contains("50 MB");
+    assertThat(exception).isInstanceOf(java.io.IOException.class);
+  }
+
   /** Test implementation of FincFileHandler to access protected method */
   private static class TestFincFileHandler extends FincFileHandler {
-    // Exposes protected method for testing
+    // Exposes protected members for testing
   }
 }
