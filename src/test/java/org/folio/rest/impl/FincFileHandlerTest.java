@@ -101,7 +101,7 @@ class FincFileHandlerTest {
   }
 
   @Test
-  void testHandleStreamUploadWithFileSizeExceededDuringStreaming() throws IOException {
+  void testHandleStreamUploadWithFileSizeExceededDuringStreaming() {
     FincFileHandler.StreamReader streamReader =
         is -> {
           throw new FileSizeExceededException("File too large");
@@ -131,7 +131,7 @@ class FincFileHandlerTest {
   }
 
   @Test
-  void testHandleStreamUploadWithIOException() throws IOException {
+  void testHandleStreamUploadWithIOException() {
     FincFileHandler.StreamReader streamReader =
         is -> {
           throw new IOException("Stream read error");
@@ -162,7 +162,7 @@ class FincFileHandlerTest {
   }
 
   @Test
-  void testHandleStreamUploadWithGenericException() throws IOException {
+  void testHandleStreamUploadWithGenericException() {
     FincFileHandler.StreamReader streamReader =
         is -> {
           throw new RuntimeException("Unexpected error");
@@ -192,7 +192,7 @@ class FincFileHandlerTest {
   }
 
   @Test
-  void testHandleStreamUploadWithFailedStreamCompletion() throws IOException {
+  void testHandleStreamUploadWithFailedStreamCompletion() {
     String streamId = "failed-stream";
 
     InputStream inputStream1 = new ByteArrayInputStream(new byte[100]);
@@ -265,6 +265,69 @@ class FincFileHandlerTest {
 
     assertThat(result).isNotNull();
     assertThat(handler.requestedBytes).doesNotContainKey(streamId);
+  }
+
+  @Test
+  void testCleanupAbandonedStreams() throws InterruptedException {
+    // Add some streams with different ages
+    String oldStream = "old-stream";
+    String recentStream = "recent-stream";
+
+    // Add old stream and set its timestamp to 6 minutes ago (older than 5 min threshold)
+    handler.requestedBytes.put(oldStream, new java.io.ByteArrayOutputStream());
+    handler.streamTimestamps.put(oldStream, System.currentTimeMillis() - (6 * 60 * 1000));
+
+    // Add recent stream with current timestamp
+    handler.requestedBytes.put(recentStream, new java.io.ByteArrayOutputStream());
+    handler.streamTimestamps.put(recentStream, System.currentTimeMillis());
+
+    // Verify both streams exist
+    assertThat(handler.requestedBytes).containsKey(oldStream);
+    assertThat(handler.requestedBytes).containsKey(recentStream);
+
+    // Run cleanup
+    handler.cleanupAbandonedStreams();
+
+    // Old stream should be removed
+    assertThat(handler.requestedBytes).doesNotContainKey(oldStream);
+    assertThat(handler.streamTimestamps).doesNotContainKey(oldStream);
+
+    // Recent stream should still exist
+    assertThat(handler.requestedBytes).containsKey(recentStream);
+    assertThat(handler.streamTimestamps).containsKey(recentStream);
+  }
+
+  @Test
+  void testCleanupAbandonedStreamsWithFailedStreams() {
+    // Add an abandoned stream that also has a failed status
+    String abandonedStream = "abandoned-failed-stream";
+
+    handler.requestedBytes.put(abandonedStream, new java.io.ByteArrayOutputStream());
+    handler.failedStreams.put(abandonedStream, true);
+    handler.streamTimestamps.put(abandonedStream, System.currentTimeMillis() - (6 * 60 * 1000));
+
+    // Verify stream exists in all maps
+    assertThat(handler.requestedBytes).containsKey(abandonedStream);
+    assertThat(handler.failedStreams).containsKey(abandonedStream);
+    assertThat(handler.streamTimestamps).containsKey(abandonedStream);
+
+    // Run cleanup
+    handler.cleanupAbandonedStreams();
+
+    // All traces should be removed
+    assertThat(handler.requestedBytes).doesNotContainKey(abandonedStream);
+    assertThat(handler.failedStreams).doesNotContainKey(abandonedStream);
+    assertThat(handler.streamTimestamps).doesNotContainKey(abandonedStream);
+  }
+
+  @Test
+  void testCleanupAbandonedStreamsWithEmptyMaps() {
+    // Should not throw exception with empty maps
+    handler.cleanupAbandonedStreams();
+
+    assertThat(handler.requestedBytes).isEmpty();
+    assertThat(handler.failedStreams).isEmpty();
+    assertThat(handler.streamTimestamps).isEmpty();
   }
 
   // Test implementation of FincFileHandler

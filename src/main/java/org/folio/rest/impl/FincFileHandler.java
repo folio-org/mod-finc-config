@@ -25,8 +25,11 @@ import org.folio.rest.tools.utils.BinaryOutStream;
 public abstract class FincFileHandler {
   private static final Logger log = LogManager.getLogger(FincFileHandler.class);
 
+  private static final long STREAM_MAX_AGE_MS = 5L * 60 * 1000;
+
   protected final Map<String, ByteArrayOutputStream> requestedBytes = new ConcurrentHashMap<>();
   protected final Map<String, Boolean> failedStreams = new ConcurrentHashMap<>();
+  protected final Map<String, Long> streamTimestamps = new ConcurrentHashMap<>();
 
   protected void handleAsyncFileResponse(
       AsyncResult<File> ar,
@@ -107,6 +110,8 @@ public abstract class FincFileHandler {
       StreamReader streamReader,
       FileCreator fileCreator) {
 
+    cleanupAbandonedStreams();
+
     String streamId = okapiHeaders.get(STREAM_ID);
     boolean isComplete = okapiHeaders.get(STREAM_COMPLETE) != null;
     boolean isAbort = okapiHeaders.get(STREAM_ABORT) != null;
@@ -148,6 +153,8 @@ public abstract class FincFileHandler {
    * @return The ByteArrayOutputStream or null if not found
    */
   protected ByteArrayOutputStream getAndRemoveStream(String streamId) {
+    streamTimestamps.remove(streamId);
+    failedStreams.remove(streamId);
     return requestedBytes.remove(streamId);
   }
 
@@ -161,11 +168,33 @@ public abstract class FincFileHandler {
 
     validateAndWriteBytes(baos, newBytes, streamId);
     requestedBytes.put(streamId, baos);
+    streamTimestamps.put(streamId, System.currentTimeMillis());
   }
 
   private void cleanupStream(String streamId) {
     requestedBytes.remove(streamId);
     failedStreams.remove(streamId);
+    streamTimestamps.remove(streamId);
+  }
+
+  /**
+   * Removes abandoned streams that have not been accessed within the maximum age threshold.
+   * This prevents memory leaks from clients that start uploads but never complete or abort them.
+   * Should be called periodically or at the start of new upload requests.
+   */
+  protected void cleanupAbandonedStreams() {
+    long currentTime = System.currentTimeMillis();
+    streamTimestamps.entrySet().removeIf(entry -> {
+      long age = currentTime - entry.getValue();
+      if (age > STREAM_MAX_AGE_MS) {
+        String streamId = entry.getKey();
+        log.info("Cleaning up abandoned stream {} (age: {} ms)", streamId, age);
+        requestedBytes.remove(streamId);
+        failedStreams.remove(streamId);
+        return true;
+      }
+      return false;
+    });
   }
 
   /** Functional interface for reading bytes from input stream */

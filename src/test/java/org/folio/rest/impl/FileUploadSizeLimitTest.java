@@ -116,20 +116,23 @@ class FileUploadSizeLimitTest {
   }
 
   @Test
-  void testStreamMapsAreIndependent() {
+  void testGetAndRemoveStreamCleansUpAllMaps() {
     String streamId = "test-stream";
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
     handler.requestedBytes.put(streamId, baos);
     handler.failedStreams.put(streamId, true);
+    handler.streamTimestamps.put(streamId, System.currentTimeMillis());
 
     assertThat(handler.requestedBytes).containsKey(streamId);
     assertThat(handler.failedStreams).containsKey(streamId);
+    assertThat(handler.streamTimestamps).containsKey(streamId);
 
-    // Removing from requestedBytes shouldn't affect failedStreams
+    // getAndRemoveStream should clean up all three maps to prevent memory leaks
     handler.getAndRemoveStream(streamId);
     assertThat(handler.requestedBytes).doesNotContainKey(streamId);
-    assertThat(handler.failedStreams).containsKey(streamId);
+    assertThat(handler.failedStreams).doesNotContainKey(streamId);
+    assertThat(handler.streamTimestamps).doesNotContainKey(streamId);
   }
 
   @Test
