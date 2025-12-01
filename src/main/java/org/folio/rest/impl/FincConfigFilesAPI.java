@@ -6,12 +6,9 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,8 +27,6 @@ public class FincConfigFilesAPI extends FincFileHandler implements FincConfigFil
   public static final String X_OKAPI_TENANT = "x-okapi-tenant";
 
   private final FileDAO fileDAO;
-  private Map<String, ByteArrayOutputStream> requestedBytes = new ConcurrentHashMap<>();
-  private Map<String, Boolean> failedStreams = new ConcurrentHashMap<>();
 
   public FincConfigFilesAPI() {
     this.fileDAO = new FileDAOImpl();
@@ -53,52 +48,32 @@ public class FincConfigFilesAPI extends FincFileHandler implements FincConfigFil
                   "Isil must be set as query parameter.")));
       return;
     }
-    String streamId = okapiHeaders.get(STREAM_ID);
-    boolean isComplete = okapiHeaders.get(STREAM_COMPLETE) != null;
-    boolean isAbort = okapiHeaders.get(STREAM_ABORT) != null;
 
-    try (InputStream bis = new BufferedInputStream(entity)) {
-      if (!isComplete && !isAbort) {
-        processBytesArrayFromStream(bis, streamId);
-      } else if (isAbort) {
-        requestedBytes.remove(streamId);
-        failedStreams.remove(streamId);
-        asyncResultHandler.handle(
-            Future.succeededFuture(
-                PostFincConfigFilesResponse.respond400WithTextPlain("Stream aborted")));
-      } else {
-        // Check if this stream previously failed validation
-        if (failedStreams.containsKey(streamId)) {
-          failedStreams.remove(streamId);
-          asyncResultHandler.handle(
-              Future.succeededFuture(
-                  PostFincConfigFilesResponse.respond413WithTextPlain(
-                      "File size exceeds maximum allowed size of " + MAX_UPLOAD_FILE_SIZE_MB + " MB")));
-        } else {
-          createFile(streamId, isil, okapiHeaders, asyncResultHandler, vertxContext);
-        }
-      }
-    } catch (FileSizeExceededException e) {
-      requestedBytes.remove(streamId);
-      failedStreams.put(streamId, true);
-      asyncResultHandler.handle(
-          Future.succeededFuture(
-              PostFincConfigFilesResponse.respond413WithTextPlain(e.getMessage())));
-    } catch (IOException e) {
-      requestedBytes.remove(streamId);
-      failedStreams.remove(streamId);
-      log.error("Error processing file upload for stream {} and isil {}", streamId, isil, e);
-      asyncResultHandler.handle(
-          Future.succeededFuture(
-              PostFincConfigFilesResponse.respond500WithTextPlain("Internal server error")));
-    } catch (Exception e) {
-      requestedBytes.remove(streamId);
-      failedStreams.remove(streamId);
-      log.error("Unexpected error processing file upload for stream {} and isil {}", streamId, isil, e);
-      asyncResultHandler.handle(
-          Future.succeededFuture(
-              PostFincConfigFilesResponse.respond500WithTextPlain("Internal server error")));
-    }
+    handleStreamUpload(
+        entity,
+        okapiHeaders,
+        asyncResultHandler,
+        vertxContext,
+        new StreamUploadResponses() {
+          @Override
+          public Response streamAborted() {
+            return PostFincConfigFilesResponse.respond400WithTextPlain("Stream aborted");
+          }
+
+          @Override
+          public Response fileSizeExceeded() {
+            return PostFincConfigFilesResponse.respond413WithTextPlain(
+                "File size exceeds maximum allowed size of " + MAX_UPLOAD_FILE_SIZE_MB + " MB");
+          }
+
+          @Override
+          public Response internalError() {
+            return PostFincConfigFilesResponse.respond500WithTextPlain("Internal server error");
+          }
+        },
+        InputStream::readAllBytes,
+        (streamId, headers, handler, context) ->
+            createFile(streamId, isil, headers, handler, context));
   }
 
   private void createFile(
@@ -107,8 +82,7 @@ public class FincConfigFilesAPI extends FincFileHandler implements FincConfigFil
       Map<String, String> okapiHeaders,
       Handler<AsyncResult<Response>> asyncResultHandler,
       Context vertxContext) {
-    ByteArrayOutputStream baos = requestedBytes.get(streamId);
-    requestedBytes.remove(streamId);
+    ByteArrayOutputStream baos = getAndRemoveStream(streamId);
 
     if (baos == null) {
       log.error("No data found for stream {} and isil {}", streamId, isil);
@@ -176,16 +150,5 @@ public class FincConfigFilesAPI extends FincFileHandler implements FincConfigFil
                 asyncResultHandler.handle(
                     Future.succeededFuture(
                         DeleteFincConfigFilesByIdResponse.respond500WithTextPlain(throwable))));
-  }
-
-  private void processBytesArrayFromStream(InputStream is, String streamId) throws IOException {
-    ByteArrayOutputStream baos = requestedBytes.get(streamId);
-    if (baos == null) {
-      baos = new ByteArrayOutputStream();
-    }
-    byte[] newBytes = is.readAllBytes();
-
-    validateAndWriteBytes(baos, newBytes, streamId);
-    requestedBytes.put(streamId, baos);
   }
 }

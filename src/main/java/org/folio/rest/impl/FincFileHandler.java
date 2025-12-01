@@ -1,14 +1,20 @@
 package org.folio.rest.impl;
 
-import static org.folio.rest.utils.Constants.MAX_UPLOAD_FILE_SIZE;
-import static org.folio.rest.utils.Constants.MAX_UPLOAD_FILE_SIZE_MB;
+import static org.folio.rest.utils.Constants.*;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Context;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Base64;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import javax.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.folio.finc.model.File;
@@ -18,6 +24,9 @@ import org.folio.rest.tools.utils.BinaryOutStream;
 /** Abstract class to handle file related responses and file upload validation */
 public abstract class FincFileHandler {
   private static final Logger log = LogManager.getLogger(FincFileHandler.class);
+
+  protected final Map<String, ByteArrayOutputStream> requestedBytes = new ConcurrentHashMap<>();
+  protected final Map<String, Boolean> failedStreams = new ConcurrentHashMap<>();
 
   protected void handleAsyncFileResponse(
       AsyncResult<File> ar,
@@ -76,5 +85,115 @@ public abstract class FincFileHandler {
     }
 
     baos.write(newBytes);
+  }
+
+  /**
+   * Handles file upload stream processing with common logic for size validation and error handling
+   *
+   * @param entity The input stream
+   * @param okapiHeaders The okapi headers containing stream metadata
+   * @param asyncResultHandler The response handler
+   * @param vertxContext The Vert.x context
+   * @param responses Response factory for creating appropriate responses
+   * @param streamReader Function to read bytes from the input stream
+   * @param fileCreator Function to create the file when stream is complete
+   */
+  protected void handleStreamUpload(
+      InputStream entity,
+      Map<String, String> okapiHeaders,
+      Handler<AsyncResult<Response>> asyncResultHandler,
+      Context vertxContext,
+      StreamUploadResponses responses,
+      StreamReader streamReader,
+      FileCreator fileCreator) {
+
+    String streamId = okapiHeaders.get(STREAM_ID);
+    boolean isComplete = okapiHeaders.get(STREAM_COMPLETE) != null;
+    boolean isAbort = okapiHeaders.get(STREAM_ABORT) != null;
+
+    try (InputStream bis = new BufferedInputStream(entity)) {
+      if (!isComplete && !isAbort) {
+        processBytesArrayFromStream(bis, streamId, streamReader);
+      } else if (isAbort) {
+        cleanupStream(streamId);
+        asyncResultHandler.handle(Future.succeededFuture(responses.streamAborted()));
+      } else {
+        // Check if this stream previously failed validation
+        if (failedStreams.containsKey(streamId)) {
+          failedStreams.remove(streamId);
+          asyncResultHandler.handle(Future.succeededFuture(responses.fileSizeExceeded()));
+        } else {
+          fileCreator.createFile(streamId, okapiHeaders, asyncResultHandler, vertxContext);
+        }
+      }
+    } catch (FileSizeExceededException e) {
+      requestedBytes.remove(streamId);
+      failedStreams.put(streamId, true);
+      asyncResultHandler.handle(Future.succeededFuture(responses.fileSizeExceeded(e.getMessage())));
+    } catch (IOException e) {
+      cleanupStream(streamId);
+      log.error("Error processing file upload for stream {}", streamId, e);
+      asyncResultHandler.handle(Future.succeededFuture(responses.internalError()));
+    } catch (Exception e) {
+      cleanupStream(streamId);
+      log.error("Unexpected error processing file upload for stream {}", streamId, e);
+      asyncResultHandler.handle(Future.succeededFuture(responses.internalError()));
+    }
+  }
+
+  /**
+   * Gets the byte array output stream for a completed upload and removes it from the map
+   *
+   * @param streamId The stream identifier
+   * @return The ByteArrayOutputStream or null if not found
+   */
+  protected ByteArrayOutputStream getAndRemoveStream(String streamId) {
+    return requestedBytes.remove(streamId);
+  }
+
+  private void processBytesArrayFromStream(
+      InputStream is, String streamId, StreamReader streamReader) throws IOException {
+    ByteArrayOutputStream baos = requestedBytes.get(streamId);
+    if (baos == null) {
+      baos = new ByteArrayOutputStream();
+    }
+    byte[] newBytes = streamReader.readBytes(is);
+
+    validateAndWriteBytes(baos, newBytes, streamId);
+    requestedBytes.put(streamId, baos);
+  }
+
+  private void cleanupStream(String streamId) {
+    requestedBytes.remove(streamId);
+    failedStreams.remove(streamId);
+  }
+
+  /** Functional interface for reading bytes from input stream */
+  @FunctionalInterface
+  protected interface StreamReader {
+    byte[] readBytes(InputStream is) throws IOException;
+  }
+
+  /** Functional interface for creating file after stream is complete */
+  @FunctionalInterface
+  protected interface FileCreator {
+    void createFile(
+        String streamId,
+        Map<String, String> okapiHeaders,
+        Handler<AsyncResult<Response>> asyncResultHandler,
+        Context vertxContext);
+  }
+
+  /** Interface for creating appropriate response types */
+  protected interface StreamUploadResponses {
+    Response streamAborted();
+
+    Response fileSizeExceeded();
+
+    default Response fileSizeExceeded(String message) {
+      return fileSizeExceeded();
+    }
+
+    Response internalError();
   }
 }
