@@ -7,7 +7,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,8 +26,7 @@ class FincFileHandlerTest {
 
   @BeforeEach
   void setUp() {
-    Vertx vertx = Vertx.vertx();
-    vertxContext = vertx.getOrCreateContext();
+    vertxContext = null;
     handler = new TestFincFileHandler();
   }
 

@@ -76,6 +76,9 @@ public class TestUtils {
 
   public static void deployRestVerticle(boolean isTesting)
       throws ExecutionException, InterruptedException, TimeoutException {
+    // Instantiate FincConfigLauncher to trigger static initializer for Jackson configuration
+    new org.folio.rest.FincConfigLauncher();
+
     DeploymentOptions options = new DeploymentOptions();
     options.setConfig(new JsonObject().put("http.port", verticlePort).put("testing", isTesting));
     deploymentId =

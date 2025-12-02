@@ -11,7 +11,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import java.util.UUID;
 import org.folio.rest.jaxrs.model.Isil;
-import org.folio.rest.utils.JacksonConfigUtil;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -19,10 +18,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
 public class ApiTestBase {
-
-  static {
-    JacksonConfigUtil.configureJacksonConstraints();
-  }
 
   public static final String CONTENT_TYPE = HttpHeaders.CONTENT_TYPE;
   public static final String APPLICATION_JSON = MediaType.JSON_UTF_8.withoutParameters().toString();

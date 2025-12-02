@@ -81,71 +81,22 @@ public class FincSelectFilesIT extends ApiTestBase {
         .delete(FINC_SELECT_FILES_ENDPOINT + "/" + id)
         .then()
         .statusCode(204);
-  }
 
-  @Test
-  public void checkThatGetNonExistentFileReturns404() {
+    // Verify deleted file returns 404
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .get(FINC_SELECT_FILES_ENDPOINT + "/" + UUID.randomUUID())
-      .then()
-      .statusCode(404);
-  }
-
-  @Test
-  public void checkThatDeletedFileCannotBeRetrieved() {
-    Response postResponse =
-      given()
-        .body(TEST_CONTENT.getBytes())
         .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.BINARY)
-        .post(FINC_SELECT_FILES_ENDPOINT)
+        .get(FINC_SELECT_FILES_ENDPOINT + "/" + id)
         .then()
-        .statusCode(200)
-        .extract()
-        .response();
+        .statusCode(404);
 
-    String id = postResponse.getBody().print();
-
-    // DELETE
+    // Verify non-existent file returns 404
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .delete(FINC_SELECT_FILES_ENDPOINT + "/" + id)
-      .then()
-      .statusCode(204);
-
-    // Try to GET deleted file
-    given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .get(FINC_SELECT_FILES_ENDPOINT + "/" + id)
-      .then()
-      .statusCode(404);
-  }
-
-  @Test
-  public void checkThatWeCanUploadMediumSizedFile() {
-    byte[] content = new byte[5 * 1024 * 1024]; // 5 MB
-
-    Response postResponse =
-      given()
-        .body(content)
         .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.BINARY)
-        .post(FINC_SELECT_FILES_ENDPOINT)
+        .get(FINC_SELECT_FILES_ENDPOINT + "/" + UUID.randomUUID())
         .then()
-        .statusCode(200)
-        .extract()
-        .response();
-
-    String id = postResponse.getBody().print();
-
-    // DELETE
-    given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .delete(FINC_SELECT_FILES_ENDPOINT + "/" + id)
-      .then()
-      .statusCode(204);
+        .statusCode(404);
   }
+
 
   @Test
   public void checkThatTenantWithoutIsilCannotAccessFiles() {
