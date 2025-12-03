@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Files for Finc Select
-version: v1
+version: v1.1
 baseUri: http://localhost/mod-finc-config
 
 documentation:
@@ -18,7 +18,9 @@ resourceTypes:
 /finc-select/files:
   displayName: Finc select files
   post:
-    description: Upload/update a finc select file.
+    description: |
+      Upload/update a finc select file.
+      Maximum file size: 50 MB
     body:
       application/octet-stream:
     responses:
@@ -30,6 +32,10 @@ resourceTypes:
         body:
           text/plain:
       404:
+        body:
+          text/plain:
+      413:
+        description: "Payload Too Large - File size exceeds maximum allowed size of 50 MB"
         body:
           text/plain:
       500:

@@ -78,7 +78,7 @@ public class ConfigFilesIT extends ApiTestBase {
     given()
         .header("X-Okapi-Tenant", TENANT_DIKU)
         .header("content-type", ContentType.TEXT)
-        .get(FINC_CONFIG_FILES_ENDPOINT + "/" + UUID.randomUUID().toString())
+        .get(FINC_CONFIG_FILES_ENDPOINT + "/" + UUID.randomUUID())
         .then()
         .contentType(ContentType.TEXT)
         .statusCode(404);
@@ -108,6 +108,13 @@ public class ConfigFilesIT extends ApiTestBase {
         .delete(FINC_CONFIG_FILES_ENDPOINT + "/" + id)
         .then()
         .statusCode(204);
+
+    // Verify deleted file returns 404
+    given()
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .get(FINC_CONFIG_FILES_ENDPOINT + "/" + id)
+        .then()
+        .statusCode(404);
   }
 
   @Test

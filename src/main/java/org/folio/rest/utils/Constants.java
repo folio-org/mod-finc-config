@@ -10,6 +10,15 @@ public class Constants {
   public static final String STREAM_COMPLETE = "complete";
   public static final String STREAM_ID = "streamed_id";
 
+  /** Bytes per megabyte */
+  public static final long BYTES_PER_MB = 1024L * 1024L;
+
+  /** Maximum file upload size in bytes (50 MB) */
+  public static final long MAX_UPLOAD_FILE_SIZE = 50L * BYTES_PER_MB;
+
+  /** Maximum file upload size in MB */
+  public static final long MAX_UPLOAD_FILE_SIZE_MB = 50L;
+
   private Constants() {
     throw new IllegalStateException("Utility class");
   }
