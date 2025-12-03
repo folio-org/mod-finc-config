@@ -1,27 +1,20 @@
 package org.folio.finc.config;
 
-import io.vertx.ext.unit.junit.Timeout;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.TestUtils;
 import org.folio.finc.FileUploadSizeLimitTestBase;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-@RunWith(VertxUnitRunner.class)
 public class ConfigFilesUploadSizeLimitIT extends FileUploadSizeLimitTestBase {
 
-  @Rule public Timeout timeout = Timeout.seconds(30);
-
-  @BeforeClass
-  public static void beforeClass() throws Exception {
+  @BeforeAll
+  static void beforeAll() throws Exception {
     TestUtils.setupTenants();
   }
 
-  @AfterClass
-  public static void afterClass() throws Exception {
+  @AfterAll
+  static void afterAll() throws Exception {
     TestUtils.teardownTenants();
   }
 

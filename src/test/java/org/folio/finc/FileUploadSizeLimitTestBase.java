@@ -7,8 +7,8 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.folio.ApiTestBase;
 import org.folio.rest.jaxrs.model.Isil;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 /** Base class for file upload size limit tests across different endpoints */
 public abstract class FileUploadSizeLimitTestBase extends ApiTestBase {
@@ -21,12 +21,12 @@ public abstract class FileUploadSizeLimitTestBase extends ApiTestBase {
   /** Returns the endpoint URL for file deletion (base path without ID) */
   protected abstract String getDeleteEndpoint();
 
-  @Before
+  @BeforeEach
   public void init() {
     isilUbl = loadIsilUbl();
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     deleteIsil(isilUbl.getId());
   }

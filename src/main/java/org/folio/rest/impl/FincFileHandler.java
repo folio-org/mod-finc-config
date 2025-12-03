@@ -178,23 +178,26 @@ public abstract class FincFileHandler {
   }
 
   /**
-   * Removes abandoned streams that have not been accessed within the maximum age threshold.
-   * This prevents memory leaks from clients that start uploads but never complete or abort them.
-   * Should be called periodically or at the start of new upload requests.
+   * Removes abandoned streams that have not been accessed within the maximum age threshold. This
+   * prevents memory leaks from clients that start uploads but never complete or abort them. Should
+   * be called periodically or at the start of new upload requests.
    */
   protected void cleanupAbandonedStreams() {
     long currentTime = System.currentTimeMillis();
-    streamTimestamps.entrySet().removeIf(entry -> {
-      long age = currentTime - entry.getValue();
-      if (age > STREAM_MAX_AGE_MS) {
-        String streamId = entry.getKey();
-        log.info("Cleaning up abandoned stream {} (age: {} ms)", streamId, age);
-        requestedBytes.remove(streamId);
-        failedStreams.remove(streamId);
-        return true;
-      }
-      return false;
-    });
+    streamTimestamps
+        .entrySet()
+        .removeIf(
+            entry -> {
+              long age = currentTime - entry.getValue();
+              if (age > STREAM_MAX_AGE_MS) {
+                String streamId = entry.getKey();
+                log.info("Cleaning up abandoned stream {} (age: {} ms)", streamId, age);
+                requestedBytes.remove(streamId);
+                failedStreams.remove(streamId);
+                return true;
+              }
+              return false;
+            });
   }
 
   /** Functional interface for reading bytes from input stream */

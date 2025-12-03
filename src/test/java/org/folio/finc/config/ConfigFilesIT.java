@@ -128,6 +128,4 @@ public class ConfigFilesIT extends ApiTestBase {
         .then()
         .statusCode(400);
   }
-
-
 }

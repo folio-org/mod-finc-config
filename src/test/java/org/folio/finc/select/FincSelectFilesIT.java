@@ -7,6 +7,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import java.util.UUID;
 import org.folio.ApiTestBase;
 import org.folio.TestUtils;
 import org.folio.rest.jaxrs.model.Isil;
@@ -17,8 +18,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.UUID;
 
 @RunWith(VertxUnitRunner.class)
 public class FincSelectFilesIT extends ApiTestBase {
@@ -97,36 +96,34 @@ public class FincSelectFilesIT extends ApiTestBase {
         .statusCode(404);
   }
 
-
   @Test
   public void checkThatTenantWithoutIsilCannotAccessFiles() {
     // Upload file as UBL tenant
     Response postResponse =
-      given()
-        .body(TEST_CONTENT.getBytes())
-        .header("X-Okapi-Tenant", TENANT_UBL)
-        .header("content-type", ContentType.BINARY)
-        .post(FINC_SELECT_FILES_ENDPOINT)
-        .then()
-        .statusCode(200)
-        .extract()
-        .response();
+        given()
+            .body(TEST_CONTENT.getBytes())
+            .header("X-Okapi-Tenant", TENANT_UBL)
+            .header("content-type", ContentType.BINARY)
+            .post(FINC_SELECT_FILES_ENDPOINT)
+            .then()
+            .statusCode(200)
+            .extract()
+            .response();
 
     String id = postResponse.getBody().print();
 
     // Try to access with different tenant (DIKU) - should not find it
     given()
-      .header("X-Okapi-Tenant", TENANT_DIKU)
-      .get(FINC_SELECT_FILES_ENDPOINT + "/" + id)
-      .then()
-      .statusCode(404);
+        .header("X-Okapi-Tenant", TENANT_DIKU)
+        .get(FINC_SELECT_FILES_ENDPOINT + "/" + id)
+        .then()
+        .statusCode(404);
 
     // Cleanup
     given()
-      .header("X-Okapi-Tenant", TENANT_UBL)
-      .delete(FINC_SELECT_FILES_ENDPOINT + "/" + id)
-      .then()
-      .statusCode(204);
+        .header("X-Okapi-Tenant", TENANT_UBL)
+        .delete(FINC_SELECT_FILES_ENDPOINT + "/" + id)
+        .then()
+        .statusCode(204);
   }
-
 }

@@ -35,14 +35,14 @@ class FincFileHandlerTest {
     AsyncResult<File> failedResult = Future.failedFuture(new RuntimeException("Database error"));
 
     AtomicReference<Response> capturedResponse = new AtomicReference<>();
-    Handler<AsyncResult<Response>> asyncResultHandler =
-        ar -> capturedResponse.set(ar.result());
+    Handler<AsyncResult<Response>> asyncResultHandler = ar -> capturedResponse.set(ar.result());
 
     handler.handleAsyncFileResponse(
         failedResult,
         bos -> new TestResponseDelegate(Response.ok().build()),
         msg -> new TestResponseDelegate(Response.status(404).entity(msg).build()),
-        throwable -> new TestResponseDelegate(Response.status(500).entity("Internal error").build()),
+        throwable ->
+            new TestResponseDelegate(Response.status(500).entity("Internal error").build()),
         asyncResultHandler);
 
     assertThat(capturedResponse.get()).isNotNull();
@@ -57,14 +57,14 @@ class FincFileHandlerTest {
     AsyncResult<File> successResult = Future.succeededFuture(file);
 
     AtomicReference<Response> capturedResponse = new AtomicReference<>();
-    Handler<AsyncResult<Response>> asyncResultHandler =
-        ar -> capturedResponse.set(ar.result());
+    Handler<AsyncResult<Response>> asyncResultHandler = ar -> capturedResponse.set(ar.result());
 
     handler.handleAsyncFileResponse(
         successResult,
         bos -> new TestResponseDelegate(Response.ok().entity(bos).build()),
         msg -> new TestResponseDelegate(Response.status(404).entity(msg).build()),
-        throwable -> new TestResponseDelegate(Response.status(500).entity("Internal error").build()),
+        throwable ->
+            new TestResponseDelegate(Response.status(500).entity("Internal error").build()),
         asyncResultHandler);
 
     assertThat(capturedResponse.get()).isNotNull();
@@ -79,8 +79,7 @@ class FincFileHandlerTest {
     headers.put(STREAM_ABORT, "true");
 
     AtomicReference<Response> capturedResponse = new AtomicReference<>();
-    Handler<AsyncResult<Response>> asyncResultHandler =
-        ar -> capturedResponse.set(ar.result());
+    Handler<AsyncResult<Response>> asyncResultHandler = ar -> capturedResponse.set(ar.result());
 
     TestStreamUploadResponses responses = new TestStreamUploadResponses();
 
@@ -110,8 +109,7 @@ class FincFileHandlerTest {
     headers.put(STREAM_ID, "test-stream");
 
     AtomicReference<Response> capturedResponse = new AtomicReference<>();
-    Handler<AsyncResult<Response>> asyncResultHandler =
-        ar -> capturedResponse.set(ar.result());
+    Handler<AsyncResult<Response>> asyncResultHandler = ar -> capturedResponse.set(ar.result());
 
     TestStreamUploadResponses responses = new TestStreamUploadResponses();
 
@@ -140,8 +138,7 @@ class FincFileHandlerTest {
     headers.put(STREAM_ID, "test-stream");
 
     AtomicReference<Response> capturedResponse = new AtomicReference<>();
-    Handler<AsyncResult<Response>> asyncResultHandler =
-        ar -> capturedResponse.set(ar.result());
+    Handler<AsyncResult<Response>> asyncResultHandler = ar -> capturedResponse.set(ar.result());
 
     TestStreamUploadResponses responses = new TestStreamUploadResponses();
 
@@ -171,8 +168,7 @@ class FincFileHandlerTest {
     headers.put(STREAM_ID, "test-stream");
 
     AtomicReference<Response> capturedResponse = new AtomicReference<>();
-    Handler<AsyncResult<Response>> asyncResultHandler =
-        ar -> capturedResponse.set(ar.result());
+    Handler<AsyncResult<Response>> asyncResultHandler = ar -> capturedResponse.set(ar.result());
 
     TestStreamUploadResponses responses = new TestStreamUploadResponses();
 
@@ -203,8 +199,7 @@ class FincFileHandlerTest {
         };
 
     AtomicReference<Response> capturedResponse1 = new AtomicReference<>();
-    Handler<AsyncResult<Response>> asyncResultHandler1 =
-        ar -> capturedResponse1.set(ar.result());
+    Handler<AsyncResult<Response>> asyncResultHandler1 = ar -> capturedResponse1.set(ar.result());
 
     TestStreamUploadResponses responses = new TestStreamUploadResponses();
 
@@ -228,8 +223,7 @@ class FincFileHandlerTest {
     headers2.put(STREAM_COMPLETE, "true");
 
     AtomicReference<Response> capturedResponse2 = new AtomicReference<>();
-    Handler<AsyncResult<Response>> asyncResultHandler2 =
-        ar -> capturedResponse2.set(ar.result());
+    Handler<AsyncResult<Response>> asyncResultHandler2 = ar -> capturedResponse2.set(ar.result());
 
     handler.handleStreamUpload(
         inputStream2,
@@ -266,7 +260,7 @@ class FincFileHandlerTest {
   }
 
   @Test
-  void testCleanupAbandonedStreams() throws InterruptedException {
+  void testCleanupAbandonedStreams() {
     // Add some streams with different ages
     String oldStream = "old-stream";
     String recentStream = "recent-stream";
@@ -280,8 +274,7 @@ class FincFileHandlerTest {
     handler.streamTimestamps.put(recentStream, System.currentTimeMillis());
 
     // Verify both streams exist
-    assertThat(handler.requestedBytes).containsKey(oldStream);
-    assertThat(handler.requestedBytes).containsKey(recentStream);
+    assertThat(handler.requestedBytes).containsKey(oldStream).containsKey(recentStream);
 
     // Run cleanup
     handler.cleanupAbandonedStreams();
