@@ -1,5 +1,7 @@
 package org.folio.rest.impl;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
@@ -18,7 +20,13 @@ import org.folio.rest.jaxrs.resource.FincSelectEzbCredentials;
 import org.folio.rest.jaxrs.resource.FincSelectMetadataCollections.GetFincSelectMetadataCollectionsResponse;
 import org.folio.rest.tools.utils.TenantTool;
 
-/** Manages EZB credentials for ui-finc-select, hence depends on isil/tenant. */
+/**
+ * Manages EZB credentials for ui-finc-select, hence depends on isil/tenant.
+ *
+ * <p>This is a SINGLETON resource - each tenant has at most one EZB credential entry. GET returns
+ * 200 with null if no credentials are configured. PUT performs upsert (create or update). DELETE
+ * removes the credential entry (subsequent GET returns null).
+ */
 public class FincSelectEZBCredentialsAPI implements FincSelectEzbCredentials {
 
   private static final IsilDAO isilDAO = new IsilDAOImpl();
@@ -41,17 +49,15 @@ public class FincSelectEZBCredentialsAPI implements FincSelectEzbCredentials {
             ar -> {
               if (ar.succeeded()) {
                 Credential cred = ar.result();
-                if (cred == null) {
-                  asyncResultHandler.handle(
-                      Future.succeededFuture(
-                          GetFincSelectEzbCredentialsResponse.respond404WithTextPlain(
-                              "Not found")));
-                } else {
-                  asyncResultHandler.handle(
-                      Future.succeededFuture(
-                          GetFincSelectEzbCredentialsResponse.respond200WithApplicationJson(
-                              cred.withId(null))));
-                }
+                // Singleton resource: return JSON null if not configured.
+                // It's not possible to create a Response object with a JSON null as entity using
+                // the respond200WithApplicationJson method, so we create such a Response manually.
+                asyncResultHandler.handle(
+                    Future.succeededFuture(
+                        cred == null
+                            ? Response.ok().type(APPLICATION_JSON).entity("null").build()
+                            : GetFincSelectEzbCredentialsResponse.respond200WithApplicationJson(
+                                cred.withId(null))));
               } else {
                 asyncResultHandler.handle(
                     Future.succeededFuture(

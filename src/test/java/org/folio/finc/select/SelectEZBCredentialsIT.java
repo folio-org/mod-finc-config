@@ -1,6 +1,7 @@
 package org.folio.finc.select;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 
 import io.restassured.http.ContentType;
 import io.vertx.core.json.Json;
@@ -111,8 +112,8 @@ public class SelectEZBCredentialsIT extends ApiTestBase {
         .header("Accept", ContentType.JSON)
         .get(FINC_SELECT_EZB_CREDENTIALS_ENDPOINT)
         .then()
-        .contentType(ContentType.TEXT)
-        .statusCode(404);
+        .statusCode(200)
+        .body(equalTo("null"));
   }
 
   @Test
