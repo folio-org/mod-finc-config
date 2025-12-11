@@ -1,6 +1,8 @@
 package org.folio;
 
+import org.folio.finc.config.ConfigFilesUploadSizeLimitIT;
 import org.folio.finc.config.ConfigMetadataCollectionsWithFiltersIT;
+import org.folio.finc.select.FincSelectFilesUploadSizeLimitIT;
 import org.folio.rest.impl.FincConfigIsilsIT;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -24,4 +26,10 @@ class ITTestSuiteJunit5 {
 
   @Nested
   class FincConfigIsilsITNested extends FincConfigIsilsIT {}
+
+  @Nested
+  class ConfigFilesUploadSizeLimitITNested extends ConfigFilesUploadSizeLimitIT {}
+
+  @Nested
+  class FincSelectFilesUploadSizeLimitITNested extends FincSelectFilesUploadSizeLimitIT {}
 }

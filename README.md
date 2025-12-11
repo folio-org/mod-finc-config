@@ -72,6 +72,25 @@ of the uploaded file.
 HTTP GET */finc-select/filter-files/{id}*. Note, that you need to upload the binary file first, to
 get its id, which can then be used in the definition of a filter document.
 
+**File Upload Size Limit**: File uploads are limited to a maximum size of 50 MB to prevent denial
+of service (DoS) attacks. If a file exceeds this limit, the upload will fail with a 413 (Payload
+Too Large) error response. This limit applies to both */finc-select/files* and */finc-config/files*
+endpoints.
+
+**Gateway Configuration Required**: To support 50 MB file uploads, the API gateway and sidecar must be
+configured with appropriate request size limits. Without these configurations, uploads will be rejected
+at the gateway level before reaching this module.
+
+For **Kong** (FOLIO gateway), add to the Kong container environment:
+```yaml
+KONG_NGINX_HTTP_CLIENT_MAX_BODY_SIZE: 100m
+```
+
+For **Eureka/Module Sidecar**, add to the sidecar environment configuration:
+```yaml
+QUARKUS_HTTP_LIMITS_MAX_BODY_SIZE: 100M
+```
+
 ## Harvest EZB holding files
 
 This module can harvest holding files from the *Elektronische Zeitschriftenbibliothek (EZB)*
