@@ -68,20 +68,15 @@ public class EZBHarvestJob implements Job {
                       EZBHarvestVerticle verticle = new EZBHarvestVerticle(ezbService);
                       vertxContext
                           .owner()
-                          .deployVerticle(
-                              verticle,
-                              new DeploymentOptions().setConfig(c),
-                              stringAsyncResult -> {
-                                if (stringAsyncResult.failed()) {
-                                  log.error(
-                                      String.format(
-                                          "Failed to deploy ezb verticle: %s",
-                                          stringAsyncResult.cause().getMessage()),
-                                      stringAsyncResult.cause());
-                                  singleResult.fail(stringAsyncResult.cause());
-                                } else {
-                                  singleResult.complete();
-                                }
+                          .deployVerticle(verticle, new DeploymentOptions().setConfig(c))
+                          .onSuccess(id -> singleResult.complete())
+                          .onFailure(
+                              err -> {
+                                log.error(
+                                    String.format(
+                                        "Failed to deploy ezb verticle: %s", err.getMessage()),
+                                    err);
+                                singleResult.fail(err);
                               });
                     });
                 GenericCompositeFuture.all(composedFutures)
