@@ -14,12 +14,17 @@ import org.apache.logging.log4j.Logger;
 import org.folio.finc.periodic.EZBHarvestJob;
 import org.folio.finc.periodic.ezb.EZBServiceImpl;
 import org.folio.rest.resource.interfaces.PostDeployVerticle;
+import org.folio.rest.utils.JacksonConfigUtil;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
 public class PostDeployImpl implements PostDeployVerticle {
 
   private static final Logger log = LogManager.getLogger(PostDeployImpl.class);
+
+  static {
+    JacksonConfigUtil.configureJacksonConstraints();
+  }
 
   @Override
   public void init(Vertx vertx, Context context, Handler<AsyncResult<Boolean>> handler) {
