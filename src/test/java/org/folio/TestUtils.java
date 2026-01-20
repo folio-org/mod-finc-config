@@ -93,7 +93,8 @@ public class TestUtils {
 
   public static void setupTenants() throws ExecutionException, InterruptedException {
     TenantAttributes tenantAttributes =
-        new TenantAttributes().withModuleTo(ModuleName.getModuleVersion());
+        new TenantAttributes()
+            .withModuleTo(ModuleName.getModuleName() + "-" + ModuleName.getModuleVersion());
     Future.all(
             Stream.of(MODULE_TENANT, TENANT_UBL, TENANT_DIKU)
                 .map(tenant -> new TenantClient(URL, tenant, tenant, WEB_CLIENT))
