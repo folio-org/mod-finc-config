@@ -40,6 +40,7 @@ public class PostDeployImpl implements PostDeployVerticle {
           "Environment variable "
               + ENV_EZB_DOWNLOAD_URL
               + " is not set. EZB file harvesting is not setup.");
+      handler.handle(Future.succeededFuture(true));
       return;
     }
 
@@ -73,5 +74,6 @@ public class PostDeployImpl implements PostDeployVerticle {
     } catch (SchedulerException e) {
       log.error(e);
     }
+    handler.handle(Future.succeededFuture(true));
   }
 }
