@@ -1,18 +1,16 @@
 package org.folio.finc.select.verticles;
 
 import io.vertx.core.*;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.folio.okapi.common.GenericCompositeFuture;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.utils.Constants;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * {@link io.vertx.core.Verticle} to select resp. unselect all metadata collections of a single
@@ -108,8 +106,8 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
         .compose(
             isil -> {
               List<FincConfigMetadataCollection> selected = select(metadataCollections, isil);
-              List<Future> futures = saveCollections(selected);
-              return GenericCompositeFuture.join(futures);
+              List<Future<Void>> futures = saveCollections(selected);
+              return Future.join(futures);
             });
   }
 
@@ -152,7 +150,7 @@ public abstract class AbstractSelectMetadataSourceVerticle extends AbstractVerti
     return result.future();
   }
 
-  private List<Future> saveCollections(List<FincConfigMetadataCollection> selected) {
+  private List<Future<Void>> saveCollections(List<FincConfigMetadataCollection> selected) {
     return selected.stream().map(this::saveSingleCollection).collect(Collectors.toList());
   }
 
