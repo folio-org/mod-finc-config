@@ -596,6 +596,12 @@
       ]
     }
   ],
+  "optional": [
+    {
+      "id": "organizations-storage.organizations",
+      "version": "1.0"
+    }
+  ],
   "permissionSets": [
     {
       "permissionName": "finc-config.metadata-collections.collection.get",
