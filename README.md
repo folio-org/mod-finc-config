@@ -100,8 +100,9 @@ The module starts on port 8081.
 
 Initialize the `finc` tenant. The `x-okapi-url` header is required for tenant initialization
 because the tenant API may load reference data or make callbacks. Regular API requests don't
-need this header since they only interact with the local database. `mod-finc-config-7.0.0-SNAPSHOT`
-should be replaced with the current version.
+need this header since they only interact with the local database.
+
+Without sample data:
 
 ```bash
 curl -X POST "http://localhost:8081/_/tenant" \
@@ -111,9 +112,25 @@ curl -X POST "http://localhost:8081/_/tenant" \
   -d '{"module_to": "mod-finc-config-7.0.0-SNAPSHOT"}'
 ```
 
-### 5. Load Sample Data
+With sample data (loads ISILs, metadata sources, and collections from `sample-data/`):
 
-The module includes sample data in the `sample-data/` directory.
+```bash
+curl -X POST "http://localhost:8081/_/tenant" \
+  -H "Content-Type: application/json" \
+  -H "x-okapi-tenant: finc" \
+  -H "x-okapi-url: http://localhost:8081" \
+  -d '{
+    "module_to": "mod-finc-config-7.0.0-SNAPSHOT",
+    "parameters": [
+      {
+        "key": "loadSample",
+        "value": "true"
+      }
+    ]
+  }'
+```
+
+### 5. Example Requests
 
 **Create an ISIL (tenant identifier):**
 
@@ -164,8 +181,6 @@ curl -X POST "http://localhost:8081/finc-config/metadata-collections" \
     "collectionId": "coe-123"
   }'
 ```
-
-### 6. Example Requests
 
 **List all metadata sources:**
 
