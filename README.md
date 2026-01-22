@@ -212,18 +212,23 @@ curl "http://localhost:8081/finc-select/metadata-sources" \
 
 ### Dependencies
 
-This module has no declared interface dependencies (no `requires` section in the ModuleDescriptor).
+This module has no required interface dependencies (no `requires` section in the ModuleDescriptor).
+
+Optional dependencies declared in ModuleDescriptor:
+
+- `organizations-storage.organizations` 1.0 - Used to resolve organization names in metadata sources
 
 Runtime behavior:
 
 - **Organization names**: When returning metadata sources, the module calls
-  `/organizations-storage/organizations/{id}` to resolve organization names. If the lookup fails,
+  `/organizations-storage/organizations/{id}` to resolve organization names. The lookup uses the
+  calling user's permissions. If the lookup fails (interface unavailable or user lacks permission),
   the module logs a warning and continues without the name (see `OrganizationNameResolver.java`).
 - **User contacts**: Stored as local references (UUIDs and names) without runtime lookups.
 
 Related modules:
 
-- [mod-organizations-storage](https://github.com/folio-org/mod-organizations-storage) - Runtime lookup for organization names (graceful fallback if unavailable)
+- [mod-organizations-storage](https://github.com/folio-org/mod-organizations-storage) - Optional runtime lookup for organization names
 - [mod-users](https://github.com/folio-org/mod-users) - Source of user UUIDs stored in contacts (no runtime lookup)
 
 ## Filters
