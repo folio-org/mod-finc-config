@@ -599,7 +599,7 @@
   "optional": [
     {
       "id": "organizations-storage.organizations",
-      "version": "1.0"
+      "version": "3.3"
     }
   ],
   "permissionSets": [

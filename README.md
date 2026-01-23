@@ -216,7 +216,7 @@ This module has no required interface dependencies (no `requires` section in the
 
 Optional dependencies declared in ModuleDescriptor:
 
-- `organizations-storage.organizations` 1.0 - Used to resolve organization names in metadata sources
+- `organizations-storage.organizations` - Used to resolve organization names in metadata sources
 
 Runtime behavior:
 
