@@ -13,7 +13,6 @@ import org.apache.logging.log4j.Logger;
 import org.folio.finc.dao.EZBCredentialsDAO;
 import org.folio.finc.dao.EZBCredentialsDAOImpl;
 import org.folio.finc.periodic.ezb.EZBService;
-import org.folio.okapi.common.GenericCompositeFuture;
 import org.folio.rest.jaxrs.model.Credentials;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -48,7 +47,7 @@ public class EZBHarvestJob implements Job {
 
   public Future<Void> run(Context vertxContext) {
     Promise<Void> result = Promise.promise();
-    List<Future> composedFutures = new ArrayList<>();
+    List<Future<Void>> composedFutures = new ArrayList<>();
     //   For each tenant there is an ezb credential entry holding the credentials to fetch the
     // tenant's holding files.
     ezbCredentialsDAO
@@ -68,23 +67,18 @@ public class EZBHarvestJob implements Job {
                       EZBHarvestVerticle verticle = new EZBHarvestVerticle(ezbService);
                       vertxContext
                           .owner()
-                          .deployVerticle(
-                              verticle,
-                              new DeploymentOptions().setConfig(c),
-                              stringAsyncResult -> {
-                                if (stringAsyncResult.failed()) {
-                                  log.error(
-                                      String.format(
-                                          "Failed to deploy ezb verticle: %s",
-                                          stringAsyncResult.cause().getMessage()),
-                                      stringAsyncResult.cause());
-                                  singleResult.fail(stringAsyncResult.cause());
-                                } else {
-                                  singleResult.complete();
-                                }
+                          .deployVerticle(verticle, new DeploymentOptions().setConfig(c))
+                          .onSuccess(id -> singleResult.complete())
+                          .onFailure(
+                              err -> {
+                                log.error(
+                                    String.format(
+                                        "Failed to deploy ezb verticle: %s", err.getMessage()),
+                                    err);
+                                singleResult.fail(err);
                               });
                     });
-                GenericCompositeFuture.all(composedFutures)
+                Future.all(composedFutures)
                     .onComplete(
                         comFutAR -> {
                           if (comFutAR.succeeded()) {

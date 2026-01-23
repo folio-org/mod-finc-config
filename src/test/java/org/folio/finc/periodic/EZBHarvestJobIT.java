@@ -11,7 +11,6 @@ import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Date;
 import org.folio.finc.mocks.EZBServiceMock;
-import org.folio.okapi.common.GenericCompositeFuture;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.persist.PostgresClient;
 import org.junit.Test;
@@ -44,7 +43,7 @@ public class EZBHarvestJobIT extends AbstractEZBHarvestJobTest {
   public void checkThatEZBFileIsUpdatedForMultiFiles(TestContext context) {
     Future<FincSelectFilter> firstInsert = insertEZBFile("foo", FILE_ID, DATE);
     Future<FincSelectFilter> secondInsert = insertEZBFile("bar", FILE_ID2, DATE);
-    GenericCompositeFuture.all(Arrays.asList(firstInsert, secondInsert))
+    Future.all(Arrays.asList(firstInsert, secondInsert))
         .flatMap(cf -> EZB_JOB.run(vertxContext))
         .flatMap(v -> getUpdatedEZBFile())
         .onComplete(context.asyncAssertSuccess(s -> assertThat(s).isEqualTo(EZB_FILE_CONTENT)));

@@ -2,6 +2,9 @@ package org.folio.finc.select;
 
 import io.vertx.core.*;
 import io.vertx.core.json.JsonObject;
+import java.util.Map;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.folio.finc.select.verticles.AbstractSelectMetadataSourceVerticle;
@@ -11,10 +14,6 @@ import org.folio.rest.jaxrs.model.Select;
 import org.folio.rest.jaxrs.resource.FincSelectMetadataSources.PutFincSelectMetadataSourcesCollectionsSelectAllByIdResponse;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.TenantTool;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.Map;
 
 /** Helper class to select/unselect metadata sources for finc-select. */
 public class SelectMetadataSourcesHelper {
@@ -65,17 +64,15 @@ public class SelectMetadataSourcesHelper {
     JsonObject cfg = vertx.getOrCreateContext().config();
     cfg.put("tenantId", tenantId);
     cfg.put("metadataSourceId", metadataSourceId);
-    vertx.deployVerticle(
-        verticle,
-        new DeploymentOptions().setConfig(cfg),
-        stringAsyncResult -> {
-          if (stringAsyncResult.failed()) {
-            logger.error(
-                String.format(
-                    "Failed to deploy SelectVerticle for metadata source %s and for tenant %s: %s",
-                    metadataSourceId, tenantId, stringAsyncResult.cause().getMessage()),
-                stringAsyncResult.cause());
-          }
-        });
+    vertx
+        .deployVerticle(verticle, new DeploymentOptions().setConfig(cfg))
+        .onFailure(
+            err ->
+                logger.error(
+                    String.format(
+                        "Failed to deploy SelectVerticle for metadata source %s and for tenant %s:"
+                            + " %s",
+                        metadataSourceId, tenantId, err.getMessage()),
+                    err));
   }
 }

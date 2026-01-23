@@ -76,9 +76,6 @@ public class TestUtils {
 
   public static void deployRestVerticle(boolean isTesting)
       throws ExecutionException, InterruptedException, TimeoutException {
-    // Instantiate FincConfigLauncher to trigger static initializer for Jackson configuration
-    new org.folio.rest.FincConfigLauncher();
-
     DeploymentOptions options = new DeploymentOptions();
     options.setConfig(new JsonObject().put("http.port", verticlePort).put("testing", isTesting));
     deploymentId =
@@ -96,7 +93,8 @@ public class TestUtils {
 
   public static void setupTenants() throws ExecutionException, InterruptedException {
     TenantAttributes tenantAttributes =
-        new TenantAttributes().withModuleTo(ModuleName.getModuleVersion());
+        new TenantAttributes()
+            .withModuleTo(ModuleName.getModuleName() + "-" + ModuleName.getModuleVersion());
     Future.all(
             Stream.of(MODULE_TENANT, TENANT_UBL, TENANT_DIKU)
                 .map(tenant -> new TenantClient(URL, tenant, tenant, WEB_CLIENT))
