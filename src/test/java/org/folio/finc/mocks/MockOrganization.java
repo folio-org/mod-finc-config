@@ -23,4 +23,26 @@ public class MockOrganization {
                     .withBody(Json.encode(organization))
                     .withStatus(200)));
   }
+
+  public static void mockOrganizationNotFound(String organizationId) {
+    String orgaUrl = ORGANIZATION_URL + organizationId;
+    givenThat(
+        get(urlPathEqualTo(orgaUrl))
+            .willReturn(
+                aResponse()
+                    .withHeader("Content-type", "text/plain")
+                    .withBody("Not Found")
+                    .withStatus(404)));
+  }
+
+  public static void mockOrganizationServerError(String organizationId) {
+    String orgaUrl = ORGANIZATION_URL + organizationId;
+    givenThat(
+        get(urlPathEqualTo(orgaUrl))
+            .willReturn(
+                aResponse()
+                    .withHeader("Content-type", "text/plain")
+                    .withBody("Internal Server Error")
+                    .withStatus(500)));
+  }
 }
