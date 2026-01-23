@@ -14,12 +14,17 @@ import org.apache.logging.log4j.Logger;
 import org.folio.finc.periodic.EZBHarvestJob;
 import org.folio.finc.periodic.ezb.EZBServiceImpl;
 import org.folio.rest.resource.interfaces.PostDeployVerticle;
+import org.folio.rest.utils.JacksonConfigUtil;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
 public class PostDeployImpl implements PostDeployVerticle {
 
   private static final Logger log = LogManager.getLogger(PostDeployImpl.class);
+
+  static {
+    JacksonConfigUtil.configureJacksonConstraints();
+  }
 
   @Override
   public void init(Vertx vertx, Context context, Handler<AsyncResult<Boolean>> handler) {
@@ -35,6 +40,7 @@ public class PostDeployImpl implements PostDeployVerticle {
           "Environment variable "
               + ENV_EZB_DOWNLOAD_URL
               + " is not set. EZB file harvesting is not setup.");
+      handler.handle(Future.succeededFuture(true));
       return;
     }
 
@@ -68,5 +74,6 @@ public class PostDeployImpl implements PostDeployVerticle {
     } catch (SchedulerException e) {
       log.error(e);
     }
+    handler.handle(Future.succeededFuture(true));
   }
 }

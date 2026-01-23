@@ -3,6 +3,8 @@ package org.folio.finc.periodic;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.folio.finc.dao.SelectFileDAO;
@@ -11,14 +13,10 @@ import org.folio.finc.dao.SelectFilterDAO;
 import org.folio.finc.dao.SelectFilterDAOImpl;
 import org.folio.finc.model.File;
 import org.folio.finc.periodic.ezb.EZBService;
-import org.folio.okapi.common.GenericCompositeFuture;
 import org.folio.rest.jaxrs.model.FilterFile;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.jaxrs.model.FincSelectFilters;
 import org.folio.rest.jaxrs.model.Metadata;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /** A {@link io.vertx.core.Verticle} to fetch EZB holding files for a single tenant. */
 public class EZBHarvestVerticle extends AbstractVerticle {
@@ -46,7 +44,7 @@ public class EZBHarvestVerticle extends AbstractVerticle {
 
     Future<String> ezbFileFuture = ezbService.fetchEZBFile(user, password, libId, vertx);
     Future<FincSelectFilter> dbFilterFuture = fetchFilterFromDB(isil);
-    GenericCompositeFuture.all(Arrays.asList(ezbFileFuture, dbFilterFuture))
+    Future.all(Arrays.asList(ezbFileFuture, dbFilterFuture))
         .compose(
             compositeFuture ->
                 updateEZBFileOfFilter(dbFilterFuture.result(), ezbFileFuture.result(), isil))
@@ -254,12 +252,12 @@ public class EZBHarvestVerticle extends AbstractVerticle {
       FincSelectFilter filter, List<String> fileIds, String isil) {
     Promise<List<FilterFile>> result = Promise.promise();
 
-    List<Future> deleteFileFutures =
+    List<Future<Integer>> deleteFileFutures =
         fileIds.stream()
             .map(id -> selectFileDAO.deleteById(id, isil, vertx.getOrCreateContext()))
             .collect(Collectors.toList());
 
-    GenericCompositeFuture.all(deleteFileFutures)
+    Future.all(deleteFileFutures)
         .onComplete(
             ar -> {
               if (ar.succeeded()) {

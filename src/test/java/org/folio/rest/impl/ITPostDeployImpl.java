@@ -1,12 +1,9 @@
 package org.folio.rest.impl;
 
-import static io.vertx.core.Future.succeededFuture;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.folio.rest.utils.Constants.QUARTZ_EZB_JOB_KEY;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -76,10 +73,10 @@ public class ITPostDeployImpl {
   }
 
   private static class TestJobListener extends JobListenerSupport {
-    private final Handler<AsyncResult<String>> resultHandler;
+    private final Promise<String> resultPromise;
 
-    public TestJobListener(Handler<AsyncResult<String>> resultHandler) {
-      this.resultHandler = resultHandler;
+    public TestJobListener(Promise<String> resultPromise) {
+      this.resultPromise = resultPromise;
     }
 
     @Override
@@ -90,7 +87,7 @@ public class ITPostDeployImpl {
     @Override
     public void jobToBeExecuted(JobExecutionContext context) {
       String url = getUrl(context.getJobInstance());
-      resultHandler.handle(succeededFuture(url));
+      resultPromise.complete(url);
     }
 
     private static String getUrl(Job jobInstance) {
