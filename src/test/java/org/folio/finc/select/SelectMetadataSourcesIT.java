@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.UUID;
 import org.folio.ApiTestBase;
 import org.folio.TestUtils;
-import org.folio.finc.mocks.MockOrganization;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection.UsageRestricted;
 import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
@@ -23,7 +22,6 @@ import org.folio.rest.jaxrs.model.FincSelectMetadataSource;
 import org.folio.rest.jaxrs.model.FincSelectMetadataSource.Selected;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.jaxrs.model.MdSource;
-import org.folio.rest.jaxrs.model.Organization;
 import org.folio.rest.jaxrs.model.SelectedBy;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -39,7 +37,6 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
   @Rule public Timeout timeout = Timeout.seconds(10);
   @Rule public WireMockRule wireMockRule = new WireMockRule(options().dynamicPort());
   private FincConfigMetadataSource metadatasourceSelected;
-  private Organization organizationUUID1234;
   private Isil isilUBL;
   private Isil isilDiku;
 
@@ -57,8 +54,6 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
   public void init() {
     isilUBL = loadIsilUbl();
     isilDiku = loadIsilDiku();
-    organizationUUID1234 =
-        new Organization().withName("Organization Name 1234").withId("uuid-1234");
     metadatasourceSelected =
         new FincConfigMetadataSource()
             .withId(UUID.randomUUID().toString())
@@ -80,7 +75,6 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
   @Test
   public void checkThatWeCanSelectAndUnselect() {
     String mockedOkapiUrl = "http://localhost:" + wireMockRule.port();
-    MockOrganization.mockOrganizationFound(organizationUUID1234);
 
     // POST
     given()
@@ -159,7 +153,6 @@ public class SelectMetadataSourcesIT extends ApiTestBase {
   @Test
   public void selectAllCollectionsOfSource() throws InterruptedException {
     String mockedOkapiUrl = "http://localhost:" + wireMockRule.port();
-    MockOrganization.mockOrganizationFound(organizationUUID1234);
 
     FincConfigMetadataSource metadataSource =
         new FincConfigMetadataSource()

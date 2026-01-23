@@ -8,7 +8,7 @@ import io.vertx.core.json.Json;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.TestUtils;
 import org.folio.finc.mocks.MockOrganization;
-import org.folio.rest.jaxrs.model.FincConfigMetadataSource;
+import org.folio.rest.jaxrs.model.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,7 +30,11 @@ public class ConfigMetadataSourcesIT extends AbstractMetadataSourcesIT {
   @Test
   public void checkThatWeCanAddGetPutAndDeleteMetadataSources() {
     String mockedOkapiUrl = "http://localhost:" + wireMockRule.port();
+
+    metadataSource2.setOrganization(new Organization().withId(organizationUUID1235.getId()));
+    metadataSource2Changed.setOrganization(new Organization().withId(organizationUUID1235.getId()));
     MockOrganization.mockOrganizationFound(organizationUUID1235);
+
     // POST
     given()
         .body(Json.encode(metadataSource2))
@@ -58,7 +62,8 @@ public class ConfigMetadataSourcesIT extends AbstractMetadataSourcesIT {
         .body("id", equalTo(metadataSource2.getId()))
         .body("label", equalTo(metadataSource2.getLabel()))
         .body("status", equalTo(metadataSource2.getStatus().value()))
-        .body("accessUrl", equalTo(metadataSource2.getAccessUrl()));
+        .body("accessUrl", equalTo(metadataSource2.getAccessUrl()))
+        .body("organization.name", equalTo(organizationUUID1235.getName()));
 
     // PUT
     given()
@@ -84,7 +89,8 @@ public class ConfigMetadataSourcesIT extends AbstractMetadataSourcesIT {
         .body("id", equalTo(metadataSource2Changed.getId()))
         .body("label", equalTo(metadataSource2Changed.getLabel()))
         .body("status", equalTo(metadataSource2Changed.getStatus().value()))
-        .body("accessUrl", equalTo(metadataSource2Changed.getAccessUrl()));
+        .body("accessUrl", equalTo(metadataSource2Changed.getAccessUrl()))
+        .body("organization.name", equalTo(organizationUUID1235.getName()));
 
     // DELETE
     given()
@@ -122,7 +128,6 @@ public class ConfigMetadataSourcesIT extends AbstractMetadataSourcesIT {
   public void checkThatWeCanSearchByCQL() {
     String mockedOkapiUrl = "http://localhost:" + wireMockRule.port();
 
-    MockOrganization.mockOrganizationFound(organizationUUID1234);
     given()
         .body(Json.encode(metadataSource1))
         .header("X-Okapi-Tenant", TENANT_DIKU)
