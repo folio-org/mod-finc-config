@@ -543,6 +543,9 @@
         </executions>
         <configuration>
           <useSystemClassLoader>false</useSystemClassLoader>
+          <!-- en.US required because some integration tests rely on English error messages.
+             @{argLine} required for sonarqube jacoco -->
+          <argLine>-Duser.language=en -Duser.region=US @{argLine}</argLine>
           <!--
           name tests *IT.java if they are part of a suite
           name tests IT*.java if they are standalone tests / suites
