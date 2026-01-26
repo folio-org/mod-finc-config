@@ -1,45 +1,31 @@
 package org.folio.finc.select;
 
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import org.folio.finc.select.verticles.UnselectMetadataSourceVerticle;
+import org.folio.finc.select.services.UnselectMetadataSourceService;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.utils.Constants;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class UnselectMetadataSourceVerticleIT extends MetadataSourceVerticleTestBase {
+public class UnselectMetadataSourceServiceIT extends MetadataSourceServiceTestBase {
 
-  private static final UnselectMetadataSourceVerticle cut =
-      new UnselectMetadataSourceVerticle(vertx, vertx.getOrCreateContext());
   @Rule public Timeout timeout = Timeout.seconds(10);
-
-  @Before
-  public void before2(TestContext context) {
-    JsonObject cfg2 = vertx.getOrCreateContext().config();
-    cfg2.put("tenantId", TENANT_UBL);
-    cfg2.put("metadataSourceId", metadataSource2.getId());
-    cfg2.put("testing", true);
-
-    vertx
-        .deployVerticle(cut, new DeploymentOptions().setConfig(cfg2))
-        .onComplete(context.asyncAssertSuccess());
-  }
 
   @Test
   public void testSuccessfulUnSelect(TestContext context) {
     Async async = context.async();
-    cut.selectAllCollections(metadataSource1.getId(), TENANT_UBL)
+    UnselectMetadataSourceService service =
+        new UnselectMetadataSourceService(vertx.getOrCreateContext());
+    service
+        .selectAllCollections(metadataSource1.getId(), TENANT_UBL)
         .onComplete(
             aVoid -> {
               if (aVoid.succeeded()) {

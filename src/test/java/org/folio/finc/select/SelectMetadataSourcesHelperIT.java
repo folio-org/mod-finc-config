@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class SelectMetadataSourcesHelperIT extends MetadataSourceVerticleTestBase {
+public class SelectMetadataSourcesHelperIT extends MetadataSourceServiceTestBase {
 
   private static final SelectMetadataSourcesHelper cut =
       new SelectMetadataSourcesHelper(vertx, TENANT_UBL);

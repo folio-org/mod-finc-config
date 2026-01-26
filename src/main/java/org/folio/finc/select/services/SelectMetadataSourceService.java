@@ -1,15 +1,13 @@
-package org.folio.finc.select.verticles;
+package org.folio.finc.select.services;
 
 import io.vertx.core.Context;
-import io.vertx.core.Vertx;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 
-public class SelectMetadataSourceVerticle extends AbstractSelectMetadataSourceVerticle {
+public class SelectMetadataSourceService extends AbstractSelectMetadataSourceService {
 
-  public SelectMetadataSourceVerticle(Vertx vertx, Context ctx) {
-    super(vertx, ctx);
+  public SelectMetadataSourceService(Context context) {
+    super(context);
   }
 
   @Override
@@ -22,6 +20,6 @@ public class SelectMetadataSourceVerticle extends AbstractSelectMetadataSourceVe
               metadataCollection.getSelectedBy().add(isil);
               return metadataCollection;
             })
-        .collect(Collectors.toList());
+        .toList();
   }
 }

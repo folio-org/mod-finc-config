@@ -1,23 +1,21 @@
-package org.folio.finc.select.verticles.factory;
+package org.folio.finc.select.services.factory;
 
 import io.vertx.core.Context;
-import io.vertx.core.Vertx;
-import org.folio.finc.select.verticles.AbstractSelectMetadataSourceVerticle;
-import org.folio.finc.select.verticles.SelectMetadataSourceVerticle;
-import org.folio.finc.select.verticles.UnselectMetadataSourceVerticle;
+import org.folio.finc.select.services.AbstractSelectMetadataSourceService;
+import org.folio.finc.select.services.SelectMetadataSourceService;
+import org.folio.finc.select.services.UnselectMetadataSourceService;
 import org.folio.rest.jaxrs.model.Select;
 
-public class SelectMetadataSourceVerticleFactory {
+public class SelectMetadataSourceServiceFactory {
 
-  private SelectMetadataSourceVerticleFactory() {}
+  private SelectMetadataSourceServiceFactory() {}
 
-  public static AbstractSelectMetadataSourceVerticle create(
-      Vertx vertx, Context context, Select select) {
+  public static AbstractSelectMetadataSourceService create(Context context, Select select) {
     boolean doSelect = select.getSelect();
     if (doSelect) {
-      return new SelectMetadataSourceVerticle(vertx, context);
+      return new SelectMetadataSourceService(context);
     } else {
-      return new UnselectMetadataSourceVerticle(vertx, context);
+      return new UnselectMetadataSourceService(context);
     }
   }
 }

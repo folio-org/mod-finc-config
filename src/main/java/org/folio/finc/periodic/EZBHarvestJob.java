@@ -1,11 +1,7 @@
 package org.folio.finc.periodic;
 
 import io.vertx.core.Context;
-import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
-import io.vertx.core.Promise;
-import io.vertx.core.json.JsonObject;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
@@ -13,20 +9,22 @@ import org.apache.logging.log4j.Logger;
 import org.folio.finc.dao.EZBCredentialsDAO;
 import org.folio.finc.dao.EZBCredentialsDAOImpl;
 import org.folio.finc.periodic.ezb.EZBService;
-import org.folio.rest.jaxrs.model.Credentials;
+import org.folio.rest.jaxrs.model.Credential;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.SchedulerException;
 
-/** A {@Link Job} to harvest EZB holding files automatically */
+/** A {@link Job} to harvest EZB holding files automatically */
 public class EZBHarvestJob implements Job {
 
   private static final Logger log = LogManager.getLogger(EZBHarvestJob.class);
   private final EZBCredentialsDAO ezbCredentialsDAO = new EZBCredentialsDAOImpl();
-  private EZBService ezbService;
+  private final EZBHarvestService ezbHarvestService;
+  private final EZBService ezbService;
 
   public EZBHarvestJob(EZBService ezbService) {
     this.ezbService = ezbService;
+    this.ezbHarvestService = new EZBHarvestService(ezbService);
   }
 
   @Override
@@ -46,67 +44,40 @@ public class EZBHarvestJob implements Job {
   }
 
   public Future<Void> run(Context vertxContext) {
-    Promise<Void> result = Promise.promise();
-    List<Future<Void>> composedFutures = new ArrayList<>();
-    //   For each tenant there is an ezb credential entry holding the credentials to fetch the
+    // For each tenant there is an ezb credential entry holding the credentials to fetch the
     // tenant's holding files.
-    ezbCredentialsDAO
+    return ezbCredentialsDAO
         .getAll(null, 0, 1000, vertxContext)
-        .onComplete(
-            ar -> {
-              if (ar.succeeded()) {
-                Credentials credentials = ar.result();
-                List<JsonObject> configs = createConfigs(credentials, vertxContext.config());
-                if (configs.isEmpty()) {
-                  log.info("No ezb credentials in DB, thus will not start ezb harvester.");
-                }
-                configs.forEach(
-                    c -> {
-                      Promise<Void> singleResult = Promise.promise();
-                      composedFutures.add(singleResult.future());
-                      EZBHarvestVerticle verticle = new EZBHarvestVerticle(ezbService);
-                      vertxContext
-                          .owner()
-                          .deployVerticle(verticle, new DeploymentOptions().setConfig(c))
-                          .onSuccess(id -> singleResult.complete())
-                          .onFailure(
-                              err -> {
-                                log.error(
-                                    String.format(
-                                        "Failed to deploy ezb verticle: %s", err.getMessage()),
-                                    err);
-                                singleResult.fail(err);
-                              });
-                    });
-                Future.all(composedFutures)
-                    .onComplete(
-                        comFutAR -> {
-                          if (comFutAR.succeeded()) {
-                            result.complete();
-                          } else {
-                            result.fail(comFutAR.cause());
-                          }
-                        });
-              } else {
-                log.error("Error getting ezb credentials", ar.cause());
-                result.fail(ar.cause());
+        .compose(
+            credentials -> {
+              List<Credential> creds = credentials.getCredentials();
+              if (creds.isEmpty()) {
+                log.info("No ezb credentials in DB, thus will not start ezb harvester.");
+                return Future.succeededFuture();
               }
-            });
-    return result.future();
+              return executeHarvestForCredentials(creds, vertxContext);
+            })
+        .onFailure(err -> log.error("Error getting ezb credentials", err));
   }
 
-  private List<JsonObject> createConfigs(Credentials creds, JsonObject vertxConfig) {
-    return creds.getCredentials().stream()
-        .map(
-            c -> {
-              JsonObject cfg = vertxConfig.copy();
-              cfg.put("isil", c.getIsil());
-              cfg.put("user", c.getUser());
-              cfg.put("password", c.getPassword());
-              cfg.put("libId", c.getLibId());
-              return cfg;
-            })
-        .collect(Collectors.toList());
+  private Future<Void> executeHarvestForCredentials(
+      List<Credential> credentials, Context vertxContext) {
+    List<Future<Void>> harvestFutures =
+        credentials.stream()
+            .map(
+                cred ->
+                    ezbHarvestService
+                        .harvest(cred, vertxContext)
+                        .onFailure(
+                            err ->
+                                log.error(
+                                    "Failed to harvest ezb for isil {}: {}",
+                                    cred.getIsil(),
+                                    err.getMessage(),
+                                    err)))
+            .collect(Collectors.toList());
+
+    return Future.all(harvestFutures).mapEmpty();
   }
 
   public EZBService getEzbService() {
