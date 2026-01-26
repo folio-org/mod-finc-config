@@ -7,7 +7,6 @@ import io.restassured.http.ContentType;
 import io.vertx.core.json.Json;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.TestUtils;
-import org.folio.finc.mocks.MockOrganization;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,7 +28,7 @@ public class TinyMetadataSourcesIT extends AbstractMetadataSourcesIT {
   @Test
   public void checkThatWeCanGetTinyMetadataSources() {
     String mockedOkapiUrl = "http://localhost:" + wireMockRule.port();
-    MockOrganization.mockOrganizationFound(organizationUUID1235);
+
     given()
         .body(Json.encode(metadataSource2))
         .header("X-Okapi-Tenant", TENANT_DIKU)
