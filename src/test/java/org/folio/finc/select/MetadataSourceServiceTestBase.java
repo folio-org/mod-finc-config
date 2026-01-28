@@ -15,7 +15,7 @@ import org.folio.rest.persist.PostgresClient;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-public class MetadataSourceVerticleTestBase extends ApiTestBase {
+public class MetadataSourceServiceTestBase extends ApiTestBase {
   static final String TABLE_ISILS = "isils";
   static final String TABLE_MD_SOURCES = "metadata_sources";
   static final String TABLE_MD_COLLECTIONS = "metadata_collections";

@@ -1,14 +1,18 @@
 package org.folio.finc.select;
 
-import io.vertx.core.*;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Context;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.folio.finc.select.verticles.AbstractSelectMetadataSourceVerticle;
-import org.folio.finc.select.verticles.factory.SelectMetadataSourceVerticleFactory;
+import org.folio.finc.select.services.AbstractSelectMetadataSourceService;
+import org.folio.finc.select.services.factory.SelectMetadataSourceServiceFactory;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.jaxrs.model.Select;
 import org.folio.rest.jaxrs.resource.FincSelectMetadataSources.PutFincSelectMetadataSourcesCollectionsSelectAllByIdResponse;
@@ -39,8 +43,7 @@ public class SelectMetadataSourcesHelper {
                     "Will (un)select metadata collections of metadata source %s for tenant %s.",
                     metadataSourceID, tenantId);
             logger.info(msg);
-            deploySelectSourceVerticle(
-                vertxContext.owner(), metadataSourceID, tenantId, selectEntity);
+            executeSelectService(vertxContext, metadataSourceID, tenantId, selectEntity);
             String result = new JsonObject().put("message", msg).toString();
             asyncResultHandler.handle(
                 Future.succeededFuture(
@@ -54,24 +57,19 @@ public class SelectMetadataSourcesHelper {
     }
   }
 
-  private void deploySelectSourceVerticle(
-      Vertx vertx, String metadataSourceId, String tenantId, Select select) {
+  private void executeSelectService(
+      Context context, String metadataSourceId, String tenantId, Select select) {
 
-    AbstractSelectMetadataSourceVerticle verticle =
-        SelectMetadataSourceVerticleFactory.create(vertx, vertx.getOrCreateContext(), select);
+    AbstractSelectMetadataSourceService service =
+        SelectMetadataSourceServiceFactory.create(context, select);
 
-    vertx = Vertx.vertx();
-    JsonObject cfg = vertx.getOrCreateContext().config();
-    cfg.put("tenantId", tenantId);
-    cfg.put("metadataSourceId", metadataSourceId);
-    vertx
-        .deployVerticle(verticle, new DeploymentOptions().setConfig(cfg))
+    service
+        .selectAllCollections(metadataSourceId, tenantId)
         .onFailure(
             err ->
                 logger.error(
                     String.format(
-                        "Failed to deploy SelectVerticle for metadata source %s and for tenant %s:"
-                            + " %s",
+                        "Failed to (un)select collections for metadata source %s and tenant %s: %s",
                         metadataSourceId, tenantId, err.getMessage()),
                     err));
   }
