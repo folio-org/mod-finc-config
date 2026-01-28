@@ -100,11 +100,9 @@ public abstract class AbstractSelectMetadataSourceService {
             results -> {
               List<Isil> isils = results.getResults();
               if (isils.isEmpty()) {
-                return Future.failedFuture(
-                    new RuntimeException("Cannot find isil for tenant " + tenantId));
+                return Future.failedFuture("Cannot find isil for tenant " + tenantId);
               } else if (isils.size() > 1) {
-                return Future.failedFuture(
-                    new RuntimeException("Found multiple isils for tenant " + tenantId));
+                return Future.failedFuture("Found multiple isils for tenant " + tenantId);
               } else {
                 return Future.succeededFuture(isils.get(0).getIsil());
               }

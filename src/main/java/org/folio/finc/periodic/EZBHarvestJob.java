@@ -57,7 +57,7 @@ public class EZBHarvestJob implements Job {
               }
               return executeHarvestForCredentials(creds, vertxContext);
             })
-        .onFailure(err -> log.error("Error getting ezb credentials", err));
+        .onFailure(err -> log.error("Error during ezb harvest", err));
   }
 
   private Future<Void> executeHarvestForCredentials(
