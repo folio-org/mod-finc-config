@@ -3,7 +3,6 @@ package org.folio.finc.periodic;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.folio.finc.dao.EZBCredentialsDAO;
@@ -32,7 +31,7 @@ public class EZBHarvestJob implements Job {
     final Context vertxContext;
     try {
       Object o = jobExecutionContext.getScheduler().getContext().get("vertxContext");
-      vertxContext = o instanceof Context ? (Context) o : null;
+      vertxContext = o instanceof Context ctx ? ctx : null;
       if (vertxContext == null) {
         log.error("Cannot find vertxContext.");
         return;
@@ -75,7 +74,7 @@ public class EZBHarvestJob implements Job {
                                     cred.getIsil(),
                                     err.getMessage(),
                                     err)))
-            .collect(Collectors.toList());
+            .toList();
 
     return Future.all(harvestFutures).mapEmpty();
   }

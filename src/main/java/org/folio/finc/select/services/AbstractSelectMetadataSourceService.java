@@ -4,11 +4,14 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.rest.jaxrs.model.FincConfigMetadataCollection;
 import org.folio.rest.jaxrs.model.Isil;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.persist.interfaces.Results;
 import org.folio.rest.utils.Constants;
 
 /**
@@ -17,6 +20,8 @@ import org.folio.rest.utils.Constants;
  */
 public abstract class AbstractSelectMetadataSourceService {
 
+  private static final Logger logger =
+      LogManager.getLogger(AbstractSelectMetadataSourceService.class);
   private static final String METADATA_COLLECTIONS_TABLE = "metadata_collections";
   private static final String ISILS_TABLE = "isils";
 
@@ -65,7 +70,8 @@ public abstract class AbstractSelectMetadataSourceService {
 
     return PostgresClient.getInstance(context.owner(), Constants.MODULE_TENANT)
         .get(METADATA_COLLECTIONS_TABLE, FincConfigMetadataCollection.class, criterion, false)
-        .map(results -> results.getResults());
+        .map(Results::getResults)
+        .onFailure(cause -> logger.error("Cannot fetch permitted collections", cause));
   }
 
   private Future<CompositeFuture> doSelectAndSave(
@@ -96,6 +102,7 @@ public abstract class AbstractSelectMetadataSourceService {
 
     return PostgresClient.getInstance(context.owner(), Constants.MODULE_TENANT)
         .get(ISILS_TABLE, Isil.class, criterion, false)
+        .onFailure(cause -> logger.error("Cannot fetch isil for tenant {}", tenantId, cause))
         .compose(
             results -> {
               List<Isil> isils = results.getResults();
@@ -116,6 +123,7 @@ public abstract class AbstractSelectMetadataSourceService {
   private Future<Void> saveSingleCollection(FincConfigMetadataCollection metadataCollection) {
     return PostgresClient.getInstance(context.owner(), Constants.MODULE_TENANT)
         .update(METADATA_COLLECTIONS_TABLE, metadataCollection, metadataCollection.getId())
+        .onFailure(cause -> logger.error("Cannot save md collection", cause))
         .mapEmpty();
   }
 
@@ -123,6 +131,8 @@ public abstract class AbstractSelectMetadataSourceService {
     String query = String.format("SELECT * FROM update_selected_state('%s')", mdSourceId);
     return PostgresClient.getInstance(context.owner(), Constants.MODULE_TENANT)
         .select(query)
+        .onFailure(
+            cause -> logger.error("Cannot update selectedBy for source {}", mdSourceId, cause))
         .mapEmpty();
   }
 }

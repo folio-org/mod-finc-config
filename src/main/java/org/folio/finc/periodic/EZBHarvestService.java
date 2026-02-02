@@ -40,7 +40,7 @@ public class EZBHarvestService {
   /**
    * Harvests EZB holding files for a single tenant.
    *
-   * @param credential EZB credentials for the tenant
+   * @param credential EZB credential for the tenant
    * @param context Vert.x context
    * @return Future that completes when harvest is done
    */
@@ -73,6 +73,7 @@ public class EZBHarvestService {
   private Future<FincSelectFilter> fetchFilterFromDB(String isil, Context context) {
     return selectFilterDAO
         .getAll("label==\"" + LABEL_EZB_HOLDINGS + "\"", 0, 1, isil, context)
+        .onFailure(err -> log.error("Cannot fetch filter from DB for isil {}", isil, err))
         .map(
             fincSelectFilters -> {
               List<FincSelectFilter> filters = fincSelectFilters.getFincSelectFilters();
@@ -153,7 +154,9 @@ public class EZBHarvestService {
     String base64Data = Base64.getEncoder().encodeToString(ezbFile.getBytes());
     String uuid = UUID.randomUUID().toString();
     File file = new File().withData(base64Data).withId(uuid).withIsil(isil);
-    return selectFileDAO.upsert(file, uuid, context);
+    return selectFileDAO
+        .upsert(file, uuid, context)
+        .onFailure(err -> log.error("Cannot insert EZB file for isil {}", isil, err));
   }
 
   /**
@@ -171,7 +174,9 @@ public class EZBHarvestService {
     } else {
       filter.getMetadata().setUpdatedDate(date);
     }
-    return selectFilterDAO.update(filter, filter.getId(), context);
+    return selectFilterDAO
+        .update(filter, filter.getId(), context)
+        .onFailure(err -> log.error("Cannot update filter {}", filter.getId(), err));
   }
 
   /**
@@ -235,7 +240,14 @@ public class EZBHarvestService {
       FincSelectFilter filter, List<String> fileIds, String isil, Context context) {
 
     List<Future<Integer>> deleteFileFutures =
-        fileIds.stream().map(id -> selectFileDAO.deleteById(id, isil, context)).toList();
+        fileIds.stream()
+            .map(
+                id ->
+                    selectFileDAO
+                        .deleteById(id, isil, context)
+                        .onFailure(
+                            err -> log.error("Cannot delete file {} for isil {}", id, isil, err)))
+            .toList();
 
     return Future.all(deleteFileFutures)
         .map(
@@ -279,6 +291,8 @@ public class EZBHarvestService {
    * @return
    */
   private Future<File> fetchFileFromDB(String id, String isil, Context context) {
-    return selectFileDAO.getById(id, isil, context);
+    return selectFileDAO
+        .getById(id, isil, context)
+        .onFailure(err -> log.error("Cannot fetch file {} from DB for isil {}", id, isil, err));
   }
 }
