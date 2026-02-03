@@ -2,7 +2,6 @@ package org.folio.finc.periodic;
 
 import io.vertx.core.Context;
 import io.vertx.core.Future;
-import io.vertx.core.Vertx;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -48,10 +47,9 @@ public class EZBHarvestService {
     String isil = credential.getIsil();
     log.info("Starting ezb harvest for isil {}", isil);
 
-    Vertx vertx = context.owner();
     Future<String> ezbFileFuture =
         ezbService.fetchEZBFile(
-            credential.getUser(), credential.getPassword(), credential.getLibId(), vertx);
+            credential.getUser(), credential.getPassword(), credential.getLibId(), context.owner());
     Future<FincSelectFilter> dbFilterFuture = fetchFilterFromDB(isil, context);
 
     return Future.all(Arrays.asList(ezbFileFuture, dbFilterFuture))
