@@ -13,10 +13,10 @@ import org.folio.finc.select.FincSelectFilesIT;
 import org.folio.finc.select.FincSelectFiltersIT;
 import org.folio.finc.select.SelectEZBCredentialsIT;
 import org.folio.finc.select.SelectMetadataCollectionsIT;
-import org.folio.finc.select.SelectMetadataSourceVerticleIT;
+import org.folio.finc.select.SelectMetadataSourceServiceIT;
 import org.folio.finc.select.SelectMetadataSourcesHelperIT;
 import org.folio.finc.select.SelectMetadataSourcesIT;
-import org.folio.finc.select.UnselectMetadataSourceVerticleIT;
+import org.folio.finc.select.UnselectMetadataSourceServiceIT;
 import org.folio.rest.impl.TenantIT;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -37,12 +37,12 @@ import org.junit.runners.Suite;
   FincSelectFiltersIT.class,
   SelectEZBCredentialsIT.class,
   SelectMetadataCollectionsIT.class,
-  SelectMetadataSourceVerticleIT.class,
+  SelectMetadataSourceServiceIT.class,
   SelectMetadataSourcesHelperIT.class,
   SelectMetadataSourcesIT.class,
   TenantIT.class,
   TinyMetadataSourcesIT.class,
-  UnselectMetadataSourceVerticleIT.class
+  UnselectMetadataSourceServiceIT.class
 })
 public class ITTestSuiteJunit4 {
 
