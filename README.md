@@ -244,8 +244,8 @@ to the file which was uploaded before (see `/finc-select/files`). `filename` is 
 of the uploaded file.
 
 `/finc-select/files` stores the actual binary file. A file is uploaded via HTTP POST to
-`/finc-select/filter-files`, which returns the file's UUID. A single file can be downloaded via a
-HTTP GET `/finc-select/filter-files/{id}`. Note, that you need to upload the binary file first, to
+`/finc-select/files`, which returns the file's UUID. A single file can be downloaded via a
+HTTP GET `/finc-select/files/{id}`. Note, that you need to upload the binary file first, to
 get its id, which can then be used in the definition of a filter document.
 
 **File Upload Size Limit**: File uploads are limited to a maximum size of 50 MB to prevent denial

@@ -468,48 +468,6 @@
       ]
     },
     {
-      "id": "finc-select-filter-files",
-      "version": "1.0",
-      "handlers": [
-        {
-          "methods": [
-            "GET"
-          ],
-          "pathPattern": "/finc-select/filter-files",
-          "permissionsRequired": [
-            "finc-select.filter-files.collection.get"
-          ]
-        },
-        {
-          "methods": [
-            "GET"
-          ],
-          "pathPattern": "/finc-select/filter-files/{id}",
-          "permissionsRequired": [
-            "finc-select.filter-files.item.get"
-          ]
-        },
-        {
-          "methods": [
-            "DELETE"
-          ],
-          "pathPattern": "/finc-select/filter-files/{id}",
-          "permissionsRequired": [
-            "finc-select.filter-files.item.delete"
-          ]
-        },
-        {
-          "methods": [
-            "POST"
-          ],
-          "pathPattern": "/finc-select/filter-files",
-          "permissionsRequired": [
-            "finc-select.filter-files.item.post"
-          ]
-        }
-      ]
-    },
-    {
       "id": "finc-select-files",
       "version": "1.1",
       "handlers": [
@@ -835,26 +793,6 @@
       "description": "Finc select: Create a new filter"
     },
     {
-      "permissionName": "finc-select.filter-files.collection.get",
-      "displayName": "finc select filter files collection get",
-      "description": "Finc select: Get a collection of filter files"
-    },
-    {
-      "permissionName": "finc-select.filter-files.item.get",
-      "displayName": "finc select filter files item get",
-      "description": "Finc select: Get a single filter file"
-    },
-    {
-      "permissionName": "finc-select.filter-files.item.delete",
-      "displayName": "finc select filter files item delete",
-      "description": "Finc select: Delete a single filter file"
-    },
-    {
-      "permissionName": "finc-select.filter-files.item.post",
-      "displayName": "finc select filter files item post",
-      "description": "Finc select: Create a new filter file"
-    },
-    {
       "permissionName": "finc-select.files.item.get",
       "displayName": "finc select files item get",
       "description": "Finc select: Get a single file"
@@ -941,10 +879,6 @@
         "finc-select.filters.item.put",
         "finc-select.filters.item.delete",
         "finc-select.filters.item.post",
-        "finc-select.filter-files.collection.get",
-        "finc-select.filter-files.item.get",
-        "finc-select.filter-files.item.delete",
-        "finc-select.filter-files.item.post",
         "finc-select.files.item.get",
         "finc-select.files.item.delete",
         "finc-select.files.item.post",
