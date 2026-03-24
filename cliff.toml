@@ -1,0 +1,24 @@
+# git-cliff ~ configuration file
+# https://git-cliff.org/docs/configuration
+
+[changelog]
+# A Tera template to be rendered for each release in the changelog.
+# See https://keats.github.io/tera/docs/#introduction
+trim = true
+header=""
+footer=""
+body = """
+{% for commit in commits %}
+    * {{ commit.message | split_regex(pat="\\n") | first }}
+{% endfor %}
+"""
+
+[git]
+conventional_commits = false
+filter_unconventional = false
+require_conventional = false
+commit_preprocessors = [
+  { pattern = "\\[(UIFC-[0-9]+)\\]", replace = "[$1](https://folio-org.atlassian.net/browse/$1)"},
+  { pattern = "(UIFC-[0-9]+)\\s", replace = "[$1](https://folio-org.atlassian.net/browse/$1) "},
+  { pattern = "#([0-9]+)", replace = "[#$1](https://github.com/folio-org/mod-finc-config/issues/$1)"}
+]
