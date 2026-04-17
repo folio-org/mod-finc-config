@@ -1,3 +1,22 @@
+# 7.0.0
+* [UIFC-404](https://folio-org.atlassian.net/browse/UIFC-404) Provide filter information in metadata collections
+* [UIFC-427](https://folio-org.atlassian.net/browse/UIFC-427) Refactor test setup
+* [UIFC-404](https://folio-org.atlassian.net/browse/UIFC-404) Use `totalRecords` parameter when retrieving metadata collections
+* [UIFC-426](https://folio-org.atlassian.net/browse/UIFC-426) Update isils schema
+* [UIFC-268](https://folio-org.atlassian.net/browse/UIFC-268) Make IsilDAO return empty Optional instead of null
+* [UIFC-446](https://folio-org.atlassian.net/browse/UIFC-446) Return empty list when filter with no collection is requested
+* [UIFC-262](https://folio-org.atlassian.net/browse/UIFC-262) Add 50MB file upload size limit to prevent DoS attacks
+* [UIFC-455](https://folio-org.atlassian.net/browse/UIFC-455) Return JSON null on missing ezb credentials
+* [UIFC-462](https://folio-org.atlassian.net/browse/UIFC-462) Update README with Quick Start and improve readability
+* [UIFC-467](https://folio-org.atlassian.net/browse/UIFC-467) Upgrade module to Vert.x 5
+* [UIFC-469](https://folio-org.atlassian.net/browse/UIFC-469) Add optional mod orders storage dependency
+* [UIFC-471](https://folio-org.atlassian.net/browse/UIFC-471) Set english locale for integration tests
+* [UIFC-470](https://folio-org.atlassian.net/browse/UIFC-470) Add test coverage for OrganizationNameResolver class
+* [UIFC-468](https://folio-org.atlassian.net/browse/UIFC-468) Refactor Verticles to plain service classes
+* [UIFC-323](https://folio-org.atlassian.net/browse/UIFC-323) Remove unused `filter-files` endpoints
+* [UIFC-481](https://folio-org.atlassian.net/browse/UIFC-481) Migrate from Jenkins to GitHub Workflows
+* [UIFC-481](https://folio-org.atlassian.net/browse/UIFC-481) Add Memory to HostConfig in ModuleDescriptor template
+
 # 6.1.0
 * [UIFC-420](https://folio-org.atlassian.net/browse/UIFC-420) Upgrade to Java 21
 * [UIFC-406](https://folio-org.atlassian.net/browse/UIFC-406) Increase maximum allowed string length for RMBs ObjectMapper
