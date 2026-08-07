@@ -1,3 +1,6 @@
+# 7.1.0 (IN PROGRESS)
+* [UIFC-502](https://folio-org.atlassian.net/browse/UIFC-502) Remove optional `version` property from RAML files
+
 # 7.0.0
 * [UIFC-404](https://folio-org.atlassian.net/browse/UIFC-404) Provide filter information in metadata collections
 * [UIFC-427](https://folio-org.atlassian.net/browse/UIFC-427) Refactor test setup
