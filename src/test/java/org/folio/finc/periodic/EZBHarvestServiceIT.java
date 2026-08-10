@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Date;
 import org.folio.finc.dao.EZBCredentialsDAOImpl;
 import org.folio.finc.mocks.EZBServiceMock;
+import org.folio.rest.jaxrs.model.Credential;
 import org.folio.rest.jaxrs.model.FincSelectFilter;
 import org.folio.rest.persist.PostgresClient;
 import org.junit.Test;
@@ -27,6 +28,7 @@ public class EZBHarvestServiceIT extends AbstractEZBHarvestTest {
   private static final String EXISTING_CONTENT = "existing ezb file content";
   private static final String OTHER_TENANT = "ubl";
   private static final String OTHER_ISIL = "DE-14";
+  private static final String SUB_ISIL = ISIL + "-292";
 
   @Test
   public void checkThatEZBFileIsAdded(TestContext context) {
@@ -77,6 +79,34 @@ public class EZBHarvestServiceIT extends AbstractEZBHarvestTest {
         .flatMap(n -> EZB_HARVEST_SERVICE.harvest(tenant, vertxContext))
         .flatMap(v -> getUpdatedEZBFile())
         .onComplete(context.asyncAssertSuccess(s -> assertThat(s).isEqualTo(EXISTING_CONTENT)));
+  }
+
+  @Test
+  public void checkThatCredentialsOfASubIsilAreNotUsed(TestContext context) {
+    Credential subIsilCredential =
+        new Credential()
+            .withUser("sub-user")
+            .withPassword("sub-password")
+            .withLibId("sub-libId")
+            .withIsil(SUB_ISIL);
+    insertEZBFile(EXISTING_CONTENT, FILE_ID, DATE)
+        .flatMap(v -> new EZBCredentialsDAOImpl().deleteByIsil(ISIL, vertxContext))
+        .flatMap(n -> insertFilter(SUB_ISIL))
+        .flatMap(
+            id ->
+                PostgresClient.getInstance(vertx, tenant)
+                    .save("ezb_credentials", subIsilCredential))
+        .flatMap(id -> EZB_HARVEST_SERVICE.harvest(tenant, vertxContext))
+        .flatMap(v -> getUpdatedEZBFile())
+        .flatMap(
+            s -> {
+              assertThat(s).isEqualTo(EXISTING_CONTENT);
+              return getEZBFilter(SUB_ISIL);
+            })
+        .onComplete(
+            context.asyncAssertSuccess(
+                filters ->
+                    assertThat(filters.getFincSelectFilters().get(0).getFilterFiles()).isEmpty()));
   }
 
   @Test

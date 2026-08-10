@@ -59,20 +59,21 @@ public class EZBCredentialsDAOImpl implements EZBCredentialsDAO {
   @Override
   public Future<Credential> getByIsil(String isil, Context vertxContext) {
     Promise<Credential> result = Promise.promise();
-    String query = String.format("isil=%s", isil);
+    String query = String.format("isil==\"%s\"", isil);
     getAll(query, 0, 1, vertxContext)
-        .onComplete(ar -> {
-          if (ar.succeeded()) {
-            if (ar.result().getTotalRecords() == 0) {
-              result.complete();
-              return;
-            }
-            Credential cred = ar.result().getCredentials().get(0);
-            result.complete(cred);
-          } else {
-            result.fail(ar.cause());
-          }
-        });
+        .onComplete(
+            ar -> {
+              if (ar.succeeded()) {
+                if (ar.result().getTotalRecords() == 0) {
+                  result.complete();
+                  return;
+                }
+                Credential cred = ar.result().getCredentials().get(0);
+                result.complete(cred);
+              } else {
+                result.fail(ar.cause());
+              }
+            });
     return result.future();
   }
 
@@ -80,23 +81,27 @@ public class EZBCredentialsDAOImpl implements EZBCredentialsDAO {
   public Future<Credential> insert(Credential entity, Context vertxContext) {
     Promise<Credential> result = Promise.promise();
     getByIsil(entity.getIsil(), vertxContext)
-        .onComplete(ar -> {
-          if (ar.succeeded()) {
-            Credential credential = ar.result();
-            if (credential != null) {
-              result.fail(new EZBCredentialsException("Isil must be unique."));
-            } else {
-              PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
-                  .save(TABLE_NAME, entity, reply -> {
-                    if (reply.succeeded()) {
-                      result.complete(entity);
-                    } else {
-                      result.fail(reply.cause());
-                    }
-                  });
-            }
-          }
-        });
+        .onComplete(
+            ar -> {
+              if (ar.succeeded()) {
+                Credential credential = ar.result();
+                if (credential != null) {
+                  result.fail(new EZBCredentialsException("Isil must be unique."));
+                } else {
+                  PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
+                      .save(
+                          TABLE_NAME,
+                          entity,
+                          reply -> {
+                            if (reply.succeeded()) {
+                              result.complete(entity);
+                            } else {
+                              result.fail(reply.cause());
+                            }
+                          });
+                }
+              }
+            });
 
     return result.future();
   }
@@ -105,23 +110,27 @@ public class EZBCredentialsDAOImpl implements EZBCredentialsDAO {
   public Future<Integer> deleteByIsil(String isil, Context vertxContext) {
     Promise<Integer> result = Promise.promise();
     getByIsil(isil, vertxContext)
-        .onComplete(ar -> {
-          if (ar.succeeded()) {
-            Credential credential = ar.result();
-            if (credential == null) {
-              result.fail("Cannot delete credential. Isil not found.");
-            } else {
-              PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
-                  .delete(TABLE_NAME, credential.getId(), reply -> {
-                    if (reply.succeeded()) {
-                      result.complete(1);
-                    } else {
-                      result.fail(reply.cause());
-                    }
-                  });
-            }
-          }
-        });
+        .onComplete(
+            ar -> {
+              if (ar.succeeded()) {
+                Credential credential = ar.result();
+                if (credential == null) {
+                  result.fail("Cannot delete credential. Isil not found.");
+                } else {
+                  PostgresClient.getInstance(vertxContext.owner(), Constants.MODULE_TENANT)
+                      .delete(
+                          TABLE_NAME,
+                          credential.getId(),
+                          reply -> {
+                            if (reply.succeeded()) {
+                              result.complete(1);
+                            } else {
+                              result.fail(reply.cause());
+                            }
+                          });
+                }
+              }
+            });
     return result.future();
   }
 
