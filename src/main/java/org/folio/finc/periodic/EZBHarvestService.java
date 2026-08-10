@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.folio.finc.dao.EZBCredentialsDAO;
+import org.folio.finc.dao.EZBCredentialsDAOImpl;
+import org.folio.finc.dao.IsilDAO;
+import org.folio.finc.dao.IsilDAOImpl;
 import org.folio.finc.dao.SelectFileDAO;
 import org.folio.finc.dao.SelectFileDAOImpl;
 import org.folio.finc.dao.SelectFilterDAO;
@@ -30,6 +34,8 @@ public class EZBHarvestService {
   private static final Logger log = LogManager.getLogger(EZBHarvestService.class);
   private final SelectFilterDAO selectFilterDAO = new SelectFilterDAOImpl();
   private final SelectFileDAO selectFileDAO = new SelectFileDAOImpl();
+  private final EZBCredentialsDAO ezbCredentialsDAO = new EZBCredentialsDAOImpl();
+  private final IsilDAO isilDAO = new IsilDAOImpl();
   private final EZBService ezbService;
 
   public EZBHarvestService(EZBService ezbService) {
@@ -37,13 +43,40 @@ public class EZBHarvestService {
   }
 
   /**
-   * Harvests EZB holding files for a single tenant.
+   * Harvests the EZB holding file for a single tenant. Does nothing if the tenant has no isil or no
+   * EZB credentials.
    *
-   * @param credential EZB credential for the tenant
+   * @param tenantId Tenant to harvest for
    * @param context Vert.x context
    * @return Future that completes when harvest is done
    */
-  public Future<Void> harvest(Credential credential, Context context) {
+  public Future<Void> harvest(String tenantId, Context context) {
+    return isilDAO
+        .getIsilForTenant(tenantId, context)
+        .compose(
+            isil -> {
+              if (isil.isEmpty()) {
+                log.info("No isil found for tenant {}. Will not harvest ezb file.", tenantId);
+                return Future.succeededFuture();
+              }
+              return harvestForIsil(isil.get(), context);
+            });
+  }
+
+  private Future<Void> harvestForIsil(String isil, Context context) {
+    return ezbCredentialsDAO
+        .getByIsil(isil, context)
+        .compose(
+            credential -> {
+              if (credential == null) {
+                log.info("No ezb credentials for isil {}. Will not harvest ezb file.", isil);
+                return Future.succeededFuture();
+              }
+              return harvestForCredential(credential, context);
+            });
+  }
+
+  private Future<Void> harvestForCredential(Credential credential, Context context) {
     String isil = credential.getIsil();
     log.info("Starting ezb harvest for isil {}", isil);
 

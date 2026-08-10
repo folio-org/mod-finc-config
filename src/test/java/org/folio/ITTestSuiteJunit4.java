@@ -7,7 +7,7 @@ import org.folio.finc.config.ConfigFiltersIT;
 import org.folio.finc.config.ConfigMetadataCollectionsIT;
 import org.folio.finc.config.ConfigMetadataSourcesIT;
 import org.folio.finc.config.TinyMetadataSourcesIT;
-import org.folio.finc.periodic.EZBHarvestJobIT;
+import org.folio.finc.periodic.EZBHarvestServiceIT;
 import org.folio.finc.select.FilterHelperIT;
 import org.folio.finc.select.FincSelectFilesIT;
 import org.folio.finc.select.FincSelectFiltersIT;
@@ -17,6 +17,7 @@ import org.folio.finc.select.SelectMetadataSourceServiceIT;
 import org.folio.finc.select.SelectMetadataSourcesHelperIT;
 import org.folio.finc.select.SelectMetadataSourcesIT;
 import org.folio.finc.select.UnselectMetadataSourceServiceIT;
+import org.folio.rest.impl.FincConfigEZBHarvestAPIIT;
 import org.folio.rest.impl.TenantIT;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -31,7 +32,8 @@ import org.junit.runners.Suite;
   ConfigFiltersIT.class,
   ConfigMetadataCollectionsIT.class,
   ConfigMetadataSourcesIT.class,
-  EZBHarvestJobIT.class,
+  EZBHarvestServiceIT.class,
+  FincConfigEZBHarvestAPIIT.class,
   FilterHelperIT.class,
   FincSelectFilesIT.class,
   FincSelectFiltersIT.class,

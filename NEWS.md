@@ -1,3 +1,6 @@
+# 7.1.0 (IN PROGRESS)
+* [UIFC-409](https://folio-org.atlassian.net/browse/UIFC-409) Utilize timer interface instead of Quartz
+
 # 7.0.0
 * [UIFC-404](https://folio-org.atlassian.net/browse/UIFC-404) Provide filter information in metadata collections
 * [UIFC-427](https://folio-org.atlassian.net/browse/UIFC-427) Refactor test setup
