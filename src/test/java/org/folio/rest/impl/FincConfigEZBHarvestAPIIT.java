@@ -35,7 +35,7 @@ public class FincConfigEZBHarvestAPIIT extends AbstractEZBHarvestTest {
 
   @Test
   public void checkThatEZBFileIsHarvested(TestContext context) {
-    harvest(new EZBServiceMock(), tenant)
+    harvest(new EZBServiceMock(), TENANT)
         .flatMap(
             response -> {
               assertThat(response.getStatus()).isEqualTo(204);
@@ -59,7 +59,7 @@ public class FincConfigEZBHarvestAPIIT extends AbstractEZBHarvestTest {
   @Test
   public void checkThatFailedHarvestIsReported(TestContext context) {
     EZBService failing = (user, password, libId, vertx) -> Future.failedFuture("ezb is down");
-    harvest(failing, tenant)
+    harvest(failing, TENANT)
         .onComplete(
             context.asyncAssertSuccess(
                 response -> {
@@ -85,7 +85,7 @@ public class FincConfigEZBHarvestAPIIT extends AbstractEZBHarvestTest {
   @Test
   public void checkThatHarvestIsAttemptedForTenantWithCredentials() {
     given()
-        .header(RestVerticle.OKAPI_HEADER_TENANT, tenant)
+        .header(RestVerticle.OKAPI_HEADER_TENANT, TENANT)
         .post(ENDPOINT)
         .then()
         .statusCode(500)

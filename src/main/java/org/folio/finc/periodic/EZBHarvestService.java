@@ -2,6 +2,7 @@ package org.folio.finc.periodic;
 
 import io.vertx.core.Context;
 import io.vertx.core.Future;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -198,7 +199,7 @@ public class EZBHarvestService {
    * @return
    */
   private Future<FincSelectFilter> updateFilter(FincSelectFilter filter, Context context) {
-    Date date = new Date();
+    Date date = Date.from(Instant.now());
     if (filter.getMetadata() == null) {
       Metadata md = new Metadata().withCreatedDate(date).withUpdatedDate(date);
       filter.setMetadata(md);

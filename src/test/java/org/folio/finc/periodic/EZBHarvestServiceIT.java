@@ -33,7 +33,7 @@ public class EZBHarvestServiceIT extends AbstractEZBHarvestTest {
   @Test
   public void checkThatEZBFileIsAdded(TestContext context) {
     EZB_HARVEST_SERVICE
-        .harvest(tenant, vertxContext)
+        .harvest(TENANT, vertxContext)
         .flatMap(v -> getUpdatedEZBFile())
         .onComplete(context.asyncAssertSuccess(s -> assertThat(s).isEqualTo(EZB_FILE_CONTENT)));
   }
@@ -41,7 +41,7 @@ public class EZBHarvestServiceIT extends AbstractEZBHarvestTest {
   @Test
   public void checkThatEZBFileIsUpdated(TestContext context) {
     insertEZBFile("foobar", FILE_ID, DATE)
-        .flatMap(v -> EZB_HARVEST_SERVICE.harvest(tenant, vertxContext))
+        .flatMap(v -> EZB_HARVEST_SERVICE.harvest(TENANT, vertxContext))
         .flatMap(v -> getUpdatedEZBFile())
         .onComplete(context.asyncAssertSuccess(s -> assertThat(s).isEqualTo(EZB_FILE_CONTENT)));
   }
@@ -51,7 +51,7 @@ public class EZBHarvestServiceIT extends AbstractEZBHarvestTest {
     Future<FincSelectFilter> firstInsert = insertEZBFile("foo", FILE_ID, DATE);
     Future<FincSelectFilter> secondInsert = insertEZBFile("bar", FILE_ID2, DATE);
     Future.all(Arrays.asList(firstInsert, secondInsert))
-        .flatMap(cf -> EZB_HARVEST_SERVICE.harvest(tenant, vertxContext))
+        .flatMap(cf -> EZB_HARVEST_SERVICE.harvest(TENANT, vertxContext))
         .flatMap(v -> getUpdatedEZBFile())
         .onComplete(context.asyncAssertSuccess(s -> assertThat(s).isEqualTo(EZB_FILE_CONTENT)));
   }
@@ -59,7 +59,7 @@ public class EZBHarvestServiceIT extends AbstractEZBHarvestTest {
   @Test
   public void checkThatEZBFileIsNotUpdated(TestContext context) {
     insertEZBFile(EZB_FILE_CONTENT, FILE_ID, DATE)
-        .flatMap(v -> EZB_HARVEST_SERVICE.harvest(tenant, vertxContext))
+        .flatMap(v -> EZB_HARVEST_SERVICE.harvest(TENANT, vertxContext))
         .flatMap(v -> getUpdatedEZBFile())
         .flatMap(
             s -> {
@@ -76,7 +76,7 @@ public class EZBHarvestServiceIT extends AbstractEZBHarvestTest {
   public void checkThatNothingIsHarvestedWithoutCredentials(TestContext context) {
     insertEZBFile(EXISTING_CONTENT, FILE_ID, DATE)
         .flatMap(v -> new EZBCredentialsDAOImpl().deleteByIsil(ISIL, vertxContext))
-        .flatMap(n -> EZB_HARVEST_SERVICE.harvest(tenant, vertxContext))
+        .flatMap(n -> EZB_HARVEST_SERVICE.harvest(TENANT, vertxContext))
         .flatMap(v -> getUpdatedEZBFile())
         .onComplete(context.asyncAssertSuccess(s -> assertThat(s).isEqualTo(EXISTING_CONTENT)));
   }
@@ -94,9 +94,9 @@ public class EZBHarvestServiceIT extends AbstractEZBHarvestTest {
         .flatMap(n -> insertFilter(SUB_ISIL))
         .flatMap(
             id ->
-                PostgresClient.getInstance(vertx, tenant)
+                PostgresClient.getInstance(vertx, TENANT)
                     .save("ezb_credentials", subIsilCredential))
-        .flatMap(id -> EZB_HARVEST_SERVICE.harvest(tenant, vertxContext))
+        .flatMap(id -> EZB_HARVEST_SERVICE.harvest(TENANT, vertxContext))
         .flatMap(v -> getUpdatedEZBFile())
         .flatMap(
             s -> {
@@ -114,7 +114,7 @@ public class EZBHarvestServiceIT extends AbstractEZBHarvestTest {
     insertIsil(OTHER_ISIL, OTHER_TENANT)
         .flatMap(id -> insertFilter(OTHER_ISIL))
         .flatMap(id -> insertCredential(OTHER_ISIL))
-        .flatMap(id -> EZB_HARVEST_SERVICE.harvest(tenant, vertxContext))
+        .flatMap(id -> EZB_HARVEST_SERVICE.harvest(TENANT, vertxContext))
         .flatMap(v -> getUpdatedEZBFile())
         .flatMap(
             s -> {
@@ -129,9 +129,9 @@ public class EZBHarvestServiceIT extends AbstractEZBHarvestTest {
 
   @Test
   public void checkThatEZBFileIsNotAddedWithoutFilter(TestContext context) {
-    PostgresClient.getInstance(vertx, tenant)
+    PostgresClient.getInstance(vertx, TENANT)
         .delete("filters", filterId)
-        .flatMap(rs -> EZB_HARVEST_SERVICE.harvest(tenant, vertxContext))
+        .flatMap(rs -> EZB_HARVEST_SERVICE.harvest(TENANT, vertxContext))
         .flatMap(v -> getEZBFilter())
         .onComplete(context.asyncAssertSuccess(fsf -> assertThat(fsf.getTotalRecords()).isZero()));
   }

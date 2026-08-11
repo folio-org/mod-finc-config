@@ -16,7 +16,6 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.folio.ApiTestBase;
 import org.folio.TestUtils;
 import org.folio.finc.dao.FileDAOImpl;
@@ -46,7 +45,7 @@ public abstract class AbstractEZBHarvestTest extends ApiTestBase {
   private static final String QUERY = "label==\"EZB holdings\"";
   protected static Vertx vertx = TestUtils.getVertx();
   protected static Context vertxContext = vertx.getOrCreateContext();
-  protected static final String tenant = "finc";
+  protected static final String TENANT = "finc";
   protected static final String ISIL = "DE-15";
   protected static String filterId = null;
 
@@ -64,7 +63,7 @@ public abstract class AbstractEZBHarvestTest extends ApiTestBase {
   @After
   public void after(TestContext context) {
     dropSchema().onComplete(context.asyncAssertSuccess());
-    PostgresClient.closeAllClients(tenant);
+    PostgresClient.closeAllClients(TENANT);
   }
 
   protected Future<FincSelectFilters> getEZBFilter() {
@@ -88,7 +87,7 @@ public abstract class AbstractEZBHarvestTest extends ApiTestBase {
                 return succeededFuture(
                     filters.get(0).getFilterFiles().stream()
                         .filter(filterFile -> filterFile.getLabel().equals("EZB file"))
-                        .collect(Collectors.toList()));
+                        .toList());
               }
             })
         .flatMap(
@@ -118,7 +117,7 @@ public abstract class AbstractEZBHarvestTest extends ApiTestBase {
   protected Future<Void> createSchema() {
     String[] sqlFile;
     try {
-      sqlFile = new TenantAPI().sqlFile(tenant, false, null, null, null);
+      sqlFile = new TenantAPI().sqlFile(TENANT, false, null, null, null);
     } catch (IOException | TemplateException e) {
       return failedFuture(e);
     }
@@ -130,7 +129,7 @@ public abstract class AbstractEZBHarvestTest extends ApiTestBase {
     try {
       sqlFile =
           new TenantAPI()
-              .sqlFile(tenant, false, new TenantAttributes().withPurge(true), null, null);
+              .sqlFile(TENANT, false, new TenantAttributes().withPurge(true), null, null);
     } catch (IOException | TemplateException e) {
       return failedFuture(e);
     }
@@ -138,7 +137,7 @@ public abstract class AbstractEZBHarvestTest extends ApiTestBase {
   }
 
   protected Future<String> insertIsil() {
-    return insertIsil(ISIL, tenant);
+    return insertIsil(ISIL, TENANT);
   }
 
   protected Future<String> insertIsil(String isil, String tenantOfIsil) {
@@ -148,7 +147,7 @@ public abstract class AbstractEZBHarvestTest extends ApiTestBase {
             .withIsil(isil)
             .withTenant(tenantOfIsil)
             .withLibrary(tenantOfIsil);
-    return PostgresClient.getInstance(vertx, tenant).save("isils", entity);
+    return PostgresClient.getInstance(vertx, TENANT).save("isils", entity);
   }
 
   protected Future<String> insertFilter() {
@@ -158,7 +157,7 @@ public abstract class AbstractEZBHarvestTest extends ApiTestBase {
   protected Future<String> insertFilter(String isil) {
     FincSelectFilter filter =
         new FincSelectFilter().withLabel("EZB holdings").withType(Type.WHITELIST).withIsil(isil);
-    return PostgresClient.getInstance(vertx, tenant).save("filters", filter);
+    return PostgresClient.getInstance(vertx, TENANT).save("filters", filter);
   }
 
   protected Future<String> insertCredential() {
@@ -172,7 +171,7 @@ public abstract class AbstractEZBHarvestTest extends ApiTestBase {
             .withPassword("password")
             .withLibId("libId")
             .withIsil(isil);
-    return PostgresClient.getInstance(vertx, tenant).save("ezb_credentials", credential);
+    return PostgresClient.getInstance(vertx, TENANT).save("ezb_credentials", credential);
   }
 
   protected Future<FincSelectFilter> insertEZBFile(String content, String fileId, Date date) {
