@@ -1,0 +1,19 @@
+#%RAML 1.0
+title: Finc Config EZB Harvest
+baseUri: http://github.com/org/folio/mod-finc-config
+
+documentation:
+  - title: mod-finc-config EZB Harvest API
+    content: This documents the API call that harvests the EZB holding file of a single tenant. It is invoked periodically via the _timer interface and is not meant to be called by clients.
+
+/finc-config/ezb-harvest:
+  post:
+    description: Harvest the EZB holding file for the tenant given by X-Okapi-Tenant
+    responses:
+      204:
+        description: "Harvest finished, or nothing to harvest for this tenant"
+      500:
+        description: "Internal server error"
+        body:
+          text/plain:
+            example: "Internal server error"

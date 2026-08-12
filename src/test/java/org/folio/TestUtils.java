@@ -71,13 +71,8 @@ public class TestUtils {
 
   public static void deployRestVerticle()
       throws ExecutionException, InterruptedException, TimeoutException {
-    deployRestVerticle(true);
-  }
-
-  public static void deployRestVerticle(boolean isTesting)
-      throws ExecutionException, InterruptedException, TimeoutException {
     DeploymentOptions options = new DeploymentOptions();
-    options.setConfig(new JsonObject().put("http.port", verticlePort).put("testing", isTesting));
+    options.setConfig(new JsonObject().put("http.port", verticlePort));
     deploymentId =
         vertx
             .deployVerticle(RestVerticle.class.getName(), options)

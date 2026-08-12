@@ -161,11 +161,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.quartz-scheduler</groupId>
-      <artifactId>quartz</artifactId>
-      <version>2.4.0</version>
-    </dependency>
-    <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
       <version>3.9.9</version>
@@ -559,7 +554,9 @@
             <exclude>**/*IT.java</exclude>
           </excludes>
           <environmentVariables>
-            <EZB_DOWNLOAD_URL>http://localhost?libId=%s</EZB_DOWNLOAD_URL>
+            <!-- port 1 is never bound, so harvesting against it always fails: this lets
+                 FincConfigEZBHarvestAPIIT assert that a timer call reached the download -->
+            <EZB_DOWNLOAD_URL>http://localhost:1?libId=%s</EZB_DOWNLOAD_URL>
           </environmentVariables>
         </configuration>
       </plugin>
