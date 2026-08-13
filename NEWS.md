@@ -1,4 +1,6 @@
 # 7.1.0 (IN PROGRESS)
+* [UIFC-409](https://folio-org.atlassian.net/browse/UIFC-409) Utilize timer interface instead of Quartz
+* [UIFC-409](https://folio-org.atlassian.net/browse/UIFC-409) Look up ezb credentials by exact isil match, backed by a unique index on isil
 * [UIFC-502](https://folio-org.atlassian.net/browse/UIFC-502) Remove optional `version` property from RAML files
 
 # 7.0.0

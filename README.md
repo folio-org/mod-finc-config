@@ -274,18 +274,25 @@ QUARKUS_HTTP_LIMITS_MAX_BODY_SIZE: 100M
 This module can harvest holding files from the *Elektronische Zeitschriftenbibliothek (EZB)*
 periodically.
 
-The harvester will run each night at 1am automatically. In order to activate automatic harvesting
-for a certain tenant/library you need to define a filter called `EZB holdings` in finc-select. This
-filter needs to have a file called `EZB file`. In addition, EZB credentials need to be defined for
-the same tenant.
+Harvesting is scheduled by the platform via the `_timer` interface, which calls
+`POST /finc-config/ezb-harvest` once per tenant, each night at 1am UTC. In order to activate
+automatic harvesting for a certain tenant/library you need to define a filter called `EZB holdings`
+in finc-select. This filter needs to have a file called `EZB file`. In addition, EZB credentials
+need to be defined for the same tenant.
 
-With this, the harvesting works as follows: The harvester fetches the EZB credentials of each tenant
-and will harvest the holding file the tenants from the EZB. It will compare the downloaded holding
-file with the file called `EZB file` of the filter `EZB holdings`. If both files differ, the `EZB
-file` will be updated by the downloaded one. If the files are equal, nothing will be done.
+With this, the harvesting works as follows: The harvester looks up the isil of the tenant and its
+EZB credentials, and harvests the tenant's holding file from the EZB. It will compare the downloaded
+holding file with the file called `EZB file` of the filter `EZB holdings`. If both files differ, the
+`EZB file` will be updated by the downloaded one. If the files are equal, nothing will be done. If
+the tenant has no isil or no EZB credentials, nothing will be done.
 
 Thus, to activate harvesting of holding files you need to define EZB credentials and add a filter
 called `EZB holdings` with a file called `EZB file`.
+
+Under Okapi the schedule can be inspected, changed or disabled per tenant at runtime via
+`/_/proxy/tenants/{tenant}/timers`, without redeploying the module. Under Eureka it can be inspected
+via mod-scheduler's `/scheduler/timers`, but system timers are internal-only there and cannot be
+changed through that API.
 
 The EZB URL needs to be configured using the environment variable `EZB_DOWNLOAD_URL`. This URL must include a `%s`
 placeholder, which will be substituted with the `bidId` when processing requests.

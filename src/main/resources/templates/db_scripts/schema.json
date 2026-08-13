@@ -218,6 +218,12 @@
       "tableName": "ezb_credentials",
       "fromModuleVersion": "mod-finc-config-2.0.0",
       "withMetadata": true,
+      "uniqueIndex": [
+        {
+          "fieldName": "isil",
+          "tOps": "ADD"
+        }
+      ],
       "fullTextIndex": [
         {
           "fieldName": "user",
